@@ -1,6 +1,6 @@
 $( document ).ready(function() {
     // Initialize map        
-    let mymap = L.map('mapid').setView([30.267153, -97.7430608], 13);
+    let mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -10,19 +10,37 @@ $( document ).ready(function() {
     }).addTo(mymap);
     
     
-    // add marker to map at barton hills park place
-    let marker = L.marker([30.2623, -97.7740]).addTo(mymap);
+    // add marker to map at Mountain View Public Librarys
+    let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
   
 });
 
+
 // BikeRack class, do we need this?
 class BikeRack {
-    constructor() {
+    constructor(lat, long) {
+        let self = this;
+        self.lat = lat;
+        self.long = long;
     }
 }
 
-function addMarker(lat, long) {
+function addMarker() {
     // add marker at lat, long (for a bike rack)
+    
 }
 
+function markerInfo() {
+    // When you click on a marker, you get info like
+    // photos, user comments on bike rack,
+    // if it is located in front of a building or behind
+}
+
+function addPhoto() {
+    // Add photo of bike rack
+}
+
+function addReview() {
+    // Add bike rack review
+}
 

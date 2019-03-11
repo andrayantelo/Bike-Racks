@@ -12,6 +12,8 @@ $( document ).ready(function() {
     
     // add marker to map at Mountain View Public Librarys
     let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
+    
+     
   
 });
 
@@ -22,8 +24,20 @@ class BikeRack {
         let self = this;
         self.lat = lat;
         self.long = long;
+        
+        // shorcuts to DOM elements
+        self.$addMarkerCard = $('#addMarkerCard');
+        self.$addMarkerLink = $('#addMarkerLink');
+        
+        // Click handlers for the DOM
+        //self.$addMarkerNavLink.click(self.addMarker.bind(self));
+        self.$addMarkerLink.click(function() {
+            alert( "Handler for .click() called." );
+        });
+       
     }
-}
+
+
 
 // A user should be able to add a marker somewhere, but it would be
 // more like request to add a marker, then a preliminary marker is
@@ -33,22 +47,33 @@ class BikeRack {
 // on the map at a time, the rest are put in a backlog and will be placed
 // on the map as markers get approved or rejected
 
-function addMarker() {
+    addMarker() {
     // add marker at lat, long (for a bike rack)
-    
-}
+    // When Add Marker is clicked on the navbar, make #addMarker card
+    // visible
+        console.log("Running addMarker");
+        self.$addMarkerCard.css({display: flex});
+    }
 
-function markerInfo() {
+    markerInfo() {
     // When you click on a marker, you get info like
     // photos, user comments on bike rack,
     // if it is located in front of a building or behind
-}
+    }
 
-function addPhoto() {
+    addPhoto() {
     // Add photo of bike rack
+    }
+
+    addReview() {
+    // Add bike rack review
+    }
+
 }
 
-function addReview() {
-    // Add bike rack review
+// BikeRackCollection Class
+class BikeRackCollection {
+    constructor() {
+    }
 }
 

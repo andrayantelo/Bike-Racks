@@ -25,6 +25,14 @@ class BikeRack {
     }
 }
 
+// A user should be able to add a marker somewhere, but it would be
+// more like request to add a marker, then a preliminary marker is
+// added in the location, and it will only become a fully fledged marker
+// when enough people verify that a bike rack actually exists at that
+// location. There can only be a select number of preliminary markers
+// on the map at a time, the rest are put in a backlog and will be placed
+// on the map as markers get approved or rejected
+
 function addMarker() {
     // add marker at lat, long (for a bike rack)
     

@@ -1,8 +1,23 @@
 #mapid { 
-  height: 100vmax; 
+  flex: 1;
+  height: 100vmax;
 }
 
 .navbar-light {
   background-color: #e3f2fd;
+}
+
+.container {
+  display: flex;
+  /*flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: stretch;
+  align-content: center;*/
+}
+
+.card {
+  width: 18rem;
+  /* default display is flex */
+  display: none;
 }
 

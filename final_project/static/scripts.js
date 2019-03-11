@@ -13,12 +13,23 @@ $( document ).ready(function() {
     // add marker to map at Mountain View Public Librarys
     let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
     
-     
+    
+    // Make instance of BikeRackCollection
+    bikeRackCollection = new BikeRackColletion();
+    
+        
+    // automatically add a mountain view library bike rack to bike rack collection class
+    // for testing purposes Todo
   
 });
 
 
-// BikeRack class, do we need this?
+// Todo probably need some kind of object (like my emptyCalendarState in
+// other project) that stores relevant information of a bike rack (like lat
+// and long), and this info can be used to create a BikeRack object, and it
+// will be the object that is stored in our database (as a JSON object).
+
+// BikeRack class
 class BikeRack {
     constructor(lat, long) {
         let self = this;
@@ -74,6 +85,19 @@ class BikeRack {
 // BikeRackCollection Class
 class BikeRackCollection {
     constructor() {
+        let this = self;
+        
+        self.bikeRackList = [];
+    }
+    
+    addBikeRack() {
+        // Add a bike rack to the collection Todo
+        
+    }
+    
+    removeBikeRack() {
+        // Remove bike rack from the collection
     }
 }
+
 

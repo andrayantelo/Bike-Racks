@@ -15,7 +15,7 @@ $( document ).ready(function() {
     
     
     // Make instance of BikeRackCollection
-    bikeRackCollection = new BikeRackColletion();
+    //bikeRackCollection = new BikeRackColletion();
     
         
     // automatically add a mountain view library bike rack to bike rack collection class
@@ -28,6 +28,36 @@ $( document ).ready(function() {
 // other project) that stores relevant information of a bike rack (like lat
 // and long), and this info can be used to create a BikeRack object, and it
 // will be the object that is stored in our database (as a JSON object).
+
+
+// checks if value is a valid latitudinal coordinate
+let isLat = lat => !Number.isNaN(Number.parseFloat(lat)) && (lat <=90 && lat >=-90)
+
+// checks if value is valid longitudinal coordinate
+let isLong = long => !Number.isNaN(Number.parseFloat(long)) && (long <=180 && long >= -180)
+
+
+let emptyBikeState = function(params) {
+    // params = {
+    //   lat: float,
+    //    long: float
+    // }
+    if ($.isEmptyObject(params)) {
+        return {}
+    }
+    //try {
+    //    for (val in params) {
+    //        isNumber(params[val])
+    //    }
+    //}
+    //catch(e) {
+    //    console.log("error " + e);
+    //}
+    //return {
+    //    lat: params.lat,
+    //    long: params.long
+    //}
+}
 
 // BikeRack class
 class BikeRack {
@@ -85,7 +115,7 @@ class BikeRack {
 // BikeRackCollection Class
 class BikeRackCollection {
     constructor() {
-        let this = self;
+        let self = this;
         
         self.bikeRackList = [];
     }

@@ -29,7 +29,6 @@ $( document ).ready(function() {
 // and long), and this info can be used to create a BikeRack object, and it
 // will be the object that is stored in our database (as a JSON object).
 
-
 // checks if value is a valid latitudinal coordinate
 let isLat = lat => !Number.isNaN(Number.parseFloat(lat)) && (lat <=90 && lat >=-90)
 
@@ -45,18 +44,13 @@ let emptyBikeState = function(params) {
     if ($.isEmptyObject(params)) {
         return {}
     }
-    //try {
-    //    for (val in params) {
-    //        isNumber(params[val])
-    //    }
-    //}
-    //catch(e) {
-    //    console.log("error " + e);
-    //}
-    //return {
-    //    lat: params.lat,
-    //    long: params.long
-    //}
+    if (!(isLat(params.lat) && isLong(params.long))) {
+        return {}
+    }
+    return {
+        lat: params.lat,
+        long: params.long
+    }
 }
 
 // BikeRack class

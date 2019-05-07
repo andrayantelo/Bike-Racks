@@ -20,7 +20,6 @@ QUnit.test("latitudinal value test", function(assert) {
     assert.notOk(isLat(NaN));
     assert.notOk(isLat(undefined));
     assert.notOk(isLat(null));
-    
 });
 
 QUnit.test("longitudinal value test", function(assert) {
@@ -37,6 +36,8 @@ QUnit.test("longitudinal value test", function(assert) {
     assert.notOk(isLong(NaN));
     assert.notOk(isLong(undefined));
     assert.notOk(isLong(null));
-    
 });
 
+QUnit.test("emtpyBikeRack test", function(assert) {
+    assert.expect(0);
+});

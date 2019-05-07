@@ -24,10 +24,9 @@ $( document ).ready(function() {
 });
 
 
-// Todo probably need some kind of object (like my emptyCalendarState in
-// other project) that stores relevant information of a bike rack (like lat
-// and long), and this info can be used to create a BikeRack object, and it
-// will be the object that is stored in our database (as a JSON object).
+// Todo maybe combine isLat and isLong into one function, is Coordinate
+// when a user adds a marker they provide coordinates, maybe a title?
+// address?
 
 // checks if value is a valid latitudinal coordinate
 let isLat = lat => !Number.isNaN(Number.parseFloat(lat)) && (lat <=90 && lat >=-90)

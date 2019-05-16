@@ -1,4 +1,6 @@
 // Qunit JS file
+// Run begin before test suite begins
+// details: { totalTests }
 QUnit.begin(function( details ) {
   console.log( "Test amount:", details.totalTests );
   $('#qunit-fixture').append('<div id="mapid"></div>');
@@ -7,6 +9,7 @@ QUnit.begin(function( details ) {
 QUnit.module("helper functions tests");
 
 QUnit.test("latitudinal value test", function(assert) {
+    // test
     assert.expect(11);
     assert.ok(isLat(-90));
     assert.notOk(isLat(-180));

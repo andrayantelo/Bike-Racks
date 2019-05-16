@@ -23,8 +23,6 @@ $( document ).ready(function() {
   
 });
 
-
-// Todo maybe combine isLat and isLong into one function, is Coordinate
 // when a user adds a marker they provide coordinates, maybe a title?
 // address?
 
@@ -74,8 +72,9 @@ class BikeRack {
 
 
 // A user should be able to add a marker somewhere, but it would be
-// more like request to add a marker, then a preliminary marker is
-// added in the location, and it will only become a fully fledged marker
+// more like request to add a marker, then a preliminary marker (maybe
+// yellow in color) is
+// added in the location, and it will only become a fully fledged marker (green)
 // when enough people verify that a bike rack actually exists at that
 // location. There can only be a select number of preliminary markers
 // on the map at a time, the rest are put in a backlog and will be placed

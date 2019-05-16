@@ -31,3 +31,27 @@ def close_db(e=None):
     
     if db is not None:
         db.close();
+    
+# open_resouce() opens a file relative to the flaskr package, which is
+# useful since you won't necessarily know where that location is when
+# deploying the application later. get_db returns a database connection,
+# which is used to execute the commands read from the file.
+
+#Click is a python package for creating command line interfaces
+# Installing Flask installs the flask script, which is a click CLI, in
+# your virtualenv
+
+#click.command() defines a command line command called init-db that calls
+# the init_db function and shows a success message to the user.
+def init_db():
+    db = get_db()
+    
+    with current_app.open_resource('schema.sql') as f:
+        db.executescript(f.read().decode('utf8'))
+    
+@click.command('init-db')
+@with_appcontext
+def init_db_command():
+    """ Clear the existing data and create new tables."""
+    init_db()
+    click.echo('Initialized the database.')

@@ -15,7 +15,14 @@ $( document ).ready(function() {
     
     
     // Make instance of BikeRackCollection
-    //bikeRackCollection = new BikeRackColletion();
+    bikeRackCollection = new BikeRackCollection();
+    
+    // when addMarker is clicked then we need to make a new emptyBikeState
+    // for a bikeRack. 
+    $('#submitButton').click(function() {
+        console.log("submit button clicked");
+        
+    });
     
         
     // automatically add a mountain view library bike rack to bike rack collection class
@@ -36,7 +43,7 @@ let isLong = long => !Number.isNaN(Number.parseFloat(long)) && (long <=180 && lo
 let emptyBikeState = function(params) {
     // params = {
     //   lat: float,
-    //    long: float
+    //   long: float
     // }
     if ($.isEmptyObject(params)) {
         return {}
@@ -58,14 +65,13 @@ class BikeRack {
         self.long = long;
         
         // shorcuts to DOM elements
-        self.$addMarkerCard = $('#addMarkerCard');
-        self.$addMarkerLink = $('#addMarkerLink');
+        self.$submitCoordinatesButton = $('#submitCoordinatesButton');
+        
         
         // Click handlers for the DOM
         //self.$addMarkerNavLink.click(self.addMarker.bind(self));
-        self.$addMarkerLink.click(function() {
-            alert( "Handler for .click() called." );
-        });
+        //self.$submitCoordinatesButton.click(function() {
+
        
     }
 

@@ -52,11 +52,8 @@
               </ul>
           </div>
       </nav>
-      
-      <!-- TODO -->
     
-
-      <!-- Modal -->
+      <!-- Modal, has to be at top level which is why it's not in the container div-->
       <div class="modal fade" id="coordinateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -79,29 +76,18 @@
       </div> <!-- /.modal-body -->
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" type="submit">Submit</button>
+        <button type="button" class="btn btn-primary" id="submitButton" type="submit">Submit</button>
       </div> <!-- /.modal-footer -->
     </div> <!-- /.modal-content -->
   </div> <!-- /.modal-dialog -->
 </div> <!-- /.modal fade -->
-      
-      <!-- /TODO -->
 
- 
-      
-      <div class="container"> <!-- flexbox container -->
+       
+      <div class="container"> 
           <div id="mapid"></div>
           
-          <div class="card" id="addMarkerCard">
-              <img src="..." class="card-img-top" alt="...">
-              <div class="card-body">
-                  <h5 class ="card-title">Card title</h5>
-                  <p class="card-text">Here we will give options
-                  for adding a marker.</p>
-                  <a href="#" class="btn btn-primary">Add Marker</a>
-              </div>
-          </div>
-      </div>
+          
+      </div> <!-- /.container -->
       
   </body>
   

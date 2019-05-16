@@ -1,6 +1,6 @@
 $( document ).ready(function() {
     // Initialize map        
-    let mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
+    const mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -14,13 +14,22 @@ $( document ).ready(function() {
     let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
     
     
+    // When the website loads, need to have an instance of BikeRax made right away
+    let bikerax = new BikeRax();
+    
+    
     // Make instance of BikeRackCollection
-    bikeRackCollection = new BikeRackCollection();
+    //const bikeRackCollection = new BikeRackCollection();
+    //console.log(JSON.stringify(bikeRackCollection.pendingBikeRacks));
     
     // when addMarker is clicked then we need to make a new emptyBikeState
     // for a bikeRack. 
     $('#submitButton').click(function() {
         console.log("submit button clicked");
+        console.log($('#latitude').val());
+        // Need to validate and sanitize the latitude and longitude values
+        // make a new emptyBikeState
+        //let newBikeRack = emptyBikeState(
         
     });
     
@@ -33,11 +42,13 @@ $( document ).ready(function() {
 // when a user adds a marker they provide coordinates, maybe a title?
 // address?
 
+// Helper Functions
+
 // checks if value is a valid latitudinal coordinate
-let isLat = lat => !Number.isNaN(Number.parseFloat(lat)) && (lat <=90 && lat >=-90)
+let isLat = lat => !Number.isNaN(Number.parseFloat(lat)) && (lat <=90 && lat >=-90);
 
 // checks if value is valid longitudinal coordinate
-let isLong = long => !Number.isNaN(Number.parseFloat(long)) && (long <=180 && long >= -180)
+let isLong = long => !Number.isNaN(Number.parseFloat(long)) && (long <=180 && long >= -180);
 
 
 let emptyBikeState = function(params) {
@@ -55,7 +66,7 @@ let emptyBikeState = function(params) {
         lat: params.lat,
         long: params.long
     }
-}
+};
 
 // BikeRack class
 class BikeRack {
@@ -108,14 +119,16 @@ class BikeRack {
     // Add bike rack review
     }
 
-}
+};
 
 // BikeRackCollection Class
 class BikeRackCollection {
     constructor() {
         let self = this;
         
-        self.bikeRackList = [];
+        self.approvedBikeRacks = [];
+        self.pendingBikeRacks = [];
+        self.rejectedBikeRacks = [];
     }
     
     addBikeRack() {
@@ -126,6 +139,19 @@ class BikeRackCollection {
     removeBikeRack() {
         // Remove bike rack from the collection
     }
-}
+};
 
-
+//BikeRax is the class for the overall website. It will include functions
+// that manipulate html, or add functionality
+class BikeRax {
+    constructor() {
+        let self = this;
+        
+        self.initBikeRax();
+    }
+    
+    initBikeRax() {
+        console.log("Initializing BikeRax");
+        // Load BikeRackCollection state from storage
+    }
+};

@@ -16,5 +16,16 @@ from werkzeug.exceptions import abort
 #from flaskr.auth import login_required
 from flaskr.db import get_db
 
-bp = Blueprint('map', __name__)
+bp = Blueprint('marker', __name__)
 # Creates a Blueprint named 'map' defined inside of __name__
+
+# The URL we are at when we add a marker is just... home
+# in other words just '/' 
+
+@bp.route('/', methods=('GET', 'POST'))
+def addMarker():
+    # add coordinates to database (for now we aren't
+    # sanitizing the data)
+    if request.method == 'POST':
+        print(request.form['latitude'])
+        print(request.form['longitude'])

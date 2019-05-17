@@ -41,6 +41,9 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
     
+    # Import and register marker blueprint
+    from . import marker
+    app.register_blueprint(marker.bp)
     
         
     return app

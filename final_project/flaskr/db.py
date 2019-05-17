@@ -45,13 +45,24 @@ def close_db(e=None):
 # the init_db function and shows a success message to the user.
 def init_db():
     db = get_db()
-    
+
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
-    
+
+
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
-    """ Clear the existing data and create new tables."""
+    """Clear the existing data and create new tables."""
     init_db()
     click.echo('Initialized the database.')
+    
+# Register close_db and init_db_command with the application instance
+# otherwise they won't be used by the application
+
+def init_app(app):
+    # tells flask to call close_db when cleaning up after returning
+    # the response
+    app.teardown_appcontext(close_db)
+    # adds a new command that can be called with the flask command
+    app.cli.add_command(init_db_command)

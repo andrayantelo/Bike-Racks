@@ -38,4 +38,10 @@ def create_app(test_config=None):
     def test_page(name=None):
         return render_template('tests.html', name=name)
         
+    from . import db
+    db.init_app(app)
+    
+    
+        
     return app
+

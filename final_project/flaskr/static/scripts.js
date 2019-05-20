@@ -1,13 +1,14 @@
 // Leaflet Map
-let map;
+let mymap;
 
 // Markers for map
 let markers = [];
+let tempMarker = {};
 
 
 $(document).ready(function() {
     // Initialize map        
-    map = L.map('mapid').setView([37.3861, -122.0839], 13);
+    mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -16,9 +17,37 @@ $(document).ready(function() {
         accessToken: 'pk.eyJ1IjoiYW5kcmF5YW50ZWxvIiwiYSI6ImNqczB1YTJ6ajFuNGo0M2x2eTVpNms1MHEifQ.1SbExoA1iGNdOKDRoG4Qng'
     }).addTo(mymap);
     
+    // set styling options for map markers
+    const tempMarkerColor = #808080;
+    const pendingMarkerColor = #FFD700;
+    const approvedMarkerColor = #008000;
+    const rejectedMarkerColor = #FF0000;
+    
     
     // add marker to map at Mountain View Public Librarys
-    let marker = L.marker([37.3903, -122.0836]).addTo(smap);
+    let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
+    
+    // when you click on a random spot on the map
+    // we need a temporary marker to be added there, like a 
+    // gray one, have a popup show up with the coordinates
+    // and a button that says "add bike rack"
+    
+    function onMapClick(e) {
+        console.log("You clicked the map at " + e.latlng);
+        console.log(JSON.stringify(e.latlng.lat));
+        console.log(JSON.stringify(e.latlng.lng));
+        
+        // if there is already a tempMarker, remove it
+        if (tempMarker !== undefined) {
+            mymap.removeLayer(tempMarker);
+        }
+        
+        tempMarker = L.marker([e.latlng.lat, e.latlng.lng]);
+        tempMarker.addTo(mymap);
+        // when you click away the temporary marker needs to be removed.
+    }
+    
+    mymap.on('click', onMapClick);
     
     
     // When the website loads, need to have an instance of BikeRax made right away

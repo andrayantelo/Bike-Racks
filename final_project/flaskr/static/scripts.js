@@ -4,6 +4,27 @@ let mymap;
 // Markers for map
 let markers = []; 
 
+// Colors for different types of markers
+const tempMarkerColor = '#808080';
+const pendingMarkerColor = '#FFD700';
+const approvedMarkerColor = '#008000';
+const rejectedMarkerColor = '#FF0000';
+
+// temporary marker for when person clicks random spot on map
+let tempMarker = {};
+
+let tempIcon = L.AwesomeMarkers.icon({
+    prefix: 'fa',
+    icon: 'bicycle',
+    markerColor: 'gray'
+});
+
+let approvedIcon = L.AwesomeMarkers.icon({
+    prefix: 'fa',
+    icon: 'bicycle',
+    markerColor: 'green'
+});
+
 
 $(document).ready(function() {
     // Initialize map        
@@ -16,42 +37,17 @@ $(document).ready(function() {
         accessToken: 'pk.eyJ1IjoiYW5kcmF5YW50ZWxvIiwiYSI6ImNqczB1YTJ6ajFuNGo0M2x2eTVpNms1MHEifQ.1SbExoA1iGNdOKDRoG4Qng'
     }).addTo(mymap);
     
-    // set styling options for map markers
-    //const tempMarkerColor = '#808080';
-    //const pendingMarkerColor = '#FFD700';
-    //const approvedMarkerColor = '#008000';
-    //const rejectedMarkerColor = '#FF0000';
     
-    /*let tempIcon = L.AwesomeMarkers.icon({
-        icon: 'bicycle',
-        markerColor: tempMarkerColor
-    });*/
-    
-    
-    var tempIcon = L.AwesomeMarkers.icon({
-        prefix: 'fa',
-        icon: 'bicycle',
-        markerColor: 'gray'
-    });
-    
-    console.log(JSON.stringify(tempIcon));
-      
-    let marker = L.marker([37.3861, -122.0839], {icon: tempIcon}).addTo(mymap);
-    
-    
-    
-    // add marker to map at Mountain View Public Librarys
-    //let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
+    // add marker to map at Mountain View Public Librarys TODO, remove later
+    let marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(mymap);
     
     // when you click on a random spot on the map
     // we need a temporary marker to be added there, like a 
     // gray one, have a popup show up with the coordinates
     // and a button that says "add bike rack"
     
-    /*function onMapClick(e) {
+    function onMapClick(e) {
         console.log("You clicked the map at " + e.latlng);
-        console.log(JSON.stringify(e.latlng.lat));
-        console.log(JSON.stringify(e.latlng.lng));
         
         // if there is already a tempMarker, remove it
         if (tempMarker !== undefined) {
@@ -60,10 +56,9 @@ $(document).ready(function() {
         
         tempMarker = L.marker([e.latlng.lat, e.latlng.lng], {icon: tempIcon});
         tempMarker.addTo(mymap);
-        // when you click away the temporary marker needs to be removed.
-    }*/
+    }
     
-    //mymap.on('click', onMapClick);
+    mymap.on('click', onMapClick);
     
     
     // When the website loads, need to have an instance of BikeRax made right away

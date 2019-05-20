@@ -2,8 +2,7 @@
 let mymap;
 
 // Markers for map
-let markers = [];
-let tempMarker = {};
+let markers = []; 
 
 
 $(document).ready(function() {
@@ -18,21 +17,38 @@ $(document).ready(function() {
     }).addTo(mymap);
     
     // set styling options for map markers
-    const tempMarkerColor = #808080;
-    const pendingMarkerColor = #FFD700;
-    const approvedMarkerColor = #008000;
-    const rejectedMarkerColor = #FF0000;
+    //const tempMarkerColor = '#808080';
+    //const pendingMarkerColor = '#FFD700';
+    //const approvedMarkerColor = '#008000';
+    //const rejectedMarkerColor = '#FF0000';
+    
+    /*let tempIcon = L.AwesomeMarkers.icon({
+        icon: 'bicycle',
+        markerColor: tempMarkerColor
+    });*/
+    
+    
+    var tempIcon = L.AwesomeMarkers.icon({
+        prefix: 'fa',
+        icon: 'bicycle',
+        markerColor: 'gray'
+    });
+    
+    console.log(JSON.stringify(tempIcon));
+      
+    let marker = L.marker([37.3861, -122.0839], {icon: tempIcon}).addTo(mymap);
+    
     
     
     // add marker to map at Mountain View Public Librarys
-    let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
+    //let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
     
     // when you click on a random spot on the map
     // we need a temporary marker to be added there, like a 
     // gray one, have a popup show up with the coordinates
     // and a button that says "add bike rack"
     
-    function onMapClick(e) {
+    /*function onMapClick(e) {
         console.log("You clicked the map at " + e.latlng);
         console.log(JSON.stringify(e.latlng.lat));
         console.log(JSON.stringify(e.latlng.lng));
@@ -42,16 +58,16 @@ $(document).ready(function() {
             mymap.removeLayer(tempMarker);
         }
         
-        tempMarker = L.marker([e.latlng.lat, e.latlng.lng]);
+        tempMarker = L.marker([e.latlng.lat, e.latlng.lng], {icon: tempIcon});
         tempMarker.addTo(mymap);
         // when you click away the temporary marker needs to be removed.
-    }
+    }*/
     
-    mymap.on('click', onMapClick);
+    //mymap.on('click', onMapClick);
     
     
     // When the website loads, need to have an instance of BikeRax made right away
-    let bikerax = new BikeRax();
+    //let bikerax = new BikeRax();
     
     
     // Make instance of BikeRackCollection
@@ -60,14 +76,14 @@ $(document).ready(function() {
     
     // when addMarker is clicked then we need to make a new emptyBikeState
     // for a bikeRack. 
-    $('#submitButton').click(function() {
-        console.log("submit button clicked");
-        console.log($('#latitude').val());
+    //$('#submitButton').click(function() {
+    //    console.log("submit button clicked");
+    //    console.log($('#latitude').val());
         // Need to validate and sanitize the latitude and longitude values
         // make a new emptyBikeState
         //let newBikeRack = emptyBikeState(
         
-    });
+    //});
     
         
     // automatically add a mountain view library bike rack to bike rack collection class

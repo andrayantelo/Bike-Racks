@@ -32,7 +32,7 @@ def create_app(test_config=None):
 
     @app.route('/')
     def home_page(name=None):
-        return render_template('index.html', name=name)
+        return render_template('base.html', name=name)
     
     @app.route('/tests')
     def test_page(name=None):

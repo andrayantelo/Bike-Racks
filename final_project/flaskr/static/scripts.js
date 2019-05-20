@@ -1,6 +1,13 @@
-$( document ).ready(function() {
+// Leaflet Map
+let map;
+
+// Markers for map
+let markers = [];
+
+
+$(document).ready(function() {
     // Initialize map        
-    const mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
+    map = L.map('mapid').setView([37.3861, -122.0839], 13);
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -11,7 +18,7 @@ $( document ).ready(function() {
     
     
     // add marker to map at Mountain View Public Librarys
-    let marker = L.marker([37.3903, -122.0836]).addTo(mymap);
+    let marker = L.marker([37.3903, -122.0836]).addTo(smap);
     
     
     // When the website loads, need to have an instance of BikeRax made right away
@@ -36,6 +43,9 @@ $( document ).ready(function() {
         
     // automatically add a mountain view library bike rack to bike rack collection class
     // for testing purposes Todo
+    
+    // Whenever the page is loaded, the map needs to be updated with new
+    // markers
   
 });
 

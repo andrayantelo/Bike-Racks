@@ -25,6 +25,14 @@ let approvedIcon = L.AwesomeMarkers.icon({
     markerColor: 'green'
 });
 
+function popupContent(lat, long) {
+    let content = 
+        `<div id="lat">${lat}, </div><div id="long">${long}</div>
+        <button type="button" class="btn btn-primary" id="submitButton" type="submit">Submit</button>
+        `
+    return content
+}
+
 
 $(document).ready(function() {
     // Initialize map        
@@ -54,11 +62,20 @@ $(document).ready(function() {
             mymap.removeLayer(tempMarker);
         }
         
+        // add the temporary  marker at coordinates
         tempMarker = L.marker([e.latlng.lat, e.latlng.lng], {icon: tempIcon});
         tempMarker.addTo(mymap);
+        
+        let content = popupContent(e.latlng.lat, e.latlng.lng);
+        console.log(content);
+        // enable popup that shows coordinates and 'add bike rack' button
+        tempMarker.bindPopup(content).openPopup();
+        
     }
     
     mymap.on('click', onMapClick);
+    
+    
     
     
     // When the website loads, need to have an instance of BikeRax made right away

@@ -25,12 +25,12 @@ let approvedIcon = L.AwesomeMarkers.icon({
     markerColor: 'green'
 });
 
-function popupContent(lat, long) {
+function popupContent(lat, lng) {
     let content = 
-        `<form id="tempForm">
-           <div id="lat">${lat}, </div><div id="long">${long}</div>
-           <input id="submitButton" type="submit"></button>
-        </form>
+        `<div id="tempForm">
+           <div id="lat">${lat}</div> <span>,</span> <div id="lng">${lng}</div>
+           <button id="submitButton" type="submit">Submit</button>
+        </div>
         `
     return content
 }

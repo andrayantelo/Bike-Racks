@@ -113,7 +113,10 @@
          $.ajax({
              method: 'POST',
              url: {{ url_for('bikes.check_coordinates')|tojson }},
-             data: $(this).serialize()
+             data: {
+                 lat: $('#lat').text(),
+                 lng: $('#lng').text()
+             }
          }).done(addShow)
      }
      

@@ -28,14 +28,18 @@ def check_coordinates():
     if request.method == 'POST':
     # will probably need a connection to the database to check
     # if the given coordinates are already in there
-    #db = get_db()
+        db = get_db()
         print("request method is post")
         
-        q = request.args
-        print("here is query: {}".format(q))
+        
         lat = request.form.get('lat', 0, type=float)
+        lng = request.form.get('lng', 0, type=float)
         print("lat: {}".format(lat))
+        print("long: {}".format(lng))
+        
+        # let's try saving into database
+        
         
     # will need some kind of update map function
         
-    return render_template('base.html') 
+    return "got {}".format(request.form)

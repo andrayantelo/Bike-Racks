@@ -84,7 +84,7 @@
       </div> <!-- /.modal-body -->
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="submitButton" type="submit">Submit</button>
+        <!--<button type="button" class="btn btn-primary" id="submitButton" type="submit">Submit</button> -->
       </div> <!-- /.modal-footer -->
     </div> <!-- /.modal-content -->
   </div> <!-- /.modal-dialog -->
@@ -93,8 +93,7 @@
        
       <div class="container"> 
           <div id="mapid"></div>
-          
-          
+        
       </div> <!-- /.container -->
       
   </body>
@@ -104,5 +103,27 @@
   <!-- Awesome Markers JS -->
   <script src="../static/dist/leaflet.awesome-markers.js"></script>
   <script src="../static/scripts.js"></script>
+  
+  <!-- Javascript that relies on jinja/flask -->
+  <script>
+     function addSubmit(e) {
+         console.log("submit button clicked");
+         console.log("this: " + JSON.stringify(this));
+         e.preventDefault();
+         $.ajax({
+             method: 'POST',
+             url: {{ url_for('bikes.check_coordinates')|tojson }},
+             data: $(this).serialize()
+         }).done(addShow)
+     }
+     
+     function addShow(data) {
+         console.log("data: " + data);
+     }
+    
+    // add submit button click handler
+    $('#mapid').on('click', '#submitButton', addSubmit);
+    
+  </script>
   
 </html>

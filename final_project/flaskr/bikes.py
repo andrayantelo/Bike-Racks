@@ -38,6 +38,10 @@ def check_coordinates():
         print("long: {}".format(lng))
         
         # let's try saving into database
+        if lat != 0 and lng != 0:
+            print("saving into database")
+            db.execute('INSERT INTO bikeracks (latitude, longitude) VALUES (?, ?);', (lat, lng))
+            db.commit()
         
         
     # will need some kind of update map function

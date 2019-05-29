@@ -38,7 +38,7 @@ def check_coordinates():
         print("long: {}".format(lng))
         
         # let's try saving into database
-        if lat != 0 and lng != 0:
+        if isinstance(lat, float) and isinstance(lng, float):
             print("saving into database")
             db.execute('INSERT INTO bikeracks (latitude, longitude) VALUES (?, ?);', (lat, lng))
             db.commit()

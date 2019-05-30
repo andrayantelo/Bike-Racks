@@ -43,3 +43,24 @@ def validate_coordinates(coordinates):
         
     # return true if all tests passed
     return True
+    
+# function that checks if coordinates already exist in the database
+def check_database(coordinates, database, table_name):
+    # pass in a tuple of the coordinates (lat, lng)
+    # and a database connection object
+    # and the name of the database table you are querying
+    lat, lng = coordinates
+    # make a cursor object
+    cur = database.cursor()
+    
+    # construct query
+    query = "SELECT latitude, longitude FROM {} WHERE latitude = {} AND longitude = {} ".format(table_name, lat, lng)
+    
+    database.execute(query)
+    result = cur.fetchone()
+    
+    if result:
+        print("record exists")
+    else:
+        print("record does not exist")
+    

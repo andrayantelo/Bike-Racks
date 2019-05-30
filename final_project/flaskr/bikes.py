@@ -15,6 +15,8 @@ from flask import (
     jsonify
 )
 
+import helpers as h
+
 from flaskr.db import get_db
 # __name__ is passed as 2nd arg so that bp knows where it is defined
 # __name__ evaluates to to the name of the current module
@@ -38,7 +40,8 @@ def check_coordinates():
         print("long: {}".format(lng))
         
         # First check if these coordinates are valid
-        if isinstance(lat, float) and isinstance(lng, float):
+        if h.validate_coordinates((lat, lng)):
+            # if they are valid, check if they are already in the database
             print("saving into database")
             db.execute('INSERT INTO bikeracks (latitude, longitude) VALUES (?, ?);', (lat, lng))
             db.commit()

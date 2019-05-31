@@ -54,7 +54,8 @@ def check_database(coordinates, database, table_name):
     cur = database.cursor()
     
     # construct query
-    query = "SELECT latitude, longitude FROM {} WHERE latitude = {} AND longitude = {} ".format(table_name, lat, lng)
+    query = "SELECT latitude, longitude FROM {} WHERE latitude = {} AND longitude = {} ".format(table_name, float(lat), float(lng))
+    print(query)
     
     database.execute(query)
     result = cur.fetchone()
@@ -64,3 +65,10 @@ def check_database(coordinates, database, table_name):
     else:
         print("record does not exist")
     
+# function that collects the data of pending bikeracks from the database
+def collect_pending():
+    # Return 50 pending bike rack results to be displayed on the map
+    
+    # start with one
+    
+    pass

@@ -7,10 +7,12 @@ DROP TABLE IF EXISTS bikeracks;
 
 CREATE TABLE bikeracks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    status INTEGER DEFAULT 0,
-    latitude REAL UNIQUE NOT NULL,
-    longitude REAL UNIQUE NOT NULL,
-    address TEXT
+    status TEXT DEFAULT "pending",
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    address TEXT,
+    CONSTRAINT coordinates UNIQUE(latitude, longitude),
+    CHECK (status in ("approved", "pending", "rejected"))
     
 );
 

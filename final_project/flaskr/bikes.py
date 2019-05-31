@@ -26,7 +26,7 @@ bp = Blueprint('bikes', __name__)
 # information in the database
 
 @bp.route('/coordinates', methods=('GET', 'POST'))
-def check_coordinates():
+def store_coordinates():
     if request.method == 'POST':
     # will probably need a connection to the database to check
     # if the given coordinates are already in there
@@ -48,5 +48,6 @@ def check_coordinates():
         
         
     # will need some kind of update map function
-        
-    return "got {}".format(request.form)
+    # returning list of pending racks to browser
+    pending_racks = h.collect_pending("bikeracks", db)
+    return pending_racks

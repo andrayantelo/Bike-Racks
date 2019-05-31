@@ -112,16 +112,16 @@
          e.preventDefault();
          $.ajax({
              method: 'POST',
-             url: {{ url_for('bikes.check_coordinates')|tojson }},
+             url: {{ url_for('bikes.store_coordinates')|tojson }},
              data: {
                  lat: $('#lat').text(),
                  lng: $('#lng').text()
              }
-         }).done(addShow)
+         }).done(updateMap)
      }
      
-     function addShow(data) {
-         console.log("data: " + data);
+     function updateMap(data) {
+         console.log(data);
      }
     
     // add submit button click handler

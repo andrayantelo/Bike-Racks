@@ -1,3 +1,5 @@
+from flask import jsonify
+
 # Helper functions
 class Error(Exception):
     """Base class for exceptions in this module."""
@@ -44,31 +46,14 @@ def validate_coordinates(coordinates):
     # return true if all tests passed
     return True
     
-# function that checks if coordinates already exist in the database
-def check_database(coordinates, database, table_name):
-    # pass in a tuple of the coordinates (lat, lng)
-    # and a database connection object
-    # and the name of the database table you are querying
-    lat, lng = coordinates
-    # make a cursor object
-    cur = database.cursor()
-    
-    # construct query
-    query = "SELECT latitude, longitude FROM {} WHERE latitude = {} AND longitude = {} ".format(table_name, float(lat), float(lng))
-    print(query)
-    
-    database.execute(query)
-    result = cur.fetchone()
-    
-    if result:
-        print("record exists")
-    else:
-        print("record does not exist")
-    
 # function that collects the data of pending bikeracks from the database
-def collect_pending():
+def collect_pending(table_name, database):
     # Return 50 pending bike rack results to be displayed on the map
+    # table_name: string
+    # database: db connection objec
     
     # start with one
-    
-    pass
+    query = "SELECT * FROM {} WHERE status = 'pending'".format(table_name)
+    result = database.execute(query)
+    pending_racks = [tuple(row) for row in result.fetchall()]
+    return jsonify(pending_racks)

@@ -50,6 +50,8 @@ def create_app(test_config=None):
         
     @app.route('/')
     def home_page(name=None):
+        # update map with approved markers
+        
         return render_template('base.html', name=name)
     
     #@app.route('/tests')

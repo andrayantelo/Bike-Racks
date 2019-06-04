@@ -27,7 +27,7 @@
             crossorigin=""></script>
     
     <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.js"></script>
     
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
@@ -42,7 +42,7 @@
   <body>
 
       <!-- Navigation Bar -->
-      <nav class="navbar navbar-expand-lg navbar-light">
+      <nav class="navbar navbar-expand-md navbar-light">
           <a class="navbar-brand" href=#>Bike Racks</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse"
             data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -50,15 +50,30 @@
               <span class="navbar-toggler-icon"></span>  
           </button>
           <div class="navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav mr-auto">
+              <ul class="navbar-nav ml-auto">
+                  
+                  
                   <li class="nav-item">
-                  <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-primary" id="addMarkerButton" data-toggle="modal" data-target="#coordinateModal">
-                      Add Bike Rack
-                    </button>
+                      <!-- dropdown with options to show pending bike racks,
+                           approved bikes, rejected, or all -->
+                      <div class="dropdown">
+                          <button class="btn btn-secondary dropdown-toggle" type="button"
+                                  id="dropdownMenuButton" data-toggle="dropdown"
+                                  aria-haspopup="true" aria-expanded="false">
+                                  Show Racks
+                          </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#">Pending</a>
+                                <a class="dropdown-item" href="#">Approved</a>
+                                <a class="dropdown-item" href="#">Rejected</a>
+                            </div>
+                      </div>
+                      
                   </li>
-              </ul>
-          </div>
+                  
+                  
+              </ul> 
+          </div> <!-- /.navbar-collapse -->
       </nav>
     
       <!-- Modal, has to be at top level which is why it's not in the container div-->
@@ -108,7 +123,7 @@
   <script>
      function addSubmit(e) {
          console.log("submit button clicked");
-         console.log("this: " + JSON.stringify(this));
+         
          e.preventDefault();
          $.ajax({
              method: 'POST',
@@ -121,6 +136,11 @@
      }
      
      function updateMap(data) {
+         // data is a 2 dimensional array, the rows hold data for one
+         // bike rack
+         
+         // also need to collect all approved markers and place those on map
+         // in case new markers have been approved since last update
          console.log(data);
          let total = 0;
          for (let i=0; i<data.length;i++) {
@@ -130,6 +150,11 @@
          }
          console.log("total pending racks: " + total);
          <!-- TODO place markers on map for pending racks -->
+     }
+     
+     function showApproved(data) {
+         // show markers for approved bike racks on the map
+         
      }
     
     // add submit button click handler

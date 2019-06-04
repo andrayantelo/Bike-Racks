@@ -57,8 +57,6 @@ $(document).ready(function() {
     // and a button that says "add bike rack"
     
     function onMapClick(e) {
-        //console.log("You clicked the map at " + e.latlng);
-        
         // if there is already a tempMarker, remove it
         if (tempMarker !== undefined) {
             mymap.removeLayer(tempMarker);
@@ -69,27 +67,24 @@ $(document).ready(function() {
         tempMarker.addTo(mymap);
         
         let content = popupContent(e.latlng.lat, e.latlng.lng);
-        //console.log(content);
+        
         // enable popup that shows coordinates and 'add bike rack' button
         tempMarker.bindPopup(content).openPopup();
         
     }
     
-    // click handler for coordinate submit button
-    //function onSubmit(e) {
-    //    console.log('you clicked submit ' + e);
-    //}
-    
+    // bind click function to the map element
     mymap.on('click', onMapClick);
     
 
     
     // When the website loads, need to have an instance of BikeRax made right away
-    //let bikerax = new BikeRax();
+    // not sure if this will be used yet
+    let bikerax = new BikeRax();
     
     
     // Make instance of BikeRackCollection
-    //const bikeRackCollection = new BikeRackCollection();
+    const bikeRackCollection = new BikeRackCollection();
     //console.log(JSON.stringify(bikeRackCollection.pendingBikeRacks));
     
     // when addMarker is clicked then we need to make a new emptyBikeState
@@ -168,8 +163,6 @@ class BikeRack {
 
     addMarker() {
     // add marker at lat, long (for a bike rack)
-    // When Add Marker is clicked on the navbar, make #addMarker card
-    // visible
         console.log("Running addMarker");
         self.$addMarkerCard.css({display: flex});
     }
@@ -191,6 +184,9 @@ class BikeRack {
 };
 
 // BikeRackCollection Class
+// Keeps track of all of the bikeracks on the page. Manipulate
+// the html for the collection of bikeracks, instead of an individual bike
+// rack
 class BikeRackCollection {
     constructor() {
         let self = this;
@@ -212,6 +208,10 @@ class BikeRackCollection {
 
 //BikeRax is the class for the overall website. It will include functions
 // that manipulate html, or add functionality
+// like what?
+// I've already been adding functionality with the BikeRack class and the
+// BikeRackCollection class
+
 class BikeRax {
     constructor() {
         let self = this;
@@ -221,6 +221,7 @@ class BikeRax {
     
     initBikeRax() {
         console.log("Initializing BikeRax");
-        // Load BikeRackCollection state from storage
     }
+    
+    
 };

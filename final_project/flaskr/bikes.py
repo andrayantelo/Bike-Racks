@@ -48,3 +48,9 @@ def store_coordinates():
     # returning list of pending racks to browser
     pending_racks = h.collect_pending("bikeracks", db)
     return pending_racks
+
+def get_pending():
+    # get data from database for pending bikeracks
+    pass
+    
+

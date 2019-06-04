@@ -84,15 +84,6 @@ $(document).ready(function() {
     
 
     
-    //$('#submitButton').on('click', function(e) {
-    //    console.log('you clicked submit ' + e);
-    //});
-
-    //$('#submitButton').on('click', onSubmit);
-    
-    
-    
-    
     // When the website loads, need to have an instance of BikeRax made right away
     //let bikerax = new BikeRax();
     
@@ -111,18 +102,11 @@ $(document).ready(function() {
         //let newBikeRack = emptyBikeState(
         
     //});
-    
-        
-    // automatically add a mountain view library bike rack to bike rack collection class
-    // for testing purposes Todo
-    
-    // Whenever the page is loaded, the map needs to be updated with new
-    // markers
+
   
 });
 
-// when a user adds a marker they provide coordinates, maybe a title?
-// address?
+
 
 // Helper Functions
 
@@ -177,7 +161,10 @@ class BikeRack {
 // when enough people verify that a bike rack actually exists at that
 // location. There can only be a select number of preliminary markers
 // on the map at a time, the rest are put in a backlog and will be placed
-// on the map as markers get approved or rejected
+// on the map as markers get approved or rejected, actually this doesn't
+// really make sense, because how would a user know if a rack is already
+// pending or not. Better to have an option to show all pending/hide all pending
+// in the navbar
 
     addMarker() {
     // add marker at lat, long (for a bike rack)

@@ -50,10 +50,16 @@ def validate_coordinates(coordinates):
 def collect_pending(table_name, database):
     # Return 50 pending bike rack results to be displayed on the map
     # table_name: string
-    # database: db connection objec
+    # database: db connection object
     
-    # start with one
     query = "SELECT * FROM {} WHERE status = 'pending'".format(table_name)
-    result = database.execute(query)
-    pending_racks = [tuple(row) for row in result.fetchall()]
+    result = database.execute(query).fetchall()
+    pending_racks = [tuple(row) for row in result]
+    
     return jsonify(pending_racks)
+    
+# TODO collect_approved function? 
+    
+# function that updates the racks to be shown on the map
+def update():
+    pass

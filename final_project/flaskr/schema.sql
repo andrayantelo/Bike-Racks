@@ -1,7 +1,7 @@
 /* The sqlite database schema */
 /* Why is 'status' blue 
-There are actually 3 states a bikerack can be in: approved (1), pending (0), and
-rejected (-1). */
+There are actually 3 states a bikerack can be in: "approved", "pending", and
+"rejected". */
 
 DROP TABLE IF EXISTS bikeracks;
 

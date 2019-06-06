@@ -22,13 +22,13 @@ from flaskr.db import get_db
 # __name__ evaluates to to the name of the current module
 bp = Blueprint('bikes', __name__)
 
-# What am I actually trying to do here? I need to store new bike rack
-# information in the database
+# View functions can be can be mapped to one or more routes
+# might want to add the '/' route here TODO
 
 @bp.route('/coordinates', methods=('GET', 'POST'))
-def store_coordinates():
+def coordinates():
     if request.method == 'POST':
-    # connect to database to be able to store new coordinates
+    # connect to database to be able to store new coordinates for temporary bikerack
         db = get_db()
         
         lat = request.form.get('lat', 0, type=float)
@@ -43,11 +43,12 @@ def store_coordinates():
             db.execute('INSERT INTO bikeracks (latitude, longitude) VALUES (?, ?);', (lat, lng))
             db.commit()
         
-        
-    # will need some kind of update map function
-    # returning list of pending racks to browser
-    pending_racks = h.collect_pending("bikeracks", db)
-    return pending_racks
+    # return data for the added temporary marker
+        bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
+    #pending_racks = h.collect_pending("bikeracks", db)
+        return bike_rack
+    # if it is not a post method then just show the map
+    return render_template('base.html')
 
 def get_pending():
     # get data from database for pending bikeracks

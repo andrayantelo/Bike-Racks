@@ -121,36 +121,46 @@
   
   <!-- Javascript that relies on jinja/flask -->
   <script>
-     function addSubmit(e) {
-         console.log("submit button clicked");
+      
+    function addSubmit(e) {
+      console.log("submit button clicked");
          
-         e.preventDefault();
-         $.ajax({
-             method: 'POST',
-             url: {{ url_for('bikes.store_coordinates')|tojson }},
-             data: {
-                 lat: $('#lat').text(),
-                 lng: $('#lng').text()
-             }
-         }).done(updateMap)
-     }
-     
-     function updateMap(data) {
-         // data is a 2 dimensional array, the rows hold data for one
-         // bike rack
+      e.preventDefault();
+      $.ajax({
+              method: 'POST',
+              url: {{ url_for('bikes.coordinates')|tojson }},
+              data: {
+                    lat: $('#lat').text(),
+                    lng: $('#lng').text()
+              }
+      }).done(addTempMarker)
+    }
+    
+    function addTempMarker(data) {
+    // data is a 2 dimensional array, the rows hold data for one
+    // bike rack
+    
+    // A temporary marker needs to be placed at the lat and long provided
+    // by the input to this function
+    
          
-         // also need to collect all approved markers and place those on map
-         // in case new markers have been approved since last update
-         console.log(data);
-         let total = 0;
-         for (let i=0; i<data.length;i++) {
-             if (data[i][1] === "pending") {
-                 total += 1;
-             }
-         }
-         console.log("total pending racks: " + total);
-         <!-- TODO place markers on map for pending racks -->
-     }
+    // also need to collect all approved markers and place those on map
+    // in case new markers have been approved since last update
+      console.log(data);
+      let total = 0;
+      for (let i=0; i<data.length;i++) {
+        if (data[i][1] === "pending") {
+          total += 1;
+        }
+      }  
+      console.log("total pending racks: " + total);
+    //<!-- TODO place markers on map for pending racks -->
+    }
+    
+    function makeBikeRack(data) {
+        let bikerack = new BikeRack
+    }
+
      
      function showApproved(data) {
          // show markers for approved bike racks on the map

@@ -47,7 +47,7 @@ def validate_coordinates(coordinates):
     return True
     
 # function that collects the data of pending bikeracks from the database
-def collect_pending(table_name, database):
+def collect_pending(table_name, database, lat, lng):
     # Return 50 pending bike rack results to be displayed on the map
     # table_name: string
     # database: db connection object
@@ -58,7 +58,13 @@ def collect_pending(table_name, database):
     
     return jsonify(pending_racks)
     
-# TODO collect_approved function? 
+# function that returns row for a bikerack with particular coordinates
+def collect_bike_rack(table_name, database, lat, lng):
+    query = "SELECT * FROM {} WHERE latitude = ? AND longitude = ?".format(table_name)
+    result = database.execute(query, (lat, lng)).fetchall()
+    bike_rack = [tuple(row) for row in result]
+    
+    return jsonify(bike_rack)
     
 # function that updates the racks to be shown on the map
 def update():

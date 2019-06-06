@@ -45,7 +45,7 @@ def coordinates():
         
     # return data for the added temporary marker
         bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
-    #pending_racks = h.collect_pending("bikeracks", db)
+        
         return bike_rack
     # if it is not a post method then just show the map
     return render_template('base.html')

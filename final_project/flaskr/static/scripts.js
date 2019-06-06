@@ -160,24 +160,13 @@ class BikeRack {
 // pending or not. Better to have an option to show all pending/hide all pending
 // in the navbar
     addTempMarker(data) {
-    // data is a 2 dimensional array, the rows hold data for one
-    // bike rack
-    
     // A temporary marker needs to be placed at the lat and long provided
     // by the input to this function
+    let lat = data[2],
+        lng = data[3];
     
-         
-    // also need to collect all approved markers and place those on map
-    // in case new markers have been approved since last update
-      console.log(data);
-      let total = 0;
-      for (let i=0; i<data.length;i++) {
-        if (data[i][1] === "pending") {
-          total += 1;
-        }
-      }  
-      console.log("total pending racks: " + total);
-    //<!-- TODO place markers on map for pending racks -->
+    console.log("placing temporary marker at lat: " + lat + " and long " + lng);
+
     }
 
     addMarker() {

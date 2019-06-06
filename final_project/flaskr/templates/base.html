@@ -137,19 +137,15 @@
     }
     
     function addTempMarker(data) {
-    // data is a 2 dimensional array, the rows hold data for one
-    // bike rack
+        
+      // make an instance of bikerack
+      let bikerack = new BikeRack(data[2], data[3])
+      console.log(bikerack);
     
-    // A temporary marker needs to be placed at the lat and long provided
-    // by the input to this function
-    
-         
-    // also need to collect all approved markers and place those on map
-    // in case new markers have been approved since last update
       console.log(data);
       let total = 0;
       for (let i=0; i<data.length;i++) {
-        if (data[i][1] === "pending") {
+        if (data[1] === "pending") {
           total += 1;
         }
       }  

@@ -114,7 +114,10 @@ let isLong = long => !Number.isNaN(Number.parseFloat(long)) && (long <=180 && lo
 let emptyBikeState = function(params) {
     // params = {
     //   lat: float,
-    //   long: float
+    //   lng: float,
+    //   address: string,
+    //   uniqueId: interger,
+    //   status: string
     // }
     if ($.isEmptyObject(params)) {
         return {}
@@ -124,16 +127,18 @@ let emptyBikeState = function(params) {
     }
     return {
         lat: params.lat,
-        long: params.long
+        lng: params.lng,
+        address: params.address,
+        uniqueId: params.uniqueId,
+        status: params.status
     }
 };
 
 // BikeRack class
 class BikeRack {
-    constructor(lat, long) {
+    constructor(state) {
         let self = this;
-        self.lat = lat;
-        self.long = long;
+        self.state = state;
         
         // shorcuts to DOM elements
         self.$submitCoordinatesButton = $('#submitCoordinatesButton');

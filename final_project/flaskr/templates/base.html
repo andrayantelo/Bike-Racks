@@ -139,10 +139,11 @@
     function addTempMarker(data) {
         
       // make an instance of bikerack
-      let bikerack = new BikeRack(data[2], data[3])
+      console.log(data);
+      
+      let bikerack = new BikeRack(data[1])
       console.log(bikerack);
     
-      console.log(data);
       let total = 0;
       for (let i=0; i<data.length;i++) {
         if (data[1] === "pending") {

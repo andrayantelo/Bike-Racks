@@ -60,21 +60,19 @@ def collect_pending(table_name, database, lat, lng):
     
 # function that returns row for a bikerack with particular coordinates
 def collect_bike_rack(table_name, database, lat, lng):
+    # returns an object containing the db row obj for the bikerack (should
+    # I do tuple(row) instead? and  
     query = "SELECT * FROM {} WHERE latitude = ? AND longitude = ?".format(table_name)
-    #result = database.execute(query, (lat, lng)).fetchall()
+    
     result = database.execute(query, (lat, lng)).fetchone()
-    #bike_rack = [tuple(row) for row in result]
     
-    # maybe return an object like { row: [array with bikerack columns], 
-    #                               coordinates: (lat, lng)
-    #
-    #                             }
-    result_obj = {"row": tuple(result), "coordinates": (result['latitude'], result['longitude'])}
-    print("printing result")
-    print(result_obj)
-    bike_rack = tuple(result)
     
-    return jsonify(bike_rack)
+    result_obj = (list(result), {"latitude": result['latitude'], 
+                  "longitude": result['longitude'], "address": result['address'],
+                  "id": result['id'], "status": result['status']})
+
+    
+    return jsonify(result_obj)
     
 # function that updates the racks to be shown on the map
 def update():

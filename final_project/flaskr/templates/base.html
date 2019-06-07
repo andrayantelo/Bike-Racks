@@ -123,8 +123,8 @@
   <script>
       
     function addSubmit(e) {
-      console.log("submit button clicked");
-         
+      // send a request to the server, sending the coordinates of the
+      // place on the map that was clicked
       e.preventDefault();
       $.ajax({
               method: 'POST',

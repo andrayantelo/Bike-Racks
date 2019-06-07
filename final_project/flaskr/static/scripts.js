@@ -5,25 +5,18 @@ let mymap;
 let markers = []; 
 
 // Colors for different types of markers
-const tempMarkerColor = '#808080';
-const pendingMarkerColor = '#FFD700';
-const approvedMarkerColor = '#008000';
-const rejectedMarkerColor = '#FF0000';
+const tempMarkerColor = 'gray';
+const pendingMarkerColor = 'yellow';
+const approvedMarkerColor = 'green';
+const rejectedMarkerColor = 'red';
 
-// temporary marker for when person clicks random spot on map
-let tempMarker = {};
-
-let tempIcon = L.AwesomeMarkers.icon({
-    prefix: 'fa',
-    icon: 'bicycle',
-    markerColor: 'gray'
-});
-
-let approvedIcon = L.AwesomeMarkers.icon({
-    prefix: 'fa',
-    icon: 'bicycle',
-    markerColor: 'green'
-});
+function buildMarkerIcon(markerColor) {
+    return L.AwesomeMarkers.icon({
+        prefix: 'fa',
+        icon: 'bicycle',
+        markerColor: markerColor
+    });
+};
 
 function popupContent(lat, lng) {
     let content = 
@@ -35,69 +28,35 @@ function popupContent(lat, lng) {
     return content
 }
 
-$(document).ready(function() {
-    // Initialize map        
-    mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
-
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 18,
-        id: 'mapbox.streets',
-        accessToken: 'pk.eyJ1IjoiYW5kcmF5YW50ZWxvIiwiYSI6ImNqczB1YTJ6ajFuNGo0M2x2eTVpNms1MHEifQ.1SbExoA1iGNdOKDRoG4Qng'
-    }).addTo(mymap);
-    
-    
-    // add marker to map at Mountain View Public Librarys TODO, remove later
-    let marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(mymap);
-    
-    // when you click on a random spot on the map
-    // we need a temporary marker to be added there, like a 
-    // gray one, have a popup show up with the coordinates
-    // and a button that says "add bike rack"
-    
-    function onMapClick(e) {
-        // if there is already a tempMarker, remove it
-        if (tempMarker !== undefined) {
-            mymap.removeLayer(tempMarker);
-        }
-        
-        // add the temporary  marker at coordinates
-        tempMarker = L.marker([e.latlng.lat, e.latlng.lng], {icon: tempIcon});
-        tempMarker.addTo(mymap);
-        
-        let content = popupContent(e.latlng.lat, e.latlng.lng);
-        
-        // enable popup that shows coordinates and 'add bike rack' button
-        tempMarker.bindPopup(content).openPopup();
-        
+function addMarker(lat, lng, markerColor, rackmap) {
+    console.log("working on map " + rackmap);
+    let markerIcon = buildMarkerIcon(markerColor);
+    // if there is already a tempMarker, remove it
+    if (tempMarker !== undefined) {
+        rackmap.removeLayer(tempMarker);
     }
-    
-    // bind click function to the map element
-    mymap.on('click', onMapClick);
-    
-
-    
-    // When the website loads, need to have an instance of BikeRax made right away
-    // not sure if this will be used yet
-    let bikerax = new BikeRax();
-    
-    
-    // Make instance of BikeRackCollection
-    const bikeRackCollection = new BikeRackCollection();
-    //console.log(JSON.stringify(bikeRackCollection.pendingBikeRacks));
-    
-    // when addMarker is clicked then we need to make a new emptyBikeState
-    // for a bikeRack. 
-    //$('#submitButton').click(function() {
-    //    console.log("submit button clicked");
-    //    console.log($('#latitude').val());
-        // Need to validate and sanitize the latitude and longitude values
-        // make a new emptyBikeState
-        //let newBikeRack = emptyBikeState(
         
-    //});
+    // add the temporary  marker at coordinates
+    tempMarker = L.marker([lat, lng], {icon: markerIcon});
+    tempMarker.addTo(rackmap);
+        
+    let content = popupContent(lat, lng);
+        
+    // enable popup that shows coordinates and 'add bike rack' button
+    tempMarker.bindPopup(content).openPopup();
+}
 
-  
+$(document).ready(function() {
+    
+    
+    // When the website loads, need to have an instance of BikeMap made right away
+    bikemap = new BikeMap();
+    // Initialize map 
+    bikemap.initBikeMap();
+    // bind click function to the map element
+    
+    bikemap.mymap.on('click', bikemap.onMapClick); 
+    
 });
 
 
@@ -139,16 +98,6 @@ class BikeRack {
     constructor(state) {
         let self = this;
         self.state = state;
-        
-        // shorcuts to DOM elements
-        self.$submitCoordinatesButton = $('#submitCoordinatesButton');
-        
-        
-        // Click handlers for the DOM
-        //self.$addMarkerNavLink.click(self.addMarker.bind(self));
-        //self.$submitCoordinatesButton.click(function() {
-
-       
     }
 
 
@@ -158,19 +107,12 @@ class BikeRack {
 // yellow in color) is
 // added in the location, and it will only become a fully fledged marker (green)
 // when enough people verify that a bike rack actually exists at that
-// location. There can only be a select number of preliminary markers
-// on the map at a time, the rest are put in a backlog and will be placed
-// on the map as markers get approved or rejected, actually this doesn't
-// really make sense, because how would a user know if a rack is already
-// pending or not. Better to have an option to show all pending/hide all pending
-// in the navbar
-    addTempMarker(data) {
+// location. have an option to show all pending/hide all pending
+// in the navbar, approved always visible?
+    addTempMarker() {
     // A temporary marker needs to be placed at the lat and long provided
     // by the input to this function
-    let lat = data[2],
-        lng = data[3];
     
-    console.log("placing temporary marker at lat: " + lat + " and long " + lng);
 
     }
 
@@ -219,22 +161,53 @@ class BikeRackCollection {
     }
 };
 
-//BikeRax is the class for the overall website. It will include functions
+//BikeMap is the class for the overall website. It will include functions
 // that manipulate html, or add functionality
 // like what?
-// I've already been adding functionality with the BikeRack class and the
-// BikeRackCollection class
+// Like initializing the map
 
-class BikeRax {
-    constructor() {
-        let self = this;
+// temporary marker for when person clicks random spot on map
+let tempMarker = {};
+
+class BikeMap {
+    constructor(mymap) {
+        this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);;
         
-        self.initBikeRax();
     }
-    
-    initBikeRax() {
-        console.log("Initializing BikeRax");
-    }
-    
-    
 };
+    
+BikeMap.prototype.initBikeMap = function () {
+    console.log("Initializing BikeRax");
+       
+ 
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoiYW5kcmF5YW50ZWxvIiwiYSI6ImNqczB1YTJ6ajFuNGo0M2x2eTVpNms1MHEifQ.1SbExoA1iGNdOKDRoG4Qng'
+    }).addTo(this.mymap);
+   
+       
+    // add marker to map at Mountain View Public Librarys TODO, remove later
+    let approvedIcon = buildMarkerIcon(approvedMarkerColor);
+    let marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
+        
+}
+    
+BikeMap.prototype.onMapClick = function (e) {
+    console.log("map clicked");
+    console.log("lat: " + e.latlng.lat + " lng: " + e.latlng.lng);
+    console.log(e.target);
+    console.log(this.mymap);
+    // TODO have to check if these coordinates already exist in the database
+    // then if user is viewing approved only map, and they clicked on a pending
+    // spot, the marker that pops up is yellow and not gray
+        
+    // add a temporary marker on the spot the user clicked
+        
+    // add the temporary  marker at coordinates
+    addMarker(e.latlng.lat, e.latlng.lng, tempMarkerColor, this.mymap)
+}
+    
+    
+

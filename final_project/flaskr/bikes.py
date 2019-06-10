@@ -28,7 +28,7 @@ bp = Blueprint('bikes', __name__)
 @bp.route('/coordinates', methods=('GET', 'POST'))
 def coordinates():
     if request.method == 'POST':
-    # connect to database to be able to store new coordinates for temporary bikerack
+        # connect to database to be able to store new coordinates for temporary bikerack
         db = get_db()
         
         lat = request.form.get('lat', 0, type=float)
@@ -40,10 +40,13 @@ def coordinates():
         if h.validate_coordinates((lat, lng)):
             # if valid, save in database
             print("saving into database")
-            db.execute('INSERT INTO bikeracks (latitude, longitude) VALUES (?, ?);', (lat, lng))
-            db.commit()
+            try:
+                db.execute('INSERT INTO bikeracks (latitude, longitude) VALUES (?, ?);', (lat, lng))
+                db.commit()
+            except Exception as e:
+                print(e)
         
-    # return data for the added temporary marker
+        # return data for the added temporary marker
         bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
         
         return bike_rack

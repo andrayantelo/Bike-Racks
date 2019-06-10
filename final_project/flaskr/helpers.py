@@ -67,12 +67,11 @@ def collect_bike_rack(table_name, database, lat, lng):
     result = database.execute(query, (lat, lng)).fetchone()
     
     
-    result_obj = (list(result), {"latitude": result['latitude'], 
+    result_tup = (list(result), {"latitude": result['latitude'], 
                   "longitude": result['longitude'], "address": result['address'],
                   "id": result['id'], "status": result['status']})
 
-    
-    return jsonify(result_obj)
+    return jsonify(result_tup)
     
 # function that updates the racks to be shown on the map
 def update():

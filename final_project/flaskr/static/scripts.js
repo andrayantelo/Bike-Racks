@@ -195,8 +195,6 @@ BikeMap.prototype.initBikeMap = function () {
 }
     
 BikeMap.prototype.onMapClick = function (e) {
-    console.log("map clicked");
-    console.log(this);
     // TODO have to check if these coordinates already exist in the database
     // then if user is viewing approved only map, and they clicked on a pending
     // spot, the marker that pops up is yellow and not gray

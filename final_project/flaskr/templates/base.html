@@ -142,16 +142,9 @@
       console.log(data);
       
       let bikerack = new BikeRack(data[1])
-      console.log(bikerack);
-    
-      let total = 0;
-      for (let i=0; i<data.length;i++) {
-        if (data[1] === "pending") {
-          total += 1;
-        }
-      }  
-      console.log("total pending racks: " + total);
-    //<!-- TODO place markers on map for pending racks -->
+      let iconColor = bikerack.setMarkerColor(bikerack.state.status);
+      console.log(bikerack.state);
+      bikemap.addMarker(bikerack.state);
     }
     
     function makeBikeRack(data) {

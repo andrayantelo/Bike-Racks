@@ -6,45 +6,9 @@ let markers = [];
 
 // Colors for different types of markers
 const tempMarkerColor = 'gray';
-const pendingMarkerColor = 'yellow';
+const pendingMarkerColor = 'orange';
 const approvedMarkerColor = 'green';
 const rejectedMarkerColor = 'red';
-
-function buildMarkerIcon(markerColor) {
-    return L.AwesomeMarkers.icon({
-        prefix: 'fa',
-        icon: 'bicycle',
-        markerColor: markerColor
-    });
-};
-
-function popupContent(lat, lng) {
-    let content = 
-        `<div id="tempForm">
-           <div id="lat">${lat}</div> <span>,</span> <div id="lng">${lng}</div>
-           <button id="submitButton" type="submit">Submit</button>
-        </div>
-        `
-    return content
-}
-
-function addMarker(lat, lng, markerColor, rackmap) {
-    console.log("working on map " + rackmap);
-    let markerIcon = buildMarkerIcon(markerColor);
-    // if there is already a tempMarker, remove it
-    if (tempMarker !== undefined) {
-        rackmap.removeLayer(tempMarker);
-    }
-        
-    // add the temporary  marker at coordinates
-    tempMarker = L.marker([lat, lng], {icon: markerIcon});
-    tempMarker.addTo(rackmap);
-        
-    let content = popupContent(lat, lng);
-        
-    // enable popup that shows coordinates and 'add bike rack' button
-    tempMarker.bindPopup(content).openPopup();
-}
 
 $(document).ready(function() {
     
@@ -72,8 +36,8 @@ let isLong = long => !Number.isNaN(Number.parseFloat(long)) && (long <=180 && lo
 
 let emptyBikeState = function(params) {
     // params = {
-    //   lat: float,
-    //   lng: float,
+    //   latitude: float,
+    //   longitude: float,
     //   address: string,
     //   uniqueId: interger,
     //   status: string
@@ -81,12 +45,12 @@ let emptyBikeState = function(params) {
     if ($.isEmptyObject(params)) {
         return {}
     }
-    if (!(isLat(params.lat) && isLong(params.long))) {
+    if (!(isLat(params.latitude) && isLong(params.longitude))) {
         return {}
     }
     return {
-        lat: params.lat,
-        lng: params.lng,
+        lat: params.latitude,
+        lng: params.longitude,
         address: params.address,
         uniqueId: params.uniqueId,
         status: params.status
@@ -109,23 +73,21 @@ class BikeRack {
 // when enough people verify that a bike rack actually exists at that
 // location. have an option to show all pending/hide all pending
 // in the navbar, approved always visible?
-    addTempMarker() {
-    // A temporary marker needs to be placed at the lat and long provided
-    // by the input to this function
-    
-
-    }
-
-    addMarker() {
-    // add marker at lat, long (for a bike rack)
-        console.log("Running addMarker");
-        self.$addMarkerCard.css({display: flex});
-    }
-
-    markerInfo() {
-    // When you click on a marker, you get info like
-    // photos, user comments on bike rack,
-    // if it is located in front of a building or behind
+    setMarkerColor(status) {
+        let markerColor;
+        if (status === "pending") {
+            console.log("pending");
+            markerColor = pendingMarkerColor;
+        }
+        else if (status === "approved") {
+            console.log("approved");
+            markerColor = approvedMarkerColor;
+        }
+        else if (status === "rejected") {
+            markerColor = rejectedMarkerColor;
+        }
+        this.state.markerColor = markerColor;
+        return markerColor;
     }
 
     addPhoto() {
@@ -166,8 +128,29 @@ class BikeRackCollection {
 // like what?
 // Like initializing the map
 
+// BikeMap class helper functions
 // temporary marker for when person clicks random spot on map
 let tempMarker = {};
+
+
+
+function buildMarkerIcon(markerColor) {
+    return L.AwesomeMarkers.icon({
+        prefix: 'fa',
+        icon: 'bicycle',
+        markerColor: markerColor
+    });
+};
+
+function popupContent(lat, lng) {
+    let content = 
+        `<div id="tempForm">
+           <div id="lat">${lat}</div> <span>,</span> <div id="lng">${lng}</div>
+           <button id="submitButton" type="submit">Submit</button>
+        </div>
+        `
+    return content
+}
 
 class BikeMap {
     constructor(mymap) {
@@ -202,7 +185,65 @@ BikeMap.prototype.onMapClick = function (e) {
     // add a temporary marker on the spot the user clicked
         
     // add the temporary  marker at coordinates
-    addMarker(e.latlng.lat, e.latlng.lng, tempMarkerColor, this.mymap)
+    this.addTempMarker(e.latlng.lat, e.latlng.lng, tempMarkerColor, this.mymap)
+}
+
+
+BikeMap.prototype.addTempMarker = function(lat, lng) {
+    // add a temporary marker, that is removed as soon as you click away
+    //build icon
+    let markerIcon = buildMarkerIcon(tempMarkerColor);
+    // if there is already a tempMarker, remove it
+    if (tempMarker !== undefined) {
+        this.mymap.removeLayer(tempMarker);
+    }
+        
+    // add the temporary  marker at coordinates
+    tempMarker = L.marker([lat, lng], {icon: markerIcon});
+    console.log("a marker: " + JSON.stringify(tempMarker.toGeoJSON()));
+    tempMarker.addTo(this.mymap);
+    
+    
+        
+    let content = popupContent(lat, lng);
+        
+    // enable popup that shows coordinates and 'add bike rack' button
+    tempMarker.bindPopup(content).openPopup();
+}
+
+BikeMap.prototype.addMarker = function(state) {
+    // add marker of type pending, approved, or rejected that is not removed
+    // when user clicks away (but is removed if user clicks on hide all temporary,
+    // hide all approved, etc
+    //build icon
+    let markerIcon = buildMarkerIcon(state.markerColor),
+        marker;
+  
+    // add the temporary  marker at coordinates
+    marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
+    marker.addTo(this.mymap);
+        
+    let content = popupContent(state.latitude, state.longitude);
+        
+    // enable popup that shows coordinates and 'add bike rack' button
+    tempMarker.bindPopup(content).openPopup();
+    
+}
+
+BikeMap.prototype.removeMarker = function(lat, lng) {
+    // remove markers at lat, lng
+}
+
+BikeMap.prototype.showPendingMarkers = function() {
+    // Hide all markers except for pending markers on map
+}
+
+BikeMap.prototype.showApprovedMarkers = function() {
+    // Hike all markers except for approved markers on map
+}
+
+BikeMap.prototype.showRejectedMarkers = function() {
+    // Hide all markers except for rejected markers on map
 }
     
     

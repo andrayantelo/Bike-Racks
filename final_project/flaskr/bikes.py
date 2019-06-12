@@ -12,7 +12,7 @@
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for,
-    jsonify
+    jsonify, Response
 )
 
 from . import helpers as h
@@ -24,6 +24,12 @@ bp = Blueprint('bikes', __name__)
 
 # View functions can be can be mapped to one or more routes
 # might want to add the '/' route here TODO
+@bp.route('/dynamic/<path:path>')
+def render_file(path):
+    response = render_template(path), 200, {'Content-Type': 'text/javascript'}
+    
+    return response
+
 
 @bp.route('/coordinates', methods=('GET', 'POST'))
 def coordinates():

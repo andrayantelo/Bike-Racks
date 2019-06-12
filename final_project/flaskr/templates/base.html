@@ -117,48 +117,14 @@
   <script src="https://unpkg.com/ionicons@4.5.5/dist/ionicons.js"></script>
   <!-- Awesome Markers JS -->
   <script src="../static/dist/leaflet.awesome-markers.js"></script>
-  <script src="../static/scripts.js"></script>
+  <script src="../dynamic/scripts.js"></script>
   
   <!-- Javascript that relies on jinja/flask -->
   <script>
       
-    function addSubmit(e) {
-      // send a request to the server, sending the coordinates of the
-      // place on the map that was clicked
-      e.preventDefault();
-      $.ajax({
-              method: 'POST',
-              url: {{ url_for('bikes.coordinates')|tojson }},
-              data: {
-                    lat: $('#lat').text(),
-                    lng: $('#lng').text()
-              }
-      }).done(addTempMarker)
-    }
-    
-    function addTempMarker(data) {
-        
-      // make an instance of bikerack
-      console.log(data);
-      
-      let bikerack = new BikeRack(data[1])
-      let iconColor = bikerack.setMarkerColor(bikerack.state.status);
-      console.log(bikerack.state);
-      bikemap.addMarker(bikerack.state);
-    }
-    
-    function makeBikeRack(data) {
-        let bikerack = new BikeRack
-    }
 
-     
-     function showApproved(data) {
-         // show markers for approved bike racks on the map
-         
-     }
     
-    // add submit button click handler
-    $('#mapid').on('click', '#submitButton', addSubmit);
+    
     
   </script>
   

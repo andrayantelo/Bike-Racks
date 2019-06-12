@@ -44,12 +44,12 @@ let emptyBikeState = function(params) {
     if ($.isEmptyObject(params)) {
         return {}
     }
-    if (!(isLat(params.latitude) && isLong(params.longitude))) {
+    if (!(isLat(params.lat) && isLong(params.lng))) {
         return {}
     }
     return {
-        lat: params.latitude,
-        lng: params.longitude,
+        lat: params.lat,
+        lng: params.lng,
         address: params.address,
         uniqueId: params.uniqueId,
         status: params.status
@@ -59,8 +59,14 @@ let emptyBikeState = function(params) {
 // BikeRack class
 class BikeRack {
     constructor(state) {
-        let self = this;
-        self.state = state;
+        this.state = state;
+        
+        this.initBikeRack();
+    }
+    
+    initBikeRack() {
+        console.log("initializing bikerack");
+        this.setMarkerColor();
     }
 
 // A user should be able to add a marker somewhere, but it would be
@@ -70,8 +76,9 @@ class BikeRack {
 // when enough people verify that a bike rack actually exists at that
 // location. have an option to show all pending/hide all pending
 // in the navbar, approved always visible?
-    setMarkerColor(status) {
+    setMarkerColor() {
         let markerColor;
+        let status = this.state.status;
         if (status === "pending") {
             console.log("pending");
             markerColor = pendingMarkerColor;
@@ -179,22 +186,6 @@ BikeMap.prototype.initBikeMap = function () {
         
 }
 
-BikeMap.prototype.validateCoordinates = function(lat, lng) {
-    // Any time a user clicks on the map, a few things need to be checked
-    // about the coordinates:
-    //     - are the coordinates valid coordinates
-    //     - are the coordinates land coordinates (and not ocean coordinates)
-    //     - are the coordinates already in the database
-    //         - if they are and it's an approved rack:
-    //             then a green marker needs to popup (with no 'add bike rack'
-    //             button)
-    //         - if they are and it's a rejected rack:
-    //             then a red marker needs to popup (with voting buttons)
-    //         - if they are and it's a pending rack:
-    //             orange marker with voting buttons
-    //         - if they are not, then it's a grey marker with 'add bike rack' button
-}
-
 BikeMap.prototype.addSubmit = function(e) {
     // send a request to the server, sending the coordinates of the
     // place on the map that was clicked
@@ -210,14 +201,21 @@ BikeMap.prototype.addSubmit = function(e) {
         },
         context: this
   }).done(function(data) {
-      console.log(data);
-      
-      this.processCoordinates(data);
+      this.processBikeRack(data);
   })
 }
 
-BikeMap.prototype.processCoordinates = function(data) {
-      // make an instance of bikerack
+BikeMap.prototype.processBikeRack = function(data) {
+    // the coordinates 
+    //  - if it's an approved rack:
+    //    then a green marker needs to popup (with no 'add bike rack'
+    //    button)
+    //  - if it's a rejected rack:
+    //    then a red marker needs to popup (with voting buttons)
+    //  - if it's a pending rack:
+    //    orange marker with voting buttons
+    //  - otherwise it's a grey marker with 'add bike rack' button
+    // 
       console.log(data);
       
       let bikerack = new BikeRack(data[1])
@@ -261,13 +259,13 @@ BikeMap.prototype.addMarker = function(state) {
         marker;
   
     // add the temporary  marker at coordinates
-    marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
+    marker = L.marker([state.lat, state.lng], {icon: markerIcon});
     marker.addTo(this.mymap);
         
-    let content = popupContent(state.latitude, state.longitude);
+    let content = popupContent(state.lat, state.lng);
         
     // enable popup that shows coordinates and 'add bike rack' button
-    tempMarker.bindPopup(content).openPopup();
+    marker.bindPopup(content).openPopup();
     
 }
 

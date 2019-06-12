@@ -59,8 +59,13 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
-def get_pending():
-    # get data from database for pending bikeracks
-    pass
+@bp.route('/approved', methods=('GET', 'POST'))
+def show_approved():
+    if request.method == 'GET':
+        # make a connection to the database
+        db = get_db()
+        
+        h.get_approved("bikeracks", db)
+        return render_template('base.html')
     
 

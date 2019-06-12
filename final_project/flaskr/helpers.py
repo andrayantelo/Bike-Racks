@@ -19,8 +19,10 @@ class RangeError(Error):
         
     def __str__(self):
         return(repr(self.value))
-        
-    
+
+# makes a dictionary out of a row object
+def dict_from_row(row):
+    return dict(zip(row.keys(), row))     
 
 # function that validates coordinate data
 def validate_coordinates(coordinates):
@@ -72,6 +74,17 @@ def collect_bike_rack(table_name, database, lat, lng):
                   "id": result['id'], "status": result['status']})
 
     return jsonify(result_tup)
+    
+def get_approved(table_name, database):
+    # get data from database for pending bikeracks
+    query = "SELECT * FROM {} WHERE status = 'approved'".format(table_name)
+    result = database.execute(query).fetchall()
+    
+    result = [ dict_from_row(row) for row in result]
+    print(result)
+    return result
+    
+
     
 # function that updates the racks to be shown on the map
 def update():

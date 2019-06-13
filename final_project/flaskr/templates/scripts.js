@@ -270,12 +270,12 @@ BikeMap.prototype.removeMarker = function(lat, lng) {
     
 }
 
-BikeMap.prototype.getMarkers = function(status) {
+BikeMap.prototype.getPendingMarkers = function() {
     // make request for pending bike racks
     
     $.ajax({
         method: 'GET',
-        url: {{ url_for('bikes.get_racks', rack=status)|tojson }},
+        url: {{ url_for('bikes.get_racks', status="pending")|tojson }},
         context: this
     }).done(function(data) {
         // show on map
@@ -283,7 +283,7 @@ BikeMap.prototype.getMarkers = function(status) {
     })
 }
 
-/*BikeMap.prototype.getApprovedMarkers = function() {
+BikeMap.prototype.getApprovedMarkers = function() {
     // make ajax request for approved bike racks
     $.ajax({
         method: 'GET',
@@ -306,7 +306,7 @@ BikeMap.prototype.getRejectedMarkers = function() {
         // show on map
         this.showMarkers(data);
     })
-}*/
+}
   
 
 BikeMap.prototype.showMarkers = function(data) {

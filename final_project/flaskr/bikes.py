@@ -60,13 +60,13 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
-@bp.route('/get_racks/<rack>', methods=['GET'])
-def get_racks(rack):
+@bp.route('/get_racks/<status>', methods=['GET'])
+def get_racks(status):
     if request.method == 'GET':
         # make a connection to the database
         db = get_db()
         
-        racks = h.get_racks("bikeracks", db, rack)
+        racks = h.get_racks("bikeracks", db, status)
         return racks
         
 #@bp.route('/pending', methods=['GET'])

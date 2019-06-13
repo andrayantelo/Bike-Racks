@@ -65,7 +65,6 @@ class BikeRack {
     }
     
     initBikeRack() {
-        console.log("initializing bikerack");
         this.setMarkerColor();
     }
 
@@ -80,11 +79,9 @@ class BikeRack {
         let markerColor;
         let status = this.state.status;
         if (status === "pending") {
-            console.log("pending");
             markerColor = pendingMarkerColor;
         }
         else if (status === "approved") {
-            console.log("approved");
             markerColor = approvedMarkerColor;
         }
         else if (status === "rejected") {
@@ -216,11 +213,10 @@ BikeMap.prototype.processBikeRack = function(data) {
     //    orange marker with voting buttons
     //  - otherwise it's a grey marker with 'add bike rack' button
     // 
-      console.log(data);
-      
+
       let bikerack = new BikeRack(data[1])
       let iconColor = bikerack.setMarkerColor(bikerack.state.status);
-      console.log(bikerack.state);
+      
       this.addMarker(bikerack.state);
 }
     
@@ -259,10 +255,10 @@ BikeMap.prototype.addMarker = function(state) {
         marker;
   
     // add the temporary  marker at coordinates
-    marker = L.marker([state.lat, state.lng], {icon: markerIcon});
+    marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
     marker.addTo(this.mymap);
         
-    let content = popupContent(state.lat, state.lng);
+    let content = popupContent(state.latitude, state.longitude);
         
     // enable popup that shows coordinates and 'add bike rack' button
     marker.bindPopup(content).openPopup();
@@ -271,19 +267,60 @@ BikeMap.prototype.addMarker = function(state) {
 
 BikeMap.prototype.removeMarker = function(lat, lng) {
     // remove markers at lat, lng
-}
-
-BikeMap.prototype.showPendingMarkers = function() {
-    // Hide all markers except for pending markers on map
-}
-
-BikeMap.prototype.showApprovedMarkers = function() {
-    // Hike all markers except for approved markers on map
-}
-
-BikeMap.prototype.showRejectedMarkers = function() {
-    // Hide all markers except for rejected markers on map
-}
     
+}
+
+BikeMap.prototype.getMarkers = function(status) {
+    // make request for pending bike racks
+    
+    $.ajax({
+        method: 'GET',
+        url: {{ url_for('bikes.get_racks', rack=status)|tojson }},
+        context: this
+    }).done(function(data) {
+        // show on map
+        this.showMarkers(data);
+    })
+}
+
+/*BikeMap.prototype.getApprovedMarkers = function() {
+    // make ajax request for approved bike racks
+    $.ajax({
+        method: 'GET',
+        url: {{ url_for('bikes.get_racks', status="approved")|tojson }},
+        context: this,
+        
+    }).done(function(data) {
+        // show on map
+        this.showMarkers(data);
+    })
+}
+
+BikeMap.prototype.getRejectedMarkers = function() {
+    // Hide all markers except for rejected markers on map
+    $.ajax({
+        method: 'GET',
+        url: {{url_for('bikes.get_racks', status="rejected")|tojson }},
+        context: this,
+    }).done(function(data) {
+        // show on map
+        this.showMarkers(data);
+    })
+}*/
+  
+
+BikeMap.prototype.showMarkers = function(data) {
+    // Hike all markers except for approved markers on map
+    for (let i=0; i<data.length; i++) {
+        // make instances of BikeRack for each
+        let bikerack = new BikeRack(data[i]);
+        // TODO, store this information somewhere? And should I use
+        // BikeRackCollection here?
+        // now add marker
+        this.addMarker(bikerack.state);
+    }
+}
+
+  
     
 

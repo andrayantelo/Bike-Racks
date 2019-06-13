@@ -75,14 +75,14 @@ def collect_bike_rack(table_name, database, lat, lng):
 
     return jsonify(result_tup)
     
-def get_approved(table_name, database):
-    # get data from database for pending bikeracks
-    query = "SELECT * FROM {} WHERE status = 'approved'".format(table_name)
-    result = database.execute(query).fetchall()
+def get_racks(table_name, database, status):
+    # get data from database for approved bikeracks
+    query = "SELECT * FROM {} WHERE status =?".format(table_name)
+    result = database.execute(query, (status,)).fetchall()
     
-    result = [ dict_from_row(row) for row in result]
+    result = [dict_from_row(row) for row in result]
     print(result)
-    return result
+    return jsonify(result)
     
 
     

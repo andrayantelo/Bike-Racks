@@ -51,6 +51,7 @@ def coordinates():
                 db.commit()
             except Exception as e:
                 print(e)
+                # TODO, maybe just render_template here?
         
         # return data for the added temporary marker
         bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
@@ -59,13 +60,27 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
-@bp.route('/approved', methods=('GET', 'POST'))
-def show_approved():
+@bp.route('/get_racks/<rack>', methods=['GET'])
+def get_racks(rack):
     if request.method == 'GET':
         # make a connection to the database
         db = get_db()
         
-        h.get_approved("bikeracks", db)
-        return render_template('base.html')
+        racks = h.get_racks("bikeracks", db, rack)
+        return racks
+        
+#@bp.route('/pending', methods=['GET'])
+#def pending():
+#    if request.method == 'GET':
+        # make a connection to the database
+#        db = get_db()
+        
+#        pending_racks = h.get_racks("bikeracks", db, "pending")
+#        return pending_racks
+        
+#@bp.route('/rejected', methods=['GET'])
+#def rejected():
+#    if request.method == 'GET':
+        # make a connection
     
 

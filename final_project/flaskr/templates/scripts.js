@@ -18,7 +18,8 @@ $(document).ready(function() {
     bikemap.initBikeMap();
     // bind click function to the map element
     
-    bikemap.mymap.on('click', bikemap.onMapClick.bind(bikemap)); 
+    //bikemap.mymap.on('click', bikemap.onMapClick.bind(bikemap));
+    //bikemap.mymap.on('click', $('#submitButton'), bikemap.addSubmit.bind(bikemap))
     
 });
 
@@ -158,19 +159,21 @@ class BikeMap {
         this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
         
         // DOM elements
-        this.$myMap = $('#mapid');
-        this.$submitButton = $('#submitButton');
-        this.$showApproved = $('#showApproved');
-        this.$showPending = $('#showPending');
-        this.$showRejected = $('#showRejected');
+        //this.$myMap = $('#mapid');
+        //this.$submitButton = $('#submitButton');
+        //this.$showApproved = $('#showApproved');
+        //this.$showPending = $('#showPending');
+        //this.$showRejected = $('#showRejected');
         
         // click handlers
         // add submit button click handler
-        this.$myMap.on('click', this.$submitButton, this.addSubmit.bind(this));
-        this.$showApproved.on('click', this.getApprovedMarkers.bind(this));
-        this.$showPending.on('click', this.getPendingMarkers.bind(this));
-        this.$showRejected.on('click', this.getRejectedMarkers.bind(this));
         
+        this.mymap.on('click', this.onMapClick.bind(this));
+        $('#mapid').on('click', '#submitButton', this.addSubmit.bind(this))
+        
+        $('#showApproved').on('click', this.getApprovedMarkers.bind(this));
+        $('#showPending').on('click', this.getPendingMarkers.bind(this));
+        $('#showRejected').on('click', this.getRejectedMarkers.bind(this));
         
     }
 };
@@ -194,11 +197,13 @@ BikeMap.prototype.initBikeMap = function () {
         
 }
 
+
 BikeMap.prototype.addSubmit = function(e) {
     // send a request to the server, sending the coordinates of the
     // place on the map that was clicked
     console.log("add bike rack button clicked");
-    console.log(this) // submit button
+    console.log(this) 
+    
     e.preventDefault();
     $.ajax({
         method: 'POST',
@@ -234,6 +239,8 @@ BikeMap.prototype.processBikeRack = function(data) {
 BikeMap.prototype.onMapClick = function (e) {
 
     // add the temporary  marker at coordinates
+    console.log(e);
+    console.log(this);
     this.addTempMarker(e.latlng.lat, e.latlng.lng, tempMarkerColor, this.mymap)
 }
 

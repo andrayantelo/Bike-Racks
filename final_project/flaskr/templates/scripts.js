@@ -157,9 +157,20 @@ class BikeMap {
     constructor(mymap) {
         this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
         
+        // DOM elements
+        this.$myMap = $('#mapid');
+        this.$submitButton = $('#submitButton');
+        this.$showApproved = $('#showApproved');
+        this.$showPending = $('#showPending');
+        this.$showRejected = $('#showRejected');
+        
         // click handlers
         // add submit button click handler
-        $('#mapid').on('click', '#submitButton', this.addSubmit.bind(this));
+        this.$myMap.on('click', this.$submitButton, this.addSubmit.bind(this));
+        this.$showApproved.on('click', this.getApprovedMarkers.bind(this));
+        this.$showPending.on('click', this.getPendingMarkers.bind(this));
+        this.$showRejected.on('click', this.getRejectedMarkers.bind(this));
+        
         
     }
 };

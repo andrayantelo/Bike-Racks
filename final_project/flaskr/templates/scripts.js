@@ -109,13 +109,18 @@ class BikeRack {
 // rack
 class BikeRackCollection {
     constructor() {
-        let self = this;
-        // arrays of BikeRack objects
+        // arrays of markers for bike racks
+        this.markers = [];
+        this.approvedMarkers = [];
+        this.pendingMarkers = [];
+        this.rejectedMarkers = [];
         
-        this.markers = []
-        self.approvedBikeRacks = [];
-        self.pendingBikeRacks = [];
-        self.rejectedBikeRacks = [];
+        // arrays of bike rack objects
+        this.allRacks = [];
+        this.approvedRacks = [];
+        this.pendingRacks = [];
+        this.rejectedRacks = [];
+        
     }
     
     addBikeRack() {
@@ -163,6 +168,10 @@ function popupContent(lat, lng) {
 class BikeMap {
     constructor(mymap) {
         this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
+        this.allRacks = [];
+        this.pendingRacks = [];
+        this.approvedRacks = [];
+        this.rejectedRacks = [];
 
         // DOM elements
         //this.$myMap = $('#mapid');
@@ -177,9 +186,9 @@ class BikeMap {
         this.mymap.on('click', this.onMapClick.bind(this));
         $('#mapid').on('click', '#submitButton', this.addSubmit.bind(this))
         
-        $('#showApproved').on('click', this.getApprovedMarkers.bind(this));
-        $('#showPending').on('click', this.getPendingMarkers.bind(this));
-        $('#showRejected').on('click', this.getRejectedMarkers.bind(this));
+        $('#showApproved').on('click', this.getApprovedRacks.bind(this));
+        $('#showPending').on('click', this.getPendingRacks.bind(this));
+        $('#showRejected').on('click', this.getRejectedRacks.bind(this));
         
     }
 };
@@ -197,15 +206,24 @@ BikeMap.prototype.initBikeMap = function () {
    
        
     // add marker to map at Mountain View Public Librarys TODO, remove later
-    let approvedIcon = buildMarkerIcon(approvedMarkerColor);
-    let marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
+    let approvedIcon = buildMarkerIcon(approvedMarkerColor),
+        marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
+    
+    // request data on all racks in the database, make BikeRackCollection object,
+    // store all rack information in the arrays of BikeRackCollection object
+    // TODO do I need a separate class here? BikeRackCollection
+    let allRacks = this.getRacks();
+    allRacks.done((data) => {
+        // TODO is the below an ok way to do it
+        this.allRacks = data;
+    });
     
     this.loadMarkers();
 }
 
 BikeMap.prototype.loadMarkers = function() {
     // when user visits page, map will load with ALL markers on it
-    let racks = this.getMarkers();
+    let racks = this.getRacks();
     racks.done((data) => {
         this.showMarkers(data);
     })
@@ -307,7 +325,7 @@ BikeMap.prototype.removeMarker = function(lat, lng) {
     
 }
 
-BikeMap.prototype.getPendingMarkers = function() {
+BikeMap.prototype.getPendingRacks = function() {
     // make request for pending bike racks
     
     $.ajax({
@@ -319,7 +337,7 @@ BikeMap.prototype.getPendingMarkers = function() {
     })
 }
 
-BikeMap.prototype.getApprovedMarkers = function() {
+BikeMap.prototype.getApprovedRacks = function() {
     // make ajax request for approved bike racks
     $.ajax({
         method: 'GET',
@@ -331,7 +349,7 @@ BikeMap.prototype.getApprovedMarkers = function() {
     })
 }
 
-BikeMap.prototype.getRejectedMarkers = function() {
+BikeMap.prototype.getRejectedRacks = function() {
     // Hide all markers except for rejected markers on map
     $.ajax({
         method: 'GET',
@@ -342,10 +360,10 @@ BikeMap.prototype.getRejectedMarkers = function() {
     })
 }
 
-BikeMap.prototype.getMarkers = function() {
+BikeMap.prototype.getRacks = function() {
     // get markers with status= 'approved', 'pending', 'rejected', or
     // if not specified, get all markers TODO change the default for status
-    
+    console.log("running getRacks");
     
     // get data on all of the bike racks stored in the database
     return $.ajax({
@@ -359,8 +377,7 @@ BikeMap.prototype.getMarkers = function() {
   
 
 BikeMap.prototype.showMarkers = function(data) {
-    // show markers with status = status
-    
+
     // Hike all markers except for approved markers on map
     for (let i=0; i<data.length; i++) {
         // make instances of BikeRack for each

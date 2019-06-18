@@ -200,8 +200,17 @@ BikeMap.prototype.initBikeMap = function () {
     let approvedIcon = buildMarkerIcon(approvedMarkerColor);
     let marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
     
-        
+    this.loadMarkers();
 }
+
+BikeMap.prototype.loadMarkers = function() {
+    // when user visits page, map will load with ALL markers on it
+    let racks = this.getMarkers();
+    racks.done((data) => {
+        this.showMarkers(data);
+    })
+    
+};
 
 
 BikeMap.prototype.addSubmit = function(e) {
@@ -339,18 +348,14 @@ BikeMap.prototype.getMarkers = function() {
     
     
     // get data on all of the bike racks stored in the database
-    $.ajax({
+    return $.ajax({
         method: 'GET',
         url: {{ url_for('bikes.get_racks')|tojson }},
         context: this,
-    }).done(function(data) {
-        this.showMarkers(data);
     })
 }
 
-BikeMap.prototype.updateMap = function() {
-    // pass
-};
+
   
 
 BikeMap.prototype.showMarkers = function(data) {

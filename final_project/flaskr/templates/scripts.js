@@ -102,6 +102,7 @@ class BikeRack {
 
 };
 
+
 // BikeRackCollection Class
 // Keeps track of all of the bikeracks on the page. Manipulate
 // the html for the collection of bikeracks, instead of an individual bike
@@ -109,7 +110,9 @@ class BikeRack {
 class BikeRackCollection {
     constructor() {
         let self = this;
+        // arrays of BikeRack objects
         
+        this.markers = []
         self.approvedBikeRacks = [];
         self.pendingBikeRacks = [];
         self.rejectedBikeRacks = [];
@@ -124,6 +127,9 @@ class BikeRackCollection {
         // Remove bike rack from the collection
     }
 };
+
+
+
 
 //BikeMap is the class for the overall website. It will include functions
 // that manipulate html, or add functionality
@@ -157,7 +163,7 @@ function popupContent(lat, lng) {
 class BikeMap {
     constructor(mymap) {
         this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
-        
+
         // DOM elements
         //this.$myMap = $('#mapid');
         //this.$submitButton = $('#submitButton');
@@ -270,21 +276,25 @@ BikeMap.prototype.addMarker = function(state) {
     // hide all approved, etc
     //build icon
     let markerIcon = buildMarkerIcon(state.markerColor),
+        content = popupContent(state.latitude, state.longitude),
         marker;
-  
-    // add the temporary  marker at coordinates
+    // create marker at coordinates
     marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
+    // bind pop up
+    marker.bindPopup(content);
+    // click handler
+    marker.on('click', function() {
+        this.openPopup();
+    })
+    
+    // add marker to map
     marker.addTo(this.mymap);
-        
-    let content = popupContent(state.latitude, state.longitude);
-        
-    // enable popup that shows coordinates and 'add bike rack' button
-    marker.bindPopup(content).openPopup();
     
 }
 
+
 BikeMap.prototype.removeMarker = function(lat, lng) {
-    // remove markers at lat, lng
+    // remove markers at lat, lng TODO
     
 }
 
@@ -296,7 +306,6 @@ BikeMap.prototype.getPendingMarkers = function() {
         url: {{ url_for('bikes.get_racks', status="pending")|tojson }},
         context: this
     }).done(function(data) {
-        // show on map
         this.showMarkers(data);
     })
 }
@@ -309,7 +318,6 @@ BikeMap.prototype.getApprovedMarkers = function() {
         context: this,
         
     }).done(function(data) {
-        // show on map
         this.showMarkers(data);
     })
 }
@@ -318,16 +326,36 @@ BikeMap.prototype.getRejectedMarkers = function() {
     // Hide all markers except for rejected markers on map
     $.ajax({
         method: 'GET',
-        url: {{url_for('bikes.get_racks', status="rejected")|tojson }},
+        url: {{ url_for('bikes.get_racks', status="rejected")|tojson }},
         context: this,
     }).done(function(data) {
-        // show on map
         this.showMarkers(data);
     })
 }
+
+BikeMap.prototype.getMarkers = function() {
+    // get markers with status= 'approved', 'pending', 'rejected', or
+    // if not specified, get all markers TODO change the default for status
+    
+    
+    // get data on all of the bike racks stored in the database
+    $.ajax({
+        method: 'GET',
+        url: {{ url_for('bikes.get_racks')|tojson }},
+        context: this,
+    }).done(function(data) {
+        this.showMarkers(data);
+    })
+}
+
+BikeMap.prototype.updateMap = function() {
+    // pass
+};
   
 
 BikeMap.prototype.showMarkers = function(data) {
+    // show markers with status = status
+    
     // Hike all markers except for approved markers on map
     for (let i=0; i<data.length; i++) {
         // make instances of BikeRack for each

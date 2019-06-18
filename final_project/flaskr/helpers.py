@@ -77,11 +77,16 @@ def collect_bike_rack(table_name, database, lat, lng):
     
 def get_racks(table_name, database, status):
     # get data from database for approved bikeracks
-    query = "SELECT * FROM {} WHERE status =?".format(table_name)
-    result = database.execute(query, (status,)).fetchall()
+    if status == None:
+        print("status was none")
+        query = "SELECT * FROM {}".format(table_name)
+        result = database.execute(query).fetchall()
+    else:
+        print("status was {}".format(status))
+        query = "SELECT * FROM {} WHERE status =?".format(table_name)
+        result = database.execute(query, (status,)).fetchall()
     
     result = [dict_from_row(row) for row in result]
-    print(result)
     return jsonify(result)
     
 

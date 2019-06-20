@@ -1,9 +1,3 @@
-// Leaflet Map
-let mymap;
-
-// Markers for map
-let markers = []; 
-
 // Colors for different types of markers
 const tempMarkerColor = 'gray';
 const pendingMarkerColor = 'orange';
@@ -26,14 +20,6 @@ $(document).ready(function() {
 
 
 // Helper Functions
-
-// checks if value is a valid latitudinal coordinate
-let isLat = lat => !Number.isNaN(Number.parseFloat(lat)) && (lat <=90 && lat >=-90);
-
-// checks if value is valid longitudinal coordinate
-let isLong = long => !Number.isNaN(Number.parseFloat(long)) && (long <=180 && long >= -180);
-
-
 let emptyBikeState = function(params) {
     // params = {
     //   latitude: float,
@@ -43,9 +29,6 @@ let emptyBikeState = function(params) {
     //   status: string
     // }
     if ($.isEmptyObject(params)) {
-        return {}
-    }
-    if (!(isLat(params.lat) && isLong(params.lng))) {
         return {}
     }
     return {
@@ -61,7 +44,6 @@ let emptyBikeState = function(params) {
 class BikeRack {
     constructor(state) {
         this.state = state;
-        
         this.initBikeRack();
     }
     
@@ -69,13 +51,6 @@ class BikeRack {
         this.setMarkerColor();
     }
 
-// A user should be able to add a marker somewhere, but it would be
-// more like request to add a marker, then a preliminary marker (maybe
-// yellow in color) is
-// added in the location, and it will only become a fully fledged marker (green)
-// when enough people verify that a bike rack actually exists at that
-// location. have an option to show all pending/hide all pending
-// in the navbar, approved always visible?
     setMarkerColor() {
         let markerColor;
         let status = this.state.status;
@@ -105,7 +80,7 @@ class BikeRack {
 
 // BikeRackCollection Class
 // Keeps track of all of the bikeracks on the page. Manipulate
-// the html for the collection of bikeracks, instead of an individual bike
+// the html for a collection of bikeracks, instead of an individual bike
 // rack
 class BikeRackCollection {
     constructor() {
@@ -163,11 +138,12 @@ function popupContent(lat, lng) {
         </div>
         `
     return content
-}
+};
 
 class BikeMap {
     constructor(mymap) {
-        this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
+        // set map to display user's current location
+        this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         this.allRacks = [];
         this.pendingRacks = [];
         this.approvedRacks = [];
@@ -203,6 +179,8 @@ BikeMap.prototype.initBikeMap = function () {
         id: 'mapbox.streets',
         accessToken: 'pk.eyJ1IjoiYW5kcmF5YW50ZWxvIiwiYSI6ImNqczB1YTJ6ajFuNGo0M2x2eTVpNms1MHEifQ.1SbExoA1iGNdOKDRoG4Qng'
     }).addTo(this.mymap);
+    
+    
    
        
     // add marker to map at Mountain View Public Librarys TODO, remove later
@@ -272,8 +250,6 @@ BikeMap.prototype.processBikeRack = function(data) {
 BikeMap.prototype.onMapClick = function (e) {
 
     // add the temporary  marker at coordinates
-    console.log(e);
-    console.log(this);
     this.addTempMarker(e.latlng.lat, e.latlng.lng, tempMarkerColor, this.mymap)
 }
 
@@ -374,8 +350,6 @@ BikeMap.prototype.getRacks = function() {
 }
 
 
-  
-
 BikeMap.prototype.showMarkers = function(data) {
 
     // Hike all markers except for approved markers on map
@@ -389,6 +363,5 @@ BikeMap.prototype.showMarkers = function(data) {
     }
 }
 
-  
-    
+
 

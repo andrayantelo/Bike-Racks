@@ -13,7 +13,7 @@ $(document).ready(function() {
     // bind click function to the map element
     
     //bikemap.mymap.on('click', bikemap.onMapClick.bind(bikemap));
-    //bikemap.mymap.on('click', $('#submitButton'), bikemap.addSubmit.bind(bikemap))
+    //bikemap.mymap.on('click', $('#submitButton'), bikemap.submitBikeRack.bind(bikemap))
     
 });
 
@@ -117,11 +117,6 @@ class BikeRackCollection {
 // Like initializing the map
 
 // BikeMap class helper functions
-// temporary marker for when person clicks random spot on map
-let tempMarker = {};
-
-
-
 function buildMarkerIcon(markerColor) {
     return L.AwesomeMarkers.icon({
         prefix: 'fa',
@@ -142,37 +137,50 @@ function popupContent(lat, lng) {
 
 class BikeMap {
     constructor(mymap) {
+        // show mountain view for now
+        this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
         // set map to display user's current location
-        this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
+        //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
+        
+        
         this.allRacks = [];
         this.pendingRacks = [];
         this.approvedRacks = [];
         this.rejectedRacks = [];
+        
+        // temporary marker for when person clicks on random spot on map
+        this.tempMarker = {};
 
         // DOM elements
-        //this.$myMap = $('#mapid');
-        //this.$submitButton = $('#submitButton');
-        //this.$showApproved = $('#showApproved');
-        //this.$showPending = $('#showPending');
-        //this.$showRejected = $('#showRejected');
+        this.$myMap = $('#mapid');
+        this.$showApproved = $('#showApproved');
+        this.$showPending = $('#showPending');
+        this.$showRejected = $('#showRejected');
         
-        // click handlers
-        // add submit button click handler
-        
+        // click bindings
         this.mymap.on('click', this.onMapClick.bind(this));
-        $('#mapid').on('click', '#submitButton', this.addSubmit.bind(this))
+        this.$myMap.on('click', '#submitButton', function(e) {
+            this.submitBikeRack(e, this.createBikeRack.bind(this));
+        }.bind(this));
         
-        $('#showApproved').on('click', this.getApprovedRacks.bind(this));
-        $('#showPending').on('click', this.getPendingRacks.bind(this));
-        $('#showRejected').on('click', this.getRejectedRacks.bind(this));
+        this.$showApproved.on('click', function(e) {
+            this.getApprovedRacks(e, this.showRacks.bind(this));
+        }.bind(this));
         
+        this.$showPending.on('click', function(e) {
+            this.getPendingRacks(e, this.showRacks.bind(this));
+        }.bind(this));
+        
+        this.$showRejected.on('click', function(e) {
+            this.getRejectedRacks(e, this.showRacks.bind(this));
+        }.bind(this));
     }
 };
     
 BikeMap.prototype.initBikeMap = function () {
     console.log("Initializing BikeRax");
        
- 
+    // add a tile layer to the map
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 18,
@@ -190,30 +198,29 @@ BikeMap.prototype.initBikeMap = function () {
     // request data on all racks in the database, make BikeRackCollection object,
     // store all rack information in the arrays of BikeRackCollection object
     // TODO do I need a separate class here? BikeRackCollection
-    let allRacks = this.getRacks();
-    allRacks.done((data) => {
-        // TODO is the below an ok way to do it
-        this.allRacks = data;
-    });
     
-    this.loadMarkers();
+    //this.loadRacks(this.showRacks.bind(this)); 
 }
 
-BikeMap.prototype.loadMarkers = function() {
+BikeMap.prototype.loadRacks = function(callback) {
+    // get data on ALL the markers in the database
     // when user visits page, map will load with ALL markers on it
-    let racks = this.getRacks();
-    racks.done((data) => {
-        this.showMarkers(data);
+    let allRacksPromise = this.getRacks();
+    allRacksPromise.done((data) => {
+        this.allRacks = data;
+        callback(data);
     })
     
 };
 
 
-BikeMap.prototype.addSubmit = function(e) {
+BikeMap.prototype.submitBikeRack = function(e, callback) {
     // send a request to the server, sending the coordinates of the
     // place on the map that was clicked
+    
+    // submit a location on the map for bike rack location consideration
+    // it will be added to the database as long as the coordinates are valid
     console.log("add bike rack button clicked");
-    console.log(this) 
     
     e.preventDefault();
     $.ajax({
@@ -224,27 +231,33 @@ BikeMap.prototype.addSubmit = function(e) {
             lng: $('#lng').text()
         },
         context: this
-  }).done(function(data) {
-      this.processBikeRack(data);
+  }).done(function(state) {
+      callback(state);
   })
 }
 
-BikeMap.prototype.processBikeRack = function(data) {
-    // the coordinates 
-    //  - if it's an approved rack:
-    //    then a green marker needs to popup (with no 'add bike rack'
-    //    button)
-    //  - if it's a rejected rack:
-    //    then a red marker needs to popup (with voting buttons)
-    //  - if it's a pending rack:
-    //    orange marker with voting buttons
-    //  - otherwise it's a grey marker with 'add bike rack' button
-    // 
+/*BikeMap.prototype.createBikeRack = function(state) {
+    // create an instance of BikeRack and return it's state
+    console.log("creating bike rack");
+    
+    let bikerack = new BikeRack(state),
+        iconColor = bikerack.setMarkerColor();
+        
+    // store this new bikerack in an array in BikeMaps constructor function
+    // or in a variable in the constructor that is pointing to an instance
+    // of BikeRackCollection? TODO 
+    
+    return bikerack.state;
+} */
 
-      let bikerack = new BikeRack(data[1])
-      let iconColor = bikerack.setMarkerColor(bikerack.state.status);
+BikeMap.prototype.createBikeRack = function(state) {
+    // creates a bike rack on the map
+    console.log("creating bike rack");
+
+    let bikerack = new BikeRack(state)
+    let iconColor = bikerack.setMarkerColor();
       
-      this.addMarker(bikerack.state);
+    this.addMarker(bikerack.state);
 }
     
 BikeMap.prototype.onMapClick = function (e) {
@@ -256,21 +269,20 @@ BikeMap.prototype.onMapClick = function (e) {
 BikeMap.prototype.addTempMarker = function(lat, lng) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
-    let markerIcon = buildMarkerIcon(tempMarkerColor);
+    let markerIcon = buildMarkerIcon(tempMarkerColor),
+        content = popupContent(lat, lng);
     // if there is already a tempMarker, remove it
-    if (tempMarker !== undefined) {
-        this.mymap.removeLayer(tempMarker);
+    if (this.tempMarker !== undefined) {
+        this.mymap.removeLayer(this.tempMarker);
     }
         
     // add the temporary  marker at coordinates
-    tempMarker = L.marker([lat, lng], {icon: markerIcon});
+    this.tempMarker = L.marker([lat, lng], {icon: markerIcon});
     
-    tempMarker.addTo(this.mymap);
-        
-    let content = popupContent(lat, lng);
+    this.tempMarker.addTo(this.mymap);
         
     // enable popup that shows coordinates and 'add bike rack' button
-    tempMarker.bindPopup(content).openPopup();
+    this.tempMarker.bindPopup(content).openPopup();
 }
 
 BikeMap.prototype.addMarker = function(state) {
@@ -301,38 +313,54 @@ BikeMap.prototype.removeMarker = function(lat, lng) {
     
 }
 
-BikeMap.prototype.getPendingRacks = function() {
+BikeMap.prototype.getPendingRacks = function(e, callback) {
     // make request for pending bike racks
-    
+    e.preventDefault();
     $.ajax({
         method: 'GET',
         url: {{ url_for('bikes.get_racks', status="pending")|tojson }},
         context: this
-    }).done(function(data) {
-        this.showMarkers(data);
+    }).done(function(racks) {
+        callback(racks);
     })
 }
 
-BikeMap.prototype.getApprovedRacks = function() {
+BikeMap.prototype.getApprovedRacks = function(e, callback) {
     // make ajax request for approved bike racks
+    // callback, function that handles response data
+    e.preventDefault();
     $.ajax({
         method: 'GET',
         url: {{ url_for('bikes.get_racks', status="approved")|tojson }},
         context: this,
         
-    }).done(function(data) {
-        this.showMarkers(data);
+    }).done(function(racks) {
+        callback(racks);
     })
 }
 
-BikeMap.prototype.getRejectedRacks = function() {
+BikeMap.prototype.getRejectedRacks = function(e, callback) {
     // Hide all markers except for rejected markers on map
+    e.preventDefault();
     $.ajax({
         method: 'GET',
         url: {{ url_for('bikes.get_racks', status="rejected")|tojson }},
         context: this,
-    }).done(function(data) {
-        this.showMarkers(data);
+    }).done(function(racks) {
+        callback(racks);
+    })
+}
+
+
+// TODO figure out if this is a possibility
+BikeMap.prototype.testGetRacks = function(e, status) {
+    e.preventDefault();
+    $.ajax({
+        method: 'GET',
+        url: {{ url_for('bikes.get_racks/', status=status)|tojson }},
+        context: this,
+    }).done(function(racks) {
+        console.log(racks);
     })
 }
 
@@ -350,7 +378,7 @@ BikeMap.prototype.getRacks = function() {
 }
 
 
-BikeMap.prototype.showMarkers = function(data) {
+BikeMap.prototype.showRacks = function(data) {
 
     // Hike all markers except for approved markers on map
     for (let i=0; i<data.length; i++) {

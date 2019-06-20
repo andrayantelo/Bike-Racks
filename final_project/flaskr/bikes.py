@@ -68,5 +68,6 @@ def get_racks(status):
         db = get_db()
         
         racks = h.get_racks("bikeracks", db, status)
-        return racks
         
+        return racks
+    

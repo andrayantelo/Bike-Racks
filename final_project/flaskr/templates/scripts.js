@@ -213,7 +213,6 @@ BikeMap.prototype.loadRacks = function(callback) {
     
 };
 
-
 BikeMap.prototype.submitBikeRack = function(e, callback) {
     // send a request to the server, sending the coordinates of the
     // place on the map that was clicked
@@ -236,7 +235,7 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
   })
 }
 
-/*BikeMap.prototype.createBikeRack = function(state) {
+BikeMap.prototype.createBikeRack = function(state) {
     // create an instance of BikeRack and return it's state
     console.log("creating bike rack");
     
@@ -248,7 +247,7 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
     // of BikeRackCollection? TODO 
     
     return bikerack.state;
-} */
+} 
 
 BikeMap.prototype.createBikeRack = function(state) {
     // creates a bike rack on the map
@@ -313,69 +312,21 @@ BikeMap.prototype.removeMarker = function(lat, lng) {
     
 }
 
-BikeMap.prototype.getPendingRacks = function(e, callback) {
-    // make request for pending bike racks
-    e.preventDefault();
-    $.ajax({
-        method: 'GET',
-        url: {{ url_for('bikes.get_racks', status="pending")|tojson }},
-        context: this
-    }).done(function(racks) {
-        callback(racks);
-    })
-}
 
-BikeMap.prototype.getApprovedRacks = function(e, callback) {
-    // make ajax request for approved bike racks
-    // callback, function that handles response data
-    e.preventDefault();
-    $.ajax({
-        method: 'GET',
-        url: {{ url_for('bikes.get_racks', status="approved")|tojson }},
-        context: this,
+BikeMap.prototype.getRacks = function(status) {
+    // send a request to the server for data on racks with status=status
+    //e.preventDefault();
+
+    let path = {{ url_for('bikes.get_racks')|tojson }},
+        params = $.param({status: status});
         
-    }).done(function(racks) {
-        callback(racks);
-    })
-}
-
-BikeMap.prototype.getRejectedRacks = function(e, callback) {
-    // Hide all markers except for rejected markers on map
-    e.preventDefault();
-    $.ajax({
-        method: 'GET',
-        url: {{ url_for('bikes.get_racks', status="rejected")|tojson }},
-        context: this,
-    }).done(function(racks) {
-        callback(racks);
-    })
-}
-
-
-// TODO figure out if this is a possibility
-BikeMap.prototype.testGetRacks = function(e, status) {
-    e.preventDefault();
-    $.ajax({
-        method: 'GET',
-        url: {{ url_for('bikes.get_racks/', status=status)|tojson }},
-        context: this,
-    }).done(function(racks) {
-        console.log(racks);
-    })
-}
-
-BikeMap.prototype.getRacks = function() {
-    // get markers with status= 'approved', 'pending', 'rejected', or
-    // if not specified, get all markers TODO change the default for status
-    console.log("running getRacks");
-    
-    // get data on all of the bike racks stored in the database
     return $.ajax({
         method: 'GET',
-        url: {{ url_for('bikes.get_racks')|tojson }},
+        url: path + '?' + params,
         context: this,
     })
 }
+
 
 
 BikeMap.prototype.showRacks = function(data) {

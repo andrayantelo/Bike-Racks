@@ -26,6 +26,8 @@ bp = Blueprint('bikes', __name__)
 # might want to add the '/' route here TODO
 @bp.route('/dynamic/<path:path>')
 def render_file(path):
+    
+    # TODO, figure out the status part of this function
     response = render_template(path), 200, {'Content-Type': 'text/javascript'}
     
     return response
@@ -60,10 +62,14 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
-@bp.route('/get_racks/', defaults={'status': None}, methods=['GET'])
-@bp.route('/get_racks/<status>', methods=['GET'])
-def get_racks(status):
+@bp.route('/get_racks/', methods=['GET'])
+def get_racks():
     if request.method == 'GET':
+        print(request.args)
+        status = request.args.get('status') or None
+        print("status: {!r}".format(status))
+        print("running get_racks")
+
         # make a connection to the database
         db = get_db()
         

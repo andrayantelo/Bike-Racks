@@ -141,12 +141,15 @@ class BikeMap {
         this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
         // set map to display user's current location
         //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
+        this.marker;
         
         
-        this.allRacks = [];
-        this.pendingRacks = [];
-        this.approvedRacks = [];
-        this.rejectedRacks = [];
+        this.allRacks = L.featureGroup([]);
+        
+      
+        this.pendingRacks = L.featureGroup([]);
+        this.approvedRacks = L.featureGroup([]);
+        this.rejectedRacks = L.featureGroup([]);
         
         // temporary marker for when person clicks on random spot on map
         this.tempMarker = {};
@@ -164,16 +167,17 @@ class BikeMap {
         }.bind(this));
         
         this.$showApproved.on('click', function(e) {
-            this.getApprovedRacks(e, this.showRacks.bind(this));
+            this.getRacks("approved").done((racks) => this.showRacks(racks));
         }.bind(this));
-        
+
         this.$showPending.on('click', function(e) {
-            this.getPendingRacks(e, this.showRacks.bind(this));
+            this.getRacks("pending").done((racks) => this.showRacks(racks));
         }.bind(this));
         
         this.$showRejected.on('click', function(e) {
-            this.getRejectedRacks(e, this.showRacks.bind(this));
+            this.getRacks("rejected").done((racks) => this.showRacks(racks));
         }.bind(this));
+
     }
 };
     
@@ -192,8 +196,8 @@ BikeMap.prototype.initBikeMap = function () {
    
        
     // add marker to map at Mountain View Public Librarys TODO, remove later
-    let approvedIcon = buildMarkerIcon(approvedMarkerColor),
-        marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
+    let approvedIcon = buildMarkerIcon(approvedMarkerColor);
+    this.marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
     
     // request data on all racks in the database, make BikeRackCollection object,
     // store all rack information in the arrays of BikeRackCollection object
@@ -235,7 +239,7 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
   })
 }
 
-BikeMap.prototype.createBikeRack = function(state) {
+/*BikeMap.prototype.createBikeRack = function(state) {
     // create an instance of BikeRack and return it's state
     console.log("creating bike rack");
     
@@ -247,9 +251,9 @@ BikeMap.prototype.createBikeRack = function(state) {
     // of BikeRackCollection? TODO 
     
     return bikerack.state;
-} 
+} */
 
-BikeMap.prototype.createBikeRack = function(state) {
+/*BikeMap.prototype.createBikeRack = function(state) {
     // creates a bike rack on the map
     console.log("creating bike rack");
 
@@ -257,7 +261,7 @@ BikeMap.prototype.createBikeRack = function(state) {
     let iconColor = bikerack.setMarkerColor();
       
     this.addMarker(bikerack.state);
-}
+}*/
     
 BikeMap.prototype.onMapClick = function (e) {
 
@@ -284,7 +288,53 @@ BikeMap.prototype.addTempMarker = function(lat, lng) {
     this.tempMarker.bindPopup(content).openPopup();
 }
 
-BikeMap.prototype.addMarker = function(state) {
+// TODO maybe have split functions, create marker, and addMarker (to map)
+// inside createMarker the marker will need to be added to a featureGroup
+// depending on it's status
+
+// TODO Figure out binding of popups, is it possible to do it via the featureGroup?
+// after that is figured out, remove uneeded and commented out functions, and
+// then implement functions that remove markers from the map using the featureGroup
+
+BikeMap.prototype.createMarker = function(state) {
+    console.log("running createMarker");
+    let markerIcon = buildMarkerIcon(state.markerColor),
+        marker;
+    
+    console.log("making marker with lat: " + state.latitude + " lng: " + state.longitude);
+    marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
+    
+    // add marker to allRacks feature group and its feature group based on status
+    console.log("adding marker to all racks LayerGroup");
+    this.allRacks.addLayer(marker);
+    if (state.status === "approved") {
+        console.log("adding marker to approved layerGroup");
+        this.approvedRacks.addLayer(marker);
+    }
+    else if (state.status === "pending") {
+        console.log("adding marker to pending layerGroup");
+        this.approvedRacks.addLayer(marker);
+    }
+    else if (state.status === "rejected") {
+        console.log("adding marker to rejected layerGroup");
+        this.rejectedRacks.addLayer(marker);
+    }
+    
+    // add its click handler
+    let content = popupContent(state.latitude, state.longitude);
+    marker.bindPopup(content)
+    marker.on('click', function() {
+        this.openPopup();
+    })
+    return marker;
+}
+
+BikeMap.prototype.addMarker = function(marker) {
+    // add given marker to map
+    marker.addTo(this.mymap);
+}
+
+/*BikeMap.prototype.addMarker = function(state) {
     // add marker of type pending, approved, or rejected that is not removed
     // when user clicks away (but is removed if user clicks on hide all temporary,
     // hide all approved, etc
@@ -300,18 +350,12 @@ BikeMap.prototype.addMarker = function(state) {
     marker.on('click', function() {
         this.openPopup();
     })
+    // add marker to group
+    
     
     // add marker to map
     marker.addTo(this.mymap);
-    
-}
-
-
-BikeMap.prototype.removeMarker = function(lat, lng) {
-    // remove markers at lat, lng TODO
-    
-}
-
+}*/
 
 BikeMap.prototype.getRacks = function(status) {
     // send a request to the server for data on racks with status=status
@@ -337,9 +381,17 @@ BikeMap.prototype.showRacks = function(data) {
         let bikerack = new BikeRack(data[i]);
         // TODO, store this information somewhere? And should I use
         // BikeRackCollection here?
-        // now add marker
-        this.addMarker(bikerack.state);
+        
+        // create marker
+        let marker = this.createMarker(bikerack.state)
+        // add marker to map
+        this.addMarker(marker);
     }
+}
+
+BikeMap.prototype.removeMarker = function() {
+    // remove markers at lat, lng TODO
+    
 }
 
 

@@ -144,7 +144,11 @@ class BikeMap {
         this.marker;
         
         
-        this.allRacks = L.featureGroup([]);
+        this.allRacks = L.featureGroup([]).on('click',
+            function(e) {
+                // open marker's popup
+                e.target.openPopup();
+            });
         
       
         this.pendingRacks = L.featureGroup([]);
@@ -320,12 +324,13 @@ BikeMap.prototype.createMarker = function(state) {
         this.rejectedRacks.addLayer(marker);
     }
     
-    // add its click handler
+    // bind popup to marker
     let content = popupContent(state.latitude, state.longitude);
     marker.bindPopup(content)
-    marker.on('click', function() {
+    /*marker.on('click', function() {
+        console.log(this)
         this.openPopup();
-    })
+    })*/
     return marker;
 }
 

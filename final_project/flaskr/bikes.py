@@ -65,10 +65,7 @@ def coordinates():
 @bp.route('/get_racks/', methods=['GET'])
 def get_racks():
     if request.method == 'GET':
-        print(request.args)
         status = request.args.get('status') or None
-        print("status: {!r}".format(status))
-        print("running get_racks")
 
         # make a connection to the database
         db = get_db()

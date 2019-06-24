@@ -77,11 +77,10 @@ def get_racks(table_name, database, status):
     # based on status
     
     if status == None:
-        print("status was none")
+        # return all racks
         query = "SELECT * FROM {}".format(table_name)
         result = database.execute(query).fetchall()
     else:
-        print("status was {}".format(status))
         query = "SELECT * FROM {} WHERE status =?".format(table_name)
         result = database.execute(query, (status,)).fetchall()
     

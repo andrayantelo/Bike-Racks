@@ -243,7 +243,7 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
   })
 }
 
-/*BikeMap.prototype.createBikeRack = function(state) {
+BikeMap.prototype.createBikeRack = function(state) {
     // create an instance of BikeRack and return it's state
     console.log("creating bike rack");
     
@@ -255,7 +255,7 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
     // of BikeRackCollection? TODO 
     
     return bikerack.state;
-} */
+} 
 
 /*BikeMap.prototype.createBikeRack = function(state) {
     // creates a bike rack on the map
@@ -305,22 +305,21 @@ BikeMap.prototype.createMarker = function(state) {
     let markerIcon = buildMarkerIcon(state.markerColor),
         marker;
     
-    console.log("making marker with lat: " + state.latitude + " lng: " + state.longitude);
     marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
     
     // add marker to allRacks feature group and its feature group based on status
     console.log("adding marker to all racks LayerGroup");
     this.allRacks.addLayer(marker);
     if (state.status === "approved") {
-        console.log("adding marker to approved layerGroup");
+        console.log("adding marker to approved featureGroup");
         this.approvedRacks.addLayer(marker);
     }
     else if (state.status === "pending") {
-        console.log("adding marker to pending layerGroup");
+        console.log("adding marker to pending featureGroup");
         this.approvedRacks.addLayer(marker);
     }
     else if (state.status === "rejected") {
-        console.log("adding marker to rejected layerGroup");
+        console.log("adding marker to rejected featureGroup");
         this.rejectedRacks.addLayer(marker);
     }
     
@@ -394,10 +393,11 @@ BikeMap.prototype.showRacks = function(data) {
     }
 }
 
-BikeMap.prototype.removeMarker = function() {
-    // remove markers at lat, lng TODO
-    
+BikeMap.prototype.removeMarkers = function(markerGroup) {
+    // remove markers only from map
+    // testing with approvedRacks
+    markerGroup.eachLayer(function(layer) {
+        this.mymap.removeLayer(layer);
+    }.bind(this));
 }
-
-
 

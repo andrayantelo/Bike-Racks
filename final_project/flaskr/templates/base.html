@@ -51,8 +51,7 @@
           </button>
           <div class="navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav ml-auto">
-                  
-                  
+
                   <li class="nav-item">
                       <!-- dropdown with options to show pending bike racks,
                            approved bikes, rejected, or all -->
@@ -63,49 +62,23 @@
                                   Show Racks
                           </button>
                             <div class="dropdown-menu">
-                                <a id="showPending" class="dropdown-item" href="#">Pending</a>
-                                <a id="showApproved" class="dropdown-item" href="#">Approved</a>
-                                <a id="showRejected" class="dropdown-item" href="#">Rejected</a>
+                                <a id="showPending" class="onmap dropdown-item" href="#">Pending</a>
+                                <a id="showApproved" class="onmap dropdown-item" href="#">Approved</a>
+                                <a id="showRejected" class="onmap dropdown-item" href="#">Rejected</a>
                             </div>
                       </div>
                       
                   </li>
-                  
-                  
+                
               </ul> 
+              <!-- address search bar -->
+              <form class="form-inline my-2 my-lg-0">
+                  <input class="form-control mr-sm-2" type="search" placeholder="Type in an address" aria-label="Search">
+                  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+              </form>
           </div> <!-- /.navbar-collapse -->
       </nav>
-    
-      <!-- Modal, has to be at top level which is why it's not in the container div-->
-      <div class="modal fade" id="coordinateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div> <!-- /.modal-header -->
-      <div class="modal-body">
-        <!-- Input coordinates form -->
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Coordinates</span>
-            </div> <!--/.input-group-prepend -->
-            <input id="latitude" type="number" step="any" aria-label="Latitude" class="form-control" placeholder="Latitude">
-            <input id="longitude" type="number" step="any" aria-label="Longitude" class="form-control" placeholder="Longitude">
-        </div> <!-- /.coordinate-input-group -->
-        
-      </div> <!-- /.modal-body -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <!--<button type="button" class="btn btn-primary" id="submitButton" type="submit">Submit</button> -->
-      </div> <!-- /.modal-footer -->
-    </div> <!-- /.modal-content -->
-  </div> <!-- /.modal-dialog -->
-</div> <!-- /.modal fade -->
 
-       
       <div class="container"> 
           <div id="mapid"></div>
         
@@ -118,6 +91,8 @@
   <!-- Awesome Markers JS -->
   <script src="../static/dist/leaflet.awesome-markers.js"></script>
   <script src="../dynamic/scripts.js"></script>
+  
+
   
   
 </html>

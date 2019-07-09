@@ -26,6 +26,8 @@ bp = Blueprint('bikes', __name__)
 # might want to add the '/' route here TODO
 @bp.route('/dynamic/<path:path>')
 def render_file(path):
+    
+    # TODO, figure out the status part of this function
     response = render_template(path), 200, {'Content-Type': 'text/javascript'}
     
     return response
@@ -51,7 +53,7 @@ def coordinates():
                 db.commit()
             except Exception as e:
                 print(e)
-                # TODO, maybe just render_template here?
+                # TODO, narrow down exception
         
         # return data for the added temporary marker
         bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
@@ -60,13 +62,26 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
-@bp.route('/get_racks/', defaults={'status': None}, methods=['GET'])
-@bp.route('/get_racks/<status>', methods=['GET'])
-def get_racks(status):
+@bp.route('/get_racks/', methods=['GET'])
+def get_racks():
     if request.method == 'GET':
+        status = request.args.get('status') or None
+
         # make a connection to the database
         db = get_db()
         
         racks = h.get_racks("bikeracks", db, status)
-        return racks
         
+        return racks
+    
+@bp.route('/store_rack/', methods=['POST'])
+def store_rack():
+    if request.method == 'POST':
+        args = request.json
+        db = get_db()
+        print("request json {}".format(args))
+        
+        h.insert_rack('bikeracks', db, args)
+        return Response(status=200)
+    return render_template('base.html')
+    

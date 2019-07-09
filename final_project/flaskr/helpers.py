@@ -1,4 +1,5 @@
 from flask import jsonify
+import sqlite3
 
 # Helper functions
 class Error(Exception):
@@ -59,38 +60,44 @@ def collect_pending(table_name, database, lat, lng):
     pending_racks = [tuple(row) for row in result]
     
     return jsonify(pending_racks)
-    
+
 # function that returns row for a bikerack with particular coordinates
 def collect_bike_rack(table_name, database, lat, lng):
-    # returns an object containing the db row obj for the bikerack (should
-    # I do tuple(row) instead? and  
+    # returns an object containing the data on a bikerack, searches
+    # database based on coordinates
+     
     query = "SELECT * FROM {} WHERE latitude = ? AND longitude = ?".format(table_name)
     
     result = database.execute(query, (lat, lng)).fetchone()
-    
-    
-    result_tup = (list(result), {"latitude": result['latitude'], 
-                  "longitude": result['longitude'], "address": result['address'],
-                  "id": result['id'], "status": result['status']})
+    result = dict_from_row(result)
 
-    return jsonify(result_tup)
+    return jsonify(result)
     
 def get_racks(table_name, database, status):
-    # get data from database for approved bikeracks
+    # get data from database for approved bikeracks, searches database
+    # based on status
+    
     if status == None:
-        print("status was none")
+        # return all racks
         query = "SELECT * FROM {}".format(table_name)
         result = database.execute(query).fetchall()
     else:
-        print("status was {}".format(status))
         query = "SELECT * FROM {} WHERE status =?".format(table_name)
         result = database.execute(query, (status,)).fetchall()
     
     result = [dict_from_row(row) for row in result]
     return jsonify(result)
-    
 
+# below function is to easily add racks to db for testing TODO 
+def insert_rack(table_name, database, rack):
+    # insert into table table_name, the rack (dict)
+    try:
+        query = "INSERT INTO {} (latitude, longitude, status, address) values (?, ?, ?, ?)".format(table_name)
+        database.execute(query, (rack['latitude'], rack['longitude'], rack['status'], rack['address']))
+        database.commit()
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
     
-# function that updates the racks to be shown on the map
-def update():
-    pass
+    return

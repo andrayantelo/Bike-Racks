@@ -32,8 +32,8 @@ let emptyBikeState = function(params) {
         return {}
     }
     return {
-        lat: params.lat,
-        lng: params.lng,
+        latitude: params.lat,
+        longitude: params.lng,
         address: params.address,
         uniqueId: params.uniqueId,
         status: params.status
@@ -135,6 +135,30 @@ function popupContent(lat, lng) {
     return content
 };
 
+
+
+/*this.$showApproved.on('click', function(e) {
+            let racksP = this.getRacks("approved");
+            // if the map is showing approved markers then remove them 
+            // from the map
+        
+            if (this.$showApproved.hasClass('onmap')) {
+                console.log("#showApproved has class 'onmap'");
+                racksP.done((racks) => this.removeMarkers(this.approvedRacks));
+                // remove class onmap
+                this.$showApproved.removeClass('onmap')
+            }
+            // if the map is not showing approved markers, add them to the map
+            else {
+                console.log("#showApproved does not have class 'onmap'");
+                racksP.done((racks) => this.showMarkers(racks));
+                this.$showApproved.addClass('onmap');
+            }
+        }.bind(this));
+
+*/
+
+
 class BikeMap {
     constructor(mymap) {
         // show mountain view for now
@@ -144,13 +168,9 @@ class BikeMap {
         this.marker;
         
         
-        this.allRacks = L.featureGroup([]).on('click',
-            function(e) {
-                // open marker's popup
-                e.target.openPopup();
-            });
+        this.allRacks = L.featureGroup([]);
+        this.allRacks.on('click', (e) => e.target.openPopup());
         
-      
         this.pendingRacks = L.featureGroup([]);
         this.approvedRacks = L.featureGroup([]);
         this.rejectedRacks = L.featureGroup([]);
@@ -167,19 +187,21 @@ class BikeMap {
         // click bindings
         this.mymap.on('click', this.onMapClick.bind(this));
         this.$myMap.on('click', '#submitButton', function(e) {
+            
             this.submitBikeRack(e, this.createBikeRack.bind(this));
         }.bind(this));
         
+        // TODO, work on below toggling click handler
         this.$showApproved.on('click', function(e) {
-            this.getRacks("approved").done((racks) => this.showRacks(racks));
+            this.toggleMarkers("approved", this.$showApproved, this.approvedRacks);
         }.bind(this));
-
+        
         this.$showPending.on('click', function(e) {
-            this.getRacks("pending").done((racks) => this.showRacks(racks));
+            this.toggleMarkers("pending", this.$showPending, this.pendingRacks);
         }.bind(this));
         
         this.$showRejected.on('click', function(e) {
-            this.getRacks("rejected").done((racks) => this.showRacks(racks));
+            this.toggleMarkers("rejected", this.$showRejected, this.rejectedRacks);
         }.bind(this));
 
     }
@@ -207,7 +229,7 @@ BikeMap.prototype.initBikeMap = function () {
     // store all rack information in the arrays of BikeRackCollection object
     // TODO do I need a separate class here? BikeRackCollection
     
-    //this.loadRacks(this.showRacks.bind(this)); 
+    this.loadRacks(this.showMarkers.bind(this)); 
 }
 
 BikeMap.prototype.loadRacks = function(callback) {
@@ -215,7 +237,6 @@ BikeMap.prototype.loadRacks = function(callback) {
     // when user visits page, map will load with ALL markers on it
     let allRacksPromise = this.getRacks();
     allRacksPromise.done((data) => {
-        this.allRacks = data;
         callback(data);
     })
     
@@ -256,16 +277,6 @@ BikeMap.prototype.createBikeRack = function(state) {
     
     return bikerack.state;
 } 
-
-/*BikeMap.prototype.createBikeRack = function(state) {
-    // creates a bike rack on the map
-    console.log("creating bike rack");
-
-    let bikerack = new BikeRack(state)
-    let iconColor = bikerack.setMarkerColor();
-      
-    this.addMarker(bikerack.state);
-}*/
     
 BikeMap.prototype.onMapClick = function (e) {
 
@@ -308,28 +319,21 @@ BikeMap.prototype.createMarker = function(state) {
     marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
     
     // add marker to allRacks feature group and its feature group based on status
-    console.log("adding marker to all racks LayerGroup");
     this.allRacks.addLayer(marker);
     if (state.status === "approved") {
-        console.log("adding marker to approved featureGroup");
         this.approvedRacks.addLayer(marker);
     }
     else if (state.status === "pending") {
-        console.log("adding marker to pending featureGroup");
-        this.approvedRacks.addLayer(marker);
+        this.pendingRacks.addLayer(marker);
     }
     else if (state.status === "rejected") {
-        console.log("adding marker to rejected featureGroup");
         this.rejectedRacks.addLayer(marker);
     }
     
     // bind popup to marker
     let content = popupContent(state.latitude, state.longitude);
     marker.bindPopup(content)
-    /*marker.on('click', function() {
-        console.log(this)
-        this.openPopup();
-    })*/
+
     return marker;
 }
 
@@ -337,29 +341,6 @@ BikeMap.prototype.addMarker = function(marker) {
     // add given marker to map
     marker.addTo(this.mymap);
 }
-
-/*BikeMap.prototype.addMarker = function(state) {
-    // add marker of type pending, approved, or rejected that is not removed
-    // when user clicks away (but is removed if user clicks on hide all temporary,
-    // hide all approved, etc
-    //build icon
-    let markerIcon = buildMarkerIcon(state.markerColor),
-        content = popupContent(state.latitude, state.longitude),
-        marker;
-    // create marker at coordinates
-    marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
-    // bind pop up
-    marker.bindPopup(content);
-    // click handler
-    marker.on('click', function() {
-        this.openPopup();
-    })
-    // add marker to group
-    
-    
-    // add marker to map
-    marker.addTo(this.mymap);
-}*/
 
 BikeMap.prototype.getRacks = function(status) {
     // send a request to the server for data on racks with status=status
@@ -376,9 +357,8 @@ BikeMap.prototype.getRacks = function(status) {
 }
 
 
-
-BikeMap.prototype.showRacks = function(data) {
-
+BikeMap.prototype.showMarkers = function(data) {
+    console.log("running showMarkers");
     // Hike all markers except for approved markers on map
     for (let i=0; i<data.length; i++) {
         // make instances of BikeRack for each
@@ -393,11 +373,58 @@ BikeMap.prototype.showRacks = function(data) {
     }
 }
 
+BikeMap.prototype.showMarker = function(marker) {
+    // show individual marker on map
+    this.mymap.addLayer(marker);
+}
+
 BikeMap.prototype.removeMarkers = function(markerGroup) {
     // remove markers only from map
-    // testing with approvedRacks
     markerGroup.eachLayer(function(layer) {
         this.mymap.removeLayer(layer);
     }.bind(this));
 }
+
+BikeMap.prototype.removeMarker = function(marker) {
+    // remove a single marker from the map
+    this.mymap.removeLayer(marker);
+}
+
+BikeMap.prototype.toggleMarkers = function(status, selector, group) {
+    let racksP = this.getRacks(status);
+    // if the map is showing markers of status=status, remove them from map
+    if (selector.hasClass('onmap')) {
+        racksP.done((racks) => this.removeMarkers(group));
+        // remove class onmap
+        selector.removeClass('onmap');
+    }
+    // if the map is now showing markers of status=status, add them to map
+    else {
+        racksP.done((racks) => this.showMarkers(racks));
+        selector.addClass('onmap');
+    }
+};
+
+// for testing purposes
+BikeMap.prototype.storeRack = function (state) {
+    
+    $.ajax({
+        method: 'POST',
+        url: {{ url_for('bikes.store_rack')|tojson }},
+        data: JSON.stringify({
+            latitude: state.latitude,
+            longitude: state.longitude,
+            status: state.status,
+            address: state.address
+        }, null, '\t'),
+        dataType: 'json',
+        contentType: 'application/json;charset=UTF-8',
+        context: this
+    }).done((data) => {
+        console.log("printing data:");
+        console.log(data);
+    })
+}
+
+
 

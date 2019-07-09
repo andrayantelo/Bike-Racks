@@ -1,4 +1,5 @@
 from flask import jsonify
+import sqlite3
 
 # Helper functions
 class Error(Exception):
@@ -86,9 +87,17 @@ def get_racks(table_name, database, status):
     
     result = [dict_from_row(row) for row in result]
     return jsonify(result)
-    
 
+# below function is to easily add racks to db for testing TODO 
+def insert_rack(table_name, database, rack):
+    # insert into table table_name, the rack (dict)
+    try:
+        query = "INSERT INTO {} (latitude, longitude, status, address) values (?, ?, ?, ?)".format(table_name)
+        database.execute(query, (rack['latitude'], rack['longitude'], rack['status'], rack['address']))
+        database.commit()
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
     
-# function that updates the racks to be shown on the map
-def update():
-    pass
+    return

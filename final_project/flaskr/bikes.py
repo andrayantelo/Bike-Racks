@@ -53,7 +53,7 @@ def coordinates():
                 db.commit()
             except Exception as e:
                 print(e)
-                # TODO, maybe just render_template here?
+                # TODO, narrow down exception
         
         # return data for the added temporary marker
         bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
@@ -73,4 +73,15 @@ def get_racks():
         racks = h.get_racks("bikeracks", db, status)
         
         return racks
+    
+@bp.route('/store_rack/', methods=['POST'])
+def store_rack():
+    if request.method == 'POST':
+        args = request.json
+        db = get_db()
+        print("request json {}".format(args))
+        
+        h.insert_rack('bikeracks', db, args)
+        return Response(status=200)
+    return render_template('base.html')
     

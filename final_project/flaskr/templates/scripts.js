@@ -135,30 +135,6 @@ function popupContent(lat, lng) {
     return content
 };
 
-
-
-/*this.$showApproved.on('click', function(e) {
-            let racksP = this.getRacks("approved");
-            // if the map is showing approved markers then remove them 
-            // from the map
-        
-            if (this.$showApproved.hasClass('onmap')) {
-                console.log("#showApproved has class 'onmap'");
-                racksP.done((racks) => this.removeMarkers(this.approvedRacks));
-                // remove class onmap
-                this.$showApproved.removeClass('onmap')
-            }
-            // if the map is not showing approved markers, add them to the map
-            else {
-                console.log("#showApproved does not have class 'onmap'");
-                racksP.done((racks) => this.showMarkers(racks));
-                this.$showApproved.addClass('onmap');
-            }
-        }.bind(this));
-
-*/
-
-
 class BikeMap {
     constructor(mymap) {
         // show mountain view for now
@@ -191,7 +167,7 @@ class BikeMap {
             this.submitBikeRack(e, this.createBikeRack.bind(this));
         }.bind(this));
         
-        // TODO, work on below toggling click handler
+        // attach click handlers
         this.$showApproved.on('click', function(e) {
             this.toggleMarkers("approved", this.$showApproved, this.approvedRacks);
         }.bind(this));
@@ -302,14 +278,6 @@ BikeMap.prototype.addTempMarker = function(lat, lng) {
     // enable popup that shows coordinates and 'add bike rack' button
     this.tempMarker.bindPopup(content).openPopup();
 }
-
-// TODO maybe have split functions, create marker, and addMarker (to map)
-// inside createMarker the marker will need to be added to a featureGroup
-// depending on it's status
-
-// TODO Figure out binding of popups, is it possible to do it via the featureGroup?
-// after that is figured out, remove uneeded and commented out functions, and
-// then implement functions that remove markers from the map using the featureGroup
 
 BikeMap.prototype.createMarker = function(state) {
     console.log("running createMarker");

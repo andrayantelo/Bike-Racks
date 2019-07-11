@@ -71,13 +71,13 @@
                   </li>
                 
               </ul> 
-              <!-- address search bar -->
-              <form class="form-inline my-2 my-lg-0">
-                  <input class="form-control mr-sm-2" type="search" placeholder="Type in an address" aria-label="Search">
+              <!-- address search bar 
+              <form id="search" class="form-inline my-2 my-lg-0">
+                  <input id="search" class="form-control mr-sm-2" type="search" placeholder="Type in an address" aria-label="Search">
                   <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-              </form>
+              </form> -->
           </div> <!-- /.navbar-collapse -->
-      </nav>
+      </nav> 
 
       <div class="container"> 
           <div id="mapid"></div>
@@ -89,9 +89,10 @@
   <!-- App's own JS -->
   
   <!-- leaflet geo-search  -->
-  <link href="../static/deps/leaflet-geosearch/dist/style.css" rel="stylesheet"/> 
-  <script src="../static/deps/leaflet-geosearch/dist/bundle.min.js"></script>
   
+  <script src="../static/deps/leaflet-geosearch/dist/bundle.min.js"></script>
+  <link href="https://unpkg.com/leaflet-geosearch@2.6.0/assets/css/leaflet.css" rel="stylesheet"/>
+  <!--<link href="../static/deps/leaflet-geosearch/dist/style.css" rel="stylesheet"/> -->
   
   <!--
   <script src="https://cdn.jsdelivr.net/npm/leaflet-geosearch@2.7.0/dist/bundle.js"></script>

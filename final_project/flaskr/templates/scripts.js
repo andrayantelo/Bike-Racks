@@ -131,13 +131,29 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-function popupContent(lat, lng) {
-    let content = 
-        `<div id="tempForm">
-           <div id="lat">${lat}</div> <span>,</span> <div id="lng">${lng}</div>
-           <button id="submitButton" type="submit">Add Bike Rack</button>
-        </div>
-        `
+function popupContent(lat, lng, address) {
+    let content;
+    if (address === null) {
+        content = 
+            `<div id="tempForm">
+              <span id="lat">${lat}</span> <span>,</span> <span id="lng">${lng}</span>
+             <div>
+             <button id="submitButton" type="submit">Add Bike Rack</button>
+             </div>
+            </div>
+            `
+    }
+    else {
+        content = 
+            `<div id="tempForm">
+               <div id="address">${address}</div>
+               <span id="lat">${lat}</span> <span>,</span> <span id="lng">${lng}</span>
+               <div>
+               <button id="submitButton" type="submit">Add Bike Rack</button>
+               </div>
+            </div>
+            `
+    }
     return content
 };
 
@@ -167,7 +183,7 @@ class BikeMap {
         this.$showRejected = $('#showRejected');
         
         // click bindings
-        this.mymap.on('click', this.onMapClick.bind(this));
+        this.mymap.on('dblclick', this.onMapClick.bind(this));
         this.$myMap.on('click', '#submitButton', function(e) {
             
             this.submitBikeRack(e, this.buildRack.bind(this));
@@ -213,7 +229,34 @@ BikeMap.prototype.initBikeMap = function () {
     // TODO do I need a separate class here? BikeRackCollection
     
     this.loadRacks(this.showMarkers.bind(this)); 
+    
+    
+    /*const provider = new GeoSearch.GoogleProvider({ 
+        params: {
+            key: 'AIzaSyAUB5ekWA4PNYedZUh0LoKCfeGD9WVG11I',
+        },
+    });*/
+    const provider = new GeoSearch.OpenStreetMapProvider();
+    
+    const searchControl = new GeoSearch.GeoSearchControl({
+        provider: provider,
+        style: 'bar',
+        autoComplete: true,
+        autoCompleteDelay: 250,
+        retainZoomLevel: true
+    }).addTo(this.mymap);
+    
+    this.mymap.on('geosearch/showlocation', (e) => {
+        console.log(e.location);
+        let lat = e.location.y,
+            lng = e.location.x,
+            address = e.location.label;
+            
+        this.addTempMarker(lat, lng, address);
+    })
+
 }
+ 
 
 BikeMap.prototype.loadRacks = function(callback) {
     // get data on ALL the markers in the database
@@ -273,11 +316,11 @@ BikeMap.prototype.onMapClick = function (e) {
     this.addTempMarker(e.latlng.lat, e.latlng.lng, tempMarkerColor, this.mymap)
 }
 
-BikeMap.prototype.addTempMarker = function(lat, lng) {
+BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
     let markerIcon = buildMarkerIcon(tempMarkerColor),
-        content = popupContent(lat, lng);
+        content = popupContent(lat, lng, address);
     // if there is already a tempMarker, remove it
     if (this.tempMarker !== undefined) {
         this.mymap.removeLayer(this.tempMarker);
@@ -290,6 +333,7 @@ BikeMap.prototype.addTempMarker = function(lat, lng) {
         
     // enable popup that shows coordinates and 'add bike rack' button
     this.tempMarker.bindPopup(content).openPopup();
+    return this.tempMarker;
 }
 
 BikeMap.prototype.createMarker = function(state) {
@@ -311,7 +355,7 @@ BikeMap.prototype.createMarker = function(state) {
     }
     
     // bind popup to marker
-    let content = popupContent(state.latitude, state.longitude);
+    let content = popupContent(state.latitude, state.longitude, state.address);
     marker.bindPopup(content)
 
     return marker;

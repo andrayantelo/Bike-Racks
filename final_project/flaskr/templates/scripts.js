@@ -236,10 +236,10 @@ BikeMap.prototype.initBikeMap = function () {
             key: 'AIzaSyAUB5ekWA4PNYedZUh0LoKCfeGD9WVG11I',
         },
     });*/
-    const provider = new GeoSearch.OpenStreetMapProvider();
+    this.provider = new GeoSearch.OpenStreetMapProvider();
     
     const searchControl = new GeoSearch.GeoSearchControl({
-        provider: provider,
+        provider: this.provider,
         style: 'bar',
         autoComplete: true,
         autoCompleteDelay: 250,
@@ -313,27 +313,59 @@ BikeMap.prototype.createBikeRack = function(state) {
 BikeMap.prototype.onMapClick = function (e) {
 
     // add the temporary  marker at coordinates
-    this.addTempMarker(e.latlng.lat, e.latlng.lng, tempMarkerColor, this.mymap)
+    this.addTempMarker(e.latlng.lat, e.latlng.lng)
 }
+
+BikeMap.prototype.findAddress = function(lat, lng) {
+    // find address corresponding to lat, lng
+    return this.provider.search({query: `${lat}, ${lng}`}).then((result) => {
+        return result[0].label;
+    })
+};
 
 BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
-    let markerIcon = buildMarkerIcon(tempMarkerColor),
-        content = popupContent(lat, lng, address);
-    // if there is already a tempMarker, remove it
-    if (this.tempMarker !== undefined) {
-        this.mymap.removeLayer(this.tempMarker);
-    }
+    console.log(address)
+
+    if (address === null || address === undefined) {
+        this.findAddress(lat, lng).then((address) => {
+            console.log(address);
+            let markerIcon = buildMarkerIcon(tempMarkerColor),
+            content = popupContent(lat, lng, address);
+        // if there is already a tempMarker, remove it
+        if (this.tempMarker !== undefined) {
+            this.mymap.removeLayer(this.tempMarker);
+        }
+            
+        // add the temporary  marker at coordinates
+        this.tempMarker = L.marker([lat, lng], {icon: markerIcon});
         
-    // add the temporary  marker at coordinates
-    this.tempMarker = L.marker([lat, lng], {icon: markerIcon});
+        this.tempMarker.addTo(this.mymap);
+            
+        // enable popup that shows coordinates and 'add bike rack' button
+        this.tempMarker.bindPopup(content).openPopup();
+        return this.tempMarker;
+        });
     
-    this.tempMarker.addTo(this.mymap);
+    }
+    else {
+        let markerIcon = buildMarkerIcon(tempMarkerColor),
+            content = popupContent(lat, lng, address);
+        // if there is already a tempMarker, remove it
+        if (this.tempMarker !== undefined) {
+            this.mymap.removeLayer(this.tempMarker);
+        }
+            
+        // add the temporary  marker at coordinates
+        this.tempMarker = L.marker([lat, lng], {icon: markerIcon});
         
-    // enable popup that shows coordinates and 'add bike rack' button
-    this.tempMarker.bindPopup(content).openPopup();
-    return this.tempMarker;
+        this.tempMarker.addTo(this.mymap);
+            
+        // enable popup that shows coordinates and 'add bike rack' button
+        this.tempMarker.bindPopup(content).openPopup();
+        return this.tempMarker;
+    }
 }
 
 BikeMap.prototype.createMarker = function(state) {

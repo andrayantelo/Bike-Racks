@@ -1,8 +1,11 @@
+"use strict"
+
 // Colors for different types of markers
 const tempMarkerColor = 'gray';
 const pendingMarkerColor = 'orange';
 const approvedMarkerColor = 'green';
 const rejectedMarkerColor = 'red';
+let bikemap;
 
 $(document).ready(function() {
     
@@ -54,6 +57,7 @@ class BikeRack {
     setMarkerColor() {
         let markerColor;
         let status = this.state.status;
+        
         if (status === "pending") {
             markerColor = pendingMarkerColor;
         }
@@ -64,6 +68,7 @@ class BikeRack {
             markerColor = rejectedMarkerColor;
         }
         this.state.markerColor = markerColor;
+        
         return markerColor;
     }
 
@@ -76,6 +81,7 @@ class BikeRack {
     }
 
 };
+
 
 
 // BikeRackCollection Class
@@ -164,7 +170,8 @@ class BikeMap {
         this.mymap.on('click', this.onMapClick.bind(this));
         this.$myMap.on('click', '#submitButton', function(e) {
             
-            this.submitBikeRack(e, this.createBikeRack.bind(this));
+            this.submitBikeRack(e, this.buildRack.bind(this));
+            
         }.bind(this));
         
         // attach click handlers
@@ -215,8 +222,16 @@ BikeMap.prototype.loadRacks = function(callback) {
     allRacksPromise.done((data) => {
         callback(data);
     })
-    
 };
+
+BikeMap.prototype.buildRack = function(state) {
+    // build a rack from creating an instance of bikeRack to creating
+    // a marker for it, and adding that marker to the map
+    this.createBikeRack(state);
+    let marker = this.createMarker(state);
+    this.addMarker(marker);
+};
+
 
 BikeMap.prototype.submitBikeRack = function(e, callback) {
     // send a request to the server, sending the coordinates of the
@@ -236,17 +251,15 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
         },
         context: this
   }).done(function(state) {
-      callback(state);
+      return callback(state);
   })
-}
+};
 
 BikeMap.prototype.createBikeRack = function(state) {
     // create an instance of BikeRack and return it's state
-    console.log("creating bike rack");
-    
     let bikerack = new BikeRack(state),
         iconColor = bikerack.setMarkerColor();
-        
+    
     // store this new bikerack in an array in BikeMaps constructor function
     // or in a variable in the constructor that is pointing to an instance
     // of BikeRackCollection? TODO 
@@ -280,7 +293,6 @@ BikeMap.prototype.addTempMarker = function(lat, lng) {
 }
 
 BikeMap.prototype.createMarker = function(state) {
-    console.log("running createMarker");
     let markerIcon = buildMarkerIcon(state.markerColor),
         marker;
     
@@ -326,8 +338,7 @@ BikeMap.prototype.getRacks = function(status) {
 
 
 BikeMap.prototype.showMarkers = function(data) {
-    console.log("running showMarkers");
-    // Hike all markers except for approved markers on map
+    // show markers for racks with particular status
     for (let i=0; i<data.length; i++) {
         // make instances of BikeRack for each
         let bikerack = new BikeRack(data[i]);

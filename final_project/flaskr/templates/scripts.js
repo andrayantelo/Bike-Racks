@@ -1,8 +1,33 @@
+"use strict"
+
+// spinner options
+var opts = {
+  lines: 13, // The number of lines to draw
+  length: 38, // The length of each line
+  width: 17, // The line thickness
+  radius: 45, // The radius of the inner circle
+  scale: 0.1, // Scales overall size of the spinner
+  corners: 1, // Corner roundness (0..1)
+  color: '#ffffff', // CSS color or array of colors
+  fadeColor: 'transparent', // CSS color or array of colors
+  speed: 1, // Rounds per second
+  rotate: 0, // The rotation offset
+  animation: 'spinner-line-fade-quick', // The CSS animation name for the lines
+  direction: 1, // 1: clockwise, -1: counterclockwise
+  zIndex: 2e9, // The z-index (defaults to 2000000000)
+  className: 'spinner', // The CSS class to assign to the spinner
+  top: '50%', // Top position relative to parent
+  left: '50%', // Left position relative to parent
+  shadow: '0 0 1px transparent', // Box-shadow for the lines
+  position: 'absolute' // Element positioning
+};
+
 // Colors for different types of markers
 const tempMarkerColor = 'gray';
 const pendingMarkerColor = 'orange';
 const approvedMarkerColor = 'green';
 const rejectedMarkerColor = 'red';
+let bikemap;
 
 $(document).ready(function() {
     
@@ -54,6 +79,7 @@ class BikeRack {
     setMarkerColor() {
         let markerColor;
         let status = this.state.status;
+        
         if (status === "pending") {
             markerColor = pendingMarkerColor;
         }
@@ -64,6 +90,7 @@ class BikeRack {
             markerColor = rejectedMarkerColor;
         }
         this.state.markerColor = markerColor;
+        
         return markerColor;
     }
 
@@ -77,43 +104,7 @@ class BikeRack {
 
 };
 
-
-// BikeRackCollection Class
-// Keeps track of all of the bikeracks on the page. Manipulate
-// the html for a collection of bikeracks, instead of an individual bike
-// rack
-class BikeRackCollection {
-    constructor() {
-        // arrays of markers for bike racks
-        this.markers = [];
-        this.approvedMarkers = [];
-        this.pendingMarkers = [];
-        this.rejectedMarkers = [];
-        
-        // arrays of bike rack objects
-        this.allRacks = [];
-        this.approvedRacks = [];
-        this.pendingRacks = [];
-        this.rejectedRacks = [];
-        
-    }
-    
-    addBikeRack() {
-        // Add a bike rack to the collection Todo
-        
-    }
-    
-    removeBikeRack() {
-        // Remove bike rack from the collection
-    }
-};
-
-
-
-
 //BikeMap is the class for the overall website. It will include functions
-// that manipulate html, or add functionality
-// like what?
 // Like initializing the map
 
 // BikeMap class helper functions
@@ -125,39 +116,21 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-function popupContent(lat, lng) {
-    let content = 
-        `<div id="tempForm">
-           <div id="lat">${lat}</div> <span>,</span> <div id="lng">${lng}</div>
-           <button id="submitButton" type="submit">Add Bike Rack</button>
-        </div>
-        `
-    return content
+function popupContent(lat, lng, address) {
+    
+    if (address === null || address === undefined) {
+        address = ""
+    }
+    return  `<div id="tempForm">
+             <div id="address">${address}</div>
+             <span id="lat">${lat}</span> <span>,</span> <span id="lng">${lng}</span>
+             <div>
+             <button id="submitButton" type="submit">Add Bike Rack</button>
+             </div>
+             </div>
+            `
+   
 };
-
-
-
-/*this.$showApproved.on('click', function(e) {
-            let racksP = this.getRacks("approved");
-            // if the map is showing approved markers then remove them 
-            // from the map
-        
-            if (this.$showApproved.hasClass('onmap')) {
-                console.log("#showApproved has class 'onmap'");
-                racksP.done((racks) => this.removeMarkers(this.approvedRacks));
-                // remove class onmap
-                this.$showApproved.removeClass('onmap')
-            }
-            // if the map is not showing approved markers, add them to the map
-            else {
-                console.log("#showApproved does not have class 'onmap'");
-                racksP.done((racks) => this.showMarkers(racks));
-                this.$showApproved.addClass('onmap');
-            }
-        }.bind(this));
-
-*/
-
 
 class BikeMap {
     constructor(mymap) {
@@ -188,10 +161,11 @@ class BikeMap {
         this.mymap.on('click', this.onMapClick.bind(this));
         this.$myMap.on('click', '#submitButton', function(e) {
             
-            this.submitBikeRack(e, this.createBikeRack.bind(this));
+            this.submitBikeRack(e, this.buildRack.bind(this));
+            
         }.bind(this));
         
-        // TODO, work on below toggling click handler
+        // attach click handlers
         this.$showApproved.on('click', function(e) {
             this.toggleMarkers("approved", this.$showApproved, this.approvedRacks);
         }.bind(this));
@@ -230,7 +204,33 @@ BikeMap.prototype.initBikeMap = function () {
     // TODO do I need a separate class here? BikeRackCollection
     
     this.loadRacks(this.showMarkers.bind(this)); 
+    
+    this.provider = new GeoSearch.OpenStreetMapProvider();
+    
+    this.searchControl = new GeoSearch.GeoSearchControl({
+        provider: this.provider,
+        style: 'bar',
+        autoComplete: true,
+        autoCompleteDelay: 250,
+        retainZoomLevel: true
+    }).addTo(this.mymap);
+    
+    // this should use .getContainer() instead of elements.container but
+    // it doesn't work
+    // https://github.com/smeijer/leaflet-geosearch/issues/169
+    this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
+    
+    this.mymap.on('geosearch/showlocation', (e) => {
+        console.log(e.location);
+        let lat = e.location.y,
+            lng = e.location.x,
+            address = e.location.label;
+            
+        this.addTempMarker(lat, lng, address);
+    })
+
 }
+ 
 
 BikeMap.prototype.loadRacks = function(callback) {
     // get data on ALL the markers in the database
@@ -239,8 +239,16 @@ BikeMap.prototype.loadRacks = function(callback) {
     allRacksPromise.done((data) => {
         callback(data);
     })
-    
 };
+
+BikeMap.prototype.buildRack = function(state) {
+    // build a rack from creating an instance of bikeRack to creating
+    // a marker for it, and adding that marker to the map
+    this.createBikeRack(state);
+    let marker = this.createMarker(state);
+    this.addMarker(marker);
+};
+
 
 BikeMap.prototype.submitBikeRack = function(e, callback) {
     // send a request to the server, sending the coordinates of the
@@ -260,17 +268,15 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
         },
         context: this
   }).done(function(state) {
-      callback(state);
+      return callback(state);
   })
-}
+};
 
 BikeMap.prototype.createBikeRack = function(state) {
     // create an instance of BikeRack and return it's state
-    console.log("creating bike rack");
-    
     let bikerack = new BikeRack(state),
         iconColor = bikerack.setMarkerColor();
-        
+    
     // store this new bikerack in an array in BikeMaps constructor function
     // or in a variable in the constructor that is pointing to an instance
     // of BikeRackCollection? TODO 
@@ -281,38 +287,51 @@ BikeMap.prototype.createBikeRack = function(state) {
 BikeMap.prototype.onMapClick = function (e) {
 
     // add the temporary  marker at coordinates
-    this.addTempMarker(e.latlng.lat, e.latlng.lng, tempMarkerColor, this.mymap)
+    // maybe use geosearch event here TODO FIX
+    // when the user clicks on the map, add a temporary marker with the
+    // coordinates in the popup? right away
+    // then look up the address (which is async) and when that is 
+    // finished, add the address to the popup content
+    let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng);
+    this.findAddress(e.latlng.lat, e.latlng.lng).then((address) => {
+        console.log("defining and placing spinner");
+        let target = document.getElementById('address'),
+            spinner = new Spinner(opts).spin(target),
+            content = popupContent(e.latlng.lat, e.latlng.lng, address);
+        tempMarker.setPopupContent(content);
+    })
 }
 
-BikeMap.prototype.addTempMarker = function(lat, lng) {
+BikeMap.prototype.findAddress = function(lat, lng) {
+    // find address corresponding to lat, lng
+    return new Promise((resolve, reject) => {
+        this.provider.search({query: `${lat}, ${lng}`}).then((result) => {
+            resolve(result[0].label);
+        }) 
+    });
+};
+
+BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
     let markerIcon = buildMarkerIcon(tempMarkerColor),
-        content = popupContent(lat, lng);
-    // if there is already a tempMarker, remove it
+        content = popupContent(lat, lng, address);
+        // if there is already a tempMarker, remove it
     if (this.tempMarker !== undefined) {
         this.mymap.removeLayer(this.tempMarker);
     }
-        
+            
     // add the temporary  marker at coordinates
     this.tempMarker = L.marker([lat, lng], {icon: markerIcon});
-    
-    this.tempMarker.addTo(this.mymap);
         
+    this.tempMarker.addTo(this.mymap);
+            
     // enable popup that shows coordinates and 'add bike rack' button
     this.tempMarker.bindPopup(content).openPopup();
+    return this.tempMarker;
 }
 
-// TODO maybe have split functions, create marker, and addMarker (to map)
-// inside createMarker the marker will need to be added to a featureGroup
-// depending on it's status
-
-// TODO Figure out binding of popups, is it possible to do it via the featureGroup?
-// after that is figured out, remove uneeded and commented out functions, and
-// then implement functions that remove markers from the map using the featureGroup
-
 BikeMap.prototype.createMarker = function(state) {
-    console.log("running createMarker");
     let markerIcon = buildMarkerIcon(state.markerColor),
         marker;
     
@@ -331,7 +350,7 @@ BikeMap.prototype.createMarker = function(state) {
     }
     
     // bind popup to marker
-    let content = popupContent(state.latitude, state.longitude);
+    let content = popupContent(state.latitude, state.longitude, state.address);
     marker.bindPopup(content)
 
     return marker;
@@ -358,8 +377,7 @@ BikeMap.prototype.getRacks = function(status) {
 
 
 BikeMap.prototype.showMarkers = function(data) {
-    console.log("running showMarkers");
-    // Hike all markers except for approved markers on map
+    // show markers for racks with particular status
     for (let i=0; i<data.length; i++) {
         // make instances of BikeRack for each
         let bikerack = new BikeRack(data[i]);

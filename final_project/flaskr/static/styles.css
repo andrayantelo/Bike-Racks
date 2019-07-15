@@ -1,10 +1,16 @@
 #mapid { 
-  flex: 1;
   height: 100vmax;
 }
 
 .navbar-light {
   background-color: #e3f2fd;
+}
+
+#address {
+  position: relative;
+  min-width: 25px;
+  min-height: 25px;
+  padding: 2px;
 }
 
 

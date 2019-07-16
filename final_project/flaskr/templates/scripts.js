@@ -121,12 +121,19 @@ function popupContent(lat, lng, address) {
     if (address === null || address === undefined) {
         address = ""
     }
-    return  `<div id="tempForm">
-             <div id="address">${address}</div>
-             <span id="lat">${lat}</span> <span>,</span> <span id="lng">${lng}</span>
-             <div>
-             <button id="submitButton" type="submit">Add Bike Rack</button>
-             </div>
+    return  `<div id="popup">
+               <div id="address">${address}</div>
+               <div id="coordinates"><span id="lat">${lat}</span> <span>
+                 <span id="coordinateComma">,</span>
+                 </span> <span id="lng">${lng}</span>
+               </div>
+               <div id="options">
+                 <button id="submitButton" type="submit">Add Bike Rack</button>
+                 <div id="arrows">
+                   <span><i class="fas fa-arrow-circle-up fa-2x"></i></i></span>
+                   <span><i class="fas fa-arrow-circle-down fa-2x"></i></span>
+                 </div>
+               </div>
              </div>
             `
    
@@ -191,9 +198,6 @@ BikeMap.prototype.initBikeMap = function () {
         id: 'mapbox.streets',
         accessToken: 'pk.eyJ1IjoiYW5kcmF5YW50ZWxvIiwiYSI6ImNqczB1YTJ6ajFuNGo0M2x2eTVpNms1MHEifQ.1SbExoA1iGNdOKDRoG4Qng'
     }).addTo(this.mymap);
-    
-    
-   
        
     // add marker to map at Mountain View Public Librarys TODO, remove later
     let approvedIcon = buildMarkerIcon(approvedMarkerColor);
@@ -201,10 +205,10 @@ BikeMap.prototype.initBikeMap = function () {
     
     // request data on all racks in the database, make BikeRackCollection object,
     // store all rack information in the arrays of BikeRackCollection object
-    // TODO do I need a separate class here? BikeRackCollection
     
     this.loadRacks(this.showMarkers.bind(this)); 
     
+    // initialize the search bar
     this.provider = new GeoSearch.OpenStreetMapProvider();
     
     this.searchControl = new GeoSearch.GeoSearchControl({
@@ -229,8 +233,7 @@ BikeMap.prototype.initBikeMap = function () {
         this.addTempMarker(lat, lng, address);
     })
 
-}
- 
+};
 
 BikeMap.prototype.loadRacks = function(callback) {
     // get data on ALL the markers in the database

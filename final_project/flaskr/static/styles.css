@@ -5,13 +5,35 @@
 .navbar-light {
   background-color: #e3f2fd;
 }
+#popup {
+  display: flex;
+  flex-wrap: wrap;
+}
+#lat, #lng, #coordinateComma {
+  display: none;
+}
 
 #address {
   position: relative;
   min-width: 25px;
-  min-height: 25px;
+  max-height: 50px;
   padding: 2px;
 }
+
+#options {
+  display: flex;
+  flex-direction: row;
+}
+
+#submitButton {
+  margin-top: 10px;
+}
+#arrows {
+  padding: 15px 15px 5px 15px;
+  
+}
+
+
 
 
 

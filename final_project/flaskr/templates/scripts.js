@@ -130,8 +130,8 @@ function popupContent(lat, lng, address) {
                <div id="options">
                  <button id="submitButton" type="submit">Add Bike Rack</button>
                  <div id="arrows">
-                   <span><i class="fas fa-arrow-circle-up fa-2x"></i></i></span>
-                   <span><i class="fas fa-arrow-circle-down fa-2x"></i></span>
+                   <span><a id="upVote" href="#"><i class="fas fa-arrow-circle-up fa-2x"></i></a></span>
+                   <span><a id="downVote" href="#"><i class="fas fa-arrow-circle-down fa-2x"></i></a></span>
                  </div>
                </div>
              </div>
@@ -424,6 +424,15 @@ BikeMap.prototype.toggleMarkers = function(status, selector, group) {
         racksP.done((racks) => this.showMarkers(racks));
         selector.addClass('onmap');
     }
+};
+
+// Voting functions TODO
+BikeMap.prototype.upVote = function() {
+  // increment the upvote count and display on popup
+};
+
+BikeMap.prototype.downVote = function() {
+  // increment the downvote count and display on popup
 };
 
 // for testing purposes

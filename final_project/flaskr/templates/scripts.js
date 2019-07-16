@@ -295,12 +295,11 @@ BikeMap.prototype.onMapClick = function (e) {
     // coordinates in the popup? right away
     // then look up the address (which is async) and when that is 
     // finished, add the address to the popup content
-    let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng);
+    let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng),
+        target = document.getElementById('address'),
+        spinner = new Spinner(opts).spin(target);
     this.findAddress(e.latlng.lat, e.latlng.lng).then((address) => {
-        console.log("defining and placing spinner");
-        let target = document.getElementById('address'),
-            spinner = new Spinner(opts).spin(target),
-            content = popupContent(e.latlng.lat, e.latlng.lng, address);
+        let content = popupContent(e.latlng.lat, e.latlng.lng, address);
         tempMarker.setPopupContent(content);
     })
 }

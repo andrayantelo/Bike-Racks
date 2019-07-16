@@ -17,7 +17,7 @@
   position: relative;
   min-width: 25px;
   max-height: 50px;
-  padding: 2px;
+  padding: 5px 0px 15px 0px;
 }
 
 #options {

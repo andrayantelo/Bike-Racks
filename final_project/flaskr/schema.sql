@@ -21,7 +21,7 @@ DROP TABLE IF EXISTS bikeracks;
 DROP TABLE IF EXISTS votes;
 
 CREATE TABLE bikeracks (
-    rack_id INTEGER PRIMARY KEY AUTOINCREMENT;
+    rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
     status TEXT DEFAULT "pending",
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,

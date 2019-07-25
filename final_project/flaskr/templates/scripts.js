@@ -51,7 +51,8 @@ let emptyBikeState = function(params) {
     //   longitude: float,
     //   address: string,
     //   uniqueId: interger,
-    //   status: string
+    //   status: string,
+    //   TODO put upvote and downvote
     // }
     if ($.isEmptyObject(params)) {
         return {}
@@ -93,7 +94,11 @@ class BikeRack {
         
         return markerColor;
     }
-
+    // add a vote for a bikerack with particular id
+    // look up all the votes for this bikerack (by id) 
+    // remove old votes for bikerack
+    // update markerColor based on votes
+    // delete all the votes for a bikerack (by id)
     addPhoto() {
     // Add photo of bike rack
     }
@@ -425,15 +430,6 @@ BikeMap.prototype.toggleMarkers = function(status, selector, group) {
     }
 };
 
-// Voting functions TODO
-BikeMap.prototype.upVote = function() {
-  // increment the upvote count and display on popup
-};
-
-BikeMap.prototype.downVote = function() {
-  // increment the downvote count and display on popup
-};
-
 // for testing purposes
 BikeMap.prototype.storeRack = function (state) {
     
@@ -456,4 +452,7 @@ BikeMap.prototype.storeRack = function (state) {
 }
 
 
-
+// over the last week of votes, if 80% upvoted it, green 
+// if less than 80%, red
+// login authentication so that one person can only vote once
+// fix popup content size

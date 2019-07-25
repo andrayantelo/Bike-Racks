@@ -18,6 +18,7 @@ In sqlite the datatype of a value is associated with the value itself,
 not with its container */
 
 DROP TABLE IF EXISTS bikeracks;
+DROP TABLE IF EXISTS votes;
 
 CREATE TABLE bikeracks (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT;
@@ -29,8 +30,6 @@ CREATE TABLE bikeracks (
     CHECK (status in ("approved", "pending", "rejected"))
     
 );
-
-DROP TABLE IF EXISTS votes;
 
 CREATE TABLE votes (
     vote_date INTEGER,

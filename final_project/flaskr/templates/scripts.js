@@ -52,7 +52,7 @@ let emptyBikeState = function(params) {
     //   address: string,
     //   uniqueId: interger,
     //   status: string,
-    //   TODO put upvote and downvote
+    //   vote: {type: string, date: integer (unix time)}
     // }
     if ($.isEmptyObject(params)) {
         return {}
@@ -62,7 +62,8 @@ let emptyBikeState = function(params) {
         longitude: params.lng,
         address: params.address,
         uniqueId: params.uniqueId,
-        status: params.status
+        status: params.status,
+        vote: {type: params.vote.type, date: params.vote.date}
     }
 };
 
@@ -78,6 +79,7 @@ class BikeRack {
     }
 
     setMarkerColor() {
+        // based on status
         let markerColor;
         let status = this.state.status;
         
@@ -94,19 +96,37 @@ class BikeRack {
         
         return markerColor;
     }
-    // add a vote for a bikerack with particular id
-    // look up all the votes for this bikerack (by id) 
-    // remove old votes for bikerack
-    // update markerColor based on votes
-    // delete all the votes for a bikerack (by id)
-    addPhoto() {
-    // Add photo of bike rack
+    
+    // over the last week of votes, if 80% upvoted it, green 
+    // if less than 80%, red
+    // login authentication so that one person can only vote once
+    // fix popup content size
+    
+    addVote() {
+        // add a vote for a bikerack with particular id
+        // update the voting information for a bikerack in the db
+        // send a request to the database, we want to send the new voting
+        // information to the database for a bikerack with particular
+        // coordinates, TODO maybe we need to keep track of rack ids on 
+        // the front end side as well somehow. we get a rack's coordinates
+        // with the geosearch api, so where would we put the id. 
     }
-
-    addReview() {
-    // Add bike rack review
+    getRackVotes() {
+        // look up all the votes for this bikerack (by id) 
     }
-
+    removeOldVotes() {
+        // Probably don't need this on the UI side
+        // remove old votes for bikerack (past a certain date)
+    }
+    updateRackStatus() {
+        // update rack status based on votes
+    }
+    deleteAllVotes() {
+        // delete all the votes for a bikerack (by id)
+    }
+    
+    
+    
 };
 
 //BikeMap is the class for the overall website. It will include functions
@@ -440,7 +460,8 @@ BikeMap.prototype.storeRack = function (state) {
             latitude: state.latitude,
             longitude: state.longitude,
             status: state.status,
-            address: state.address
+            address: state.address,
+            vote: {type: state.vote.type, date: state.vote.date}
         }, null, '\t'),
         dataType: 'json',
         contentType: 'application/json;charset=UTF-8',
@@ -452,7 +473,3 @@ BikeMap.prototype.storeRack = function (state) {
 }
 
 
-// over the last week of votes, if 80% upvoted it, green 
-// if less than 80%, red
-// login authentication so that one person can only vote once
-// fix popup content size

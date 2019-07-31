@@ -4,7 +4,7 @@
 #    users blueprint (responsible for logging in/out, password
 #        resets, email confirmations)
 #    bikes (todo change name?) (responsible for adding/deleting
-#        bike racks, displaying bike racks?
+#        bike racks
 
 # Rather than registering views and other code directly with an app
 # they are registered with a blueprint. Then the bp is registered with
@@ -73,7 +73,8 @@ def get_racks():
         racks = h.get_racks("bikeracks", db, status)
         
         return racks
-    
+
+# manually insert racks into db    
 @bp.route('/store_rack/', methods=['POST'])
 def store_rack():
     if request.method == 'POST':

@@ -46,7 +46,7 @@ def create_app(test_config=None):
     
     # import and register the blueprint from the factory
     from . import bikes
-    app.register_blueprint(bikes.bp)
+    app.register_blueprint(bikes.bikes)
         
     @app.route('/')
     def home_page(name=None):

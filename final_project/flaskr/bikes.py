@@ -11,8 +11,7 @@
 # the app when it is available in the factory function.
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for,
-    jsonify, Response
+    Blueprint, render_template, request, session, jsonify, Response
 )
 
 from . import helpers as h
@@ -20,11 +19,11 @@ from . import helpers as h
 from flaskr.db import get_db
 # __name__ is passed as 2nd arg so that bp knows where it is defined
 # __name__ evaluates to to the name of the current module
-bp = Blueprint('bikes', __name__)
+bikes = Blueprint('bikes', __name__)
 
 # View functions can be can be mapped to one or more routes
 # might want to add the '/' route here TODO
-@bp.route('/dynamic/<path:path>')
+@bikes.route('/dynamic/<path:path>')
 def render_file(path):
     
     # TODO, figure out the status part of this function
@@ -33,7 +32,7 @@ def render_file(path):
     return response
 
 
-@bp.route('/coordinates', methods=('GET', 'POST'))
+@bikes.route('/coordinates', methods=('GET', 'POST'))
 def coordinates():
     if request.method == 'POST':
         # connect to database to be able to store new coordinates for temporary bikerack
@@ -62,7 +61,7 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
-@bp.route('/get_racks/', methods=['GET'])
+@bikes.route('/get_racks/', methods=['GET'])
 def get_racks():
     if request.method == 'GET':
         status = request.args.get('status') or None
@@ -75,7 +74,7 @@ def get_racks():
         return racks
 
 # manually insert racks into db    
-@bp.route('/store_rack/', methods=['POST'])
+@bikes.route('/store_rack/', methods=['POST'])
 def store_rack():
     if request.method == 'POST':
         args = request.json

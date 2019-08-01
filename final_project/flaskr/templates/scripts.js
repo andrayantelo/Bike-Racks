@@ -72,6 +72,8 @@ class BikeRack {
     constructor(state) {
         this.state = state;
         this.initBikeRack();
+        
+
     }
     
     initBikeRack() {
@@ -102,6 +104,8 @@ class BikeRack {
     // login authentication so that one person can only vote once
     // fix popup content size
     
+
+    
     addVote() {
         // add a vote for a bikerack with particular id
         // update the voting information for a bikerack in the db
@@ -110,6 +114,8 @@ class BikeRack {
         // coordinates, TODO maybe we need to keep track of rack ids on 
         // the front end side as well somehow. we get a rack's coordinates
         // with the geosearch api, so where would we put the id. 
+        
+        // get rack from db
     }
     getRackVotes() {
         // look up all the votes for this bikerack (by id) 
@@ -155,8 +161,8 @@ function popupContent(lat, lng, address) {
                <div id="options">
                  <button id="submitButton" type="submit">Add Bike Rack</button>
                  <div id="arrows">
-                   <span><a id="upVote" href="#"><i class="fas fa-arrow-circle-up fa-2x"></i></a></span>
-                   <span><a id="downVote" href="#"><i class="fas fa-arrow-circle-down fa-2x"></i></a></span>
+                   <span><a id="upvote" href="#"><i class="fas fa-arrow-circle-up fa-2x"></i></a></span>
+                   <span><a id="downvote" href="#"><i class="fas fa-arrow-circle-down fa-2x"></i></a></span>
                  </div>
                </div>
              </div>
@@ -197,7 +203,12 @@ class BikeMap {
             
         }.bind(this));
         
-        // attach click handlers
+        // TODO figure out actual handler
+        this.$myMap.on('click', '#upvote', function(e) {
+            this.getRack();
+        }.bind(this));
+        // endTODO
+        
         this.$showApproved.on('click', function(e) {
             this.toggleMarkers("approved", this.$showApproved, this.approvedRacks);
         }.bind(this));
@@ -297,8 +308,6 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
         },
         context: this
   }).done(function(state) {
-      console.log("what server returns after submit:");
-      console.log(JSON.stringify(state));
       return callback(state);
   })
 };
@@ -451,6 +460,32 @@ BikeMap.prototype.toggleMarkers = function(status, selector, group) {
         racksP.done((racks) => this.showMarkers(racks));
         selector.addClass('onmap');
     }
+};
+
+// TODO determine if needed:
+BikeMap.prototype.getRack = function() {
+    console.log("running getRack");
+    let latitude = $('#lat').text(),
+        longitude = $('#lng').text();
+    // request a rack from db, the rack's info gets returned
+    // an emptyBikeState can be made with this info
+    let path = {{ url_for('votes.get_rack')|tojson }},
+        params = $.param({latitude: latitude, longitude: longitude});
+        
+    return $.ajax({
+        method: 'GET',
+        url: path + '?' + params,
+        context:this,
+    })
+}
+
+BikeMap.prototype.loadRack = function() {
+    console.log("running loadRack");
+    let getRackPromise = this.getRack();
+    getRackPromise.done((data) => {
+
+        console.log(data);
+    });
 };
 
 // for testing purposes

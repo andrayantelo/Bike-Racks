@@ -25,8 +25,7 @@ bikes = Blueprint('bikes', __name__)
 # might want to add the '/' route here TODO
 @bikes.route('/dynamic/<path:path>')
 def render_file(path):
-    
-    # TODO, figure out the status part of this function
+    # the view function for the route to scripts inside of dynamic directory
     response = render_template(path), 200, {'Content-Type': 'text/javascript'}
     
     return response
@@ -35,29 +34,28 @@ def render_file(path):
 @bikes.route('/coordinates', methods=('GET', 'POST'))
 def coordinates():
     if request.method == 'POST':
-        # connect to database to be able to store new coordinates for temporary bikerack
-        db = get_db()
         
+        # get the coordinates from the request
         lat = request.form.get('lat', 0, type=float)
         lng = request.form.get('lng', 0, type=float)
-        print("lat: {}".format(lat))
-        print("long: {}".format(lng))
+        address = request.form.get('address', '')
         
         # First check if these coordinates are valid
         if h.validate_coordinates((lat, lng)):
             # if valid, save in database
             print("saving into database")
             try:
-                db.execute('INSERT INTO bikeracks (latitude, longitude) VALUES (?, ?);', (lat, lng))
+                # connect to database to be able to store new coordinates for temporary bikerack
+                db = get_db()
+                db.execute('INSERT INTO bikeracks (latitude, longitude, address) VALUES (?, ?, ?);', (lat, lng, address))
                 db.commit()
+                # return data for the added temporary marker
+                bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
+        
+                return bike_rack
             except Exception as e:
                 print(e)
                 # TODO, narrow down exception
-        
-        # return data for the added temporary marker
-        bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
-        
-        return bike_rack
     # if it is not a post method then just show the map
     return render_template('base.html')
 

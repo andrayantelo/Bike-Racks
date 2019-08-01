@@ -292,10 +292,13 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
         url: {{ url_for('bikes.coordinates')|tojson }},
         data: {
             lat: $('#lat').text(),
-            lng: $('#lng').text()
+            lng: $('#lng').text(),
+            address: $('#address').text()
         },
         context: this
   }).done(function(state) {
+      console.log("what server returns after submit:");
+      console.log(JSON.stringify(state));
       return callback(state);
   })
 };

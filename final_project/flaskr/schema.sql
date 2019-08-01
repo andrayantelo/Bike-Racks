@@ -33,10 +33,10 @@ CREATE TABLE bikeracks (
     
 );
 
-/* vote_date is type INTEGER as unix time, number of seconds since 1970-01-01 00:00:00 UTC */
+/* vote_timestamp is type INTEGER as unix time, number of seconds since 1970-01-01 00:00:00 UTC */
 
 CREATE TABLE votes (
-    vote_date INTEGER,
+    vote_timestamp INTEGER,
     vote_type TEXT,
     rack_id INTEGER NOT NULL,
     FOREIGN KEY (rack_id) REFERENCES bikeracks(rack_id)
@@ -45,14 +45,11 @@ CREATE TABLE votes (
     CHECK (vote_type in ("upvote", "downvote"))
 );
 
-/* archive tables, identical to regular table,
-no coordinates restraint in case a bikerack gets added to bikeracks, is 
-later determined to not be a bikerack at all, but a spot in the ocean, is deleted,
-is moved to bikeracks_archive. then again that spot gets added to bikeracks by
-someone, is deleted again, but it's already in archives so it doesn't get added
-into archives and that's fine because it's already there, keep unique restraint on coordinates */
+/* history tables, identical to regular table,
+When a bikerack is added to bikeracks it also gets added to bikeracks_history
+that way we can link old votes back to their bikerack */
 
-CREATE TABLE bikeracks_archive (
+CREATE TABLE bikeracks_history (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
     status TEXT DEFAULT "pending",
     latitude REAL NOT NULL,
@@ -62,11 +59,7 @@ CREATE TABLE bikeracks_archive (
     CHECK (status in ("approved", "pending", "rejected"))
 );
 
-/* do not apply the rack_id as a foreign key in the votes_archive table because
-if you delete old votes from a bike rack and they get archived, the actual
-bike rack that these votes belong to may not be archived, it may still be in the
-bikeracks table. So, we don't need a foreign key that refers to rack_id in bikeracks_archive
-
+/* 
 Potential problem: if a bike rack is deleted from the bikeracks table, say with a
 rack_id of 3, and now exists in the bikeracks_archive table. Let's say another bikerack
 gets added to the bikeracks table with a rack_id of 3, and why not because the previous
@@ -75,10 +68,13 @@ if this happens. Actually, a bike rack would never be added with an id that was 
 used because of AUTOINCREMENT
  */
 
-CREATE TABLE votes_archive (
-    vote_date INTEGER,
+CREATE TABLE votes_history (
+    vote_timestamp INTEGER,
     vote_type TEXT,
-    rack_id INTEGER NOT NULL
+    rack_id INTEGER NOT NULL,
+    FOREIGN KEY (rack_id) REFERENCES bikeracks_history(rack_id)
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION
     CHECK (vote_type in ("upvote", "downvote"))
 );
 
@@ -86,6 +82,8 @@ CREATE TABLE votes_archive (
 - check that the foreign key on the regular tables bikeracks and votes works
 - Maybe instead of having a foreign key on votes be the rack_id, have it be
 the coordinates... Not needed. 
+- add all bikeracks to the bikeracks_history 
+- then you can have foreign key on it in votes_history
 */
 
 

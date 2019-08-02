@@ -121,7 +121,7 @@ function popupContent(lat, lng, address) {
     if (address === null || address === undefined) {
         address = ""
     }
-    return  `<div id="popup">
+    return  `<div class="popup">
                <div id="address">${address}</div>
                <div id="coordinates"><span id="lat">${lat}</span> <span>
                  <span id="coordinateComma">,</span>
@@ -130,8 +130,8 @@ function popupContent(lat, lng, address) {
                <div id="options">
                  <button id="submitButton" type="submit">Add Bike Rack</button>
                  <div id="arrows">
-                   <span><i class="fas fa-arrow-circle-up fa-2x"></i></i></span>
-                   <span><i class="fas fa-arrow-circle-down fa-2x"></i></span>
+                   <span class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i></i></span>
+                   <span class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i></span>
                  </div>
                </div>
              </div>

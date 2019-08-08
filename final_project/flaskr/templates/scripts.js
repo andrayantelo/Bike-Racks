@@ -110,8 +110,8 @@ function buildMarkerIcon(markerColor) {
 };
 
 const arrowHTML = `
-                     <div class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">100%</span><div>
-                     <div class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">100%</span></div>
+                     <div class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">0%</span><div>
+                     <div class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">0%</span></div>
                  `
 
 function popupContent(lat, lng, address, temp) {

@@ -8,6 +8,7 @@
 .popup {
   display: flex;
   flex-wrap: wrap;
+  min-width: 200px;
   align-items: stretch;
 }
 
@@ -26,15 +27,16 @@
 #options {
   display: flex;
   flex-direction: row;
-  flex-grow: 1;
+  flex-grow: 0.5;
   height: 50%;
 }
 
 #submitButton {
   margin-top: 10px;
 }
-#arrows {
-  padding: 15px 15px 5px 15px;
+
+#upvoteCount, #downvoteCount {
+  margin: 0 10px;
 }
 
 

@@ -109,25 +109,33 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-function popupContent(lat, lng, address) {
-    
+const arrowHTML = `
+                     <div class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">100%</span><div>
+                     <div class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">100%</span></div>
+                 `
+
+function popupContent(lat, lng, address, temp) {
     if (address === null || address === undefined) {
         address = ""
     }
-    return  `<div class="popup">
-               <div id="address">${address}</div>
+    let content = `<div id="address">${address}</div>
                <div id="coordinates"><span id="lat">${lat}</span> <span>
                  <span id="coordinateComma">,</span>
                  </span> <span id="lng">${lng}</span>
                </div>
                <div id="options">
                  <button id="submitButton" type="submit">Add Bike Rack</button>
-                 <div id="arrows">
-                   <span class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i></i></span>
-                   <span class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i></span>
-                 </div>
+               <div id="arrowsContainer"></div>
+               </div> <!-- /#options -->
+               `
+               
+    if (!temp) {
+        content += arrowHTML;
+    }
+
+    return `  <div class="popup">
+               ${content}
                </div>
-             </div>
             `
    
 };
@@ -292,7 +300,7 @@ BikeMap.prototype.onMapClick = function (e) {
             spinner = new Spinner(opts).spin(target);
     this.findAddress(e.latlng.lat, e.latlng.lng).then((address) => {
         
-        let content = popupContent(e.latlng.lat, e.latlng.lng, address);
+        let content = popupContent(e.latlng.lat, e.latlng.lng, address, true);
         tempMarker.setPopupContent(content);
     })
 }
@@ -310,7 +318,7 @@ BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
     let markerIcon = buildMarkerIcon(tempMarkerColor),
-        content = popupContent(lat, lng, address);
+        content = popupContent(lat, lng, address, true);
         // if there is already a tempMarker, remove it
     if (this.tempMarker !== undefined) {
         this.mymap.removeLayer(this.tempMarker);
@@ -321,8 +329,9 @@ BikeMap.prototype.addTempMarker = function(lat, lng, address) {
         
     this.tempMarker.addTo(this.mymap);
             
-    // enable popup that shows coordinates and 'add bike rack' button
+    // enable popup that shows address, 'add bike rack' button
     this.tempMarker.bindPopup(content).openPopup();
+    
     return this.tempMarker;
 }
 
@@ -345,7 +354,7 @@ BikeMap.prototype.createMarker = function(state) {
     }
     
     // bind popup to marker
-    let content = popupContent(state.latitude, state.longitude, state.address);
+    let content = popupContent(state.latitude, state.longitude, state.address, false);
     marker.bindPopup(content)
 
     return marker;

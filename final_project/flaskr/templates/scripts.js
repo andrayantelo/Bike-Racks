@@ -30,27 +30,20 @@ const rejectedMarkerColor = 'red';
 let bikemap;
 
 $(document).ready(function() {
-    
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 
     bikemap.initBikeMap();
-    // bind click function to the map element
-    
-    //bikemap.mymap.on('click', bikemap.onMapClick.bind(bikemap));
-    //bikemap.mymap.on('click', $('#submitButton'), bikemap.submitBikeRack.bind(bikemap))
     
 });
 
-
-
-// Helper Functions
+// Helper Function(s)
 let emptyBikeState = function(params) {
     // params = {
     //   latitude: float,
     //   longitude: float,
     //   address: string,
-    //   uniqueId: interger,
+    //   uniqueId: integer,
     //   status: string
     // }
     if ($.isEmptyObject(params)) {
@@ -116,25 +109,33 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-function popupContent(lat, lng, address) {
-    
+const arrowHTML = `
+                     <div class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">100%</span><div>
+                     <div class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">100%</span></div>
+                 `
+
+function popupContent(lat, lng, address, temp) {
     if (address === null || address === undefined) {
         address = ""
     }
-    return  `<div class="popup">
-               <div id="address">${address}</div>
+    let content = `<div id="address">${address}</div>
                <div id="coordinates"><span id="lat">${lat}</span> <span>
                  <span id="coordinateComma">,</span>
                  </span> <span id="lng">${lng}</span>
                </div>
                <div id="options">
                  <button id="submitButton" type="submit">Add Bike Rack</button>
-                 <div id="arrows">
-                   <span class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i></i></span>
-                   <span class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i></span>
-                 </div>
+               <div id="arrowsContainer"></div>
+               </div> <!-- /#options -->
+               `
+               
+    if (!temp) {
+        content += arrowHTML;
+    }
+
+    return `  <div class="popup">
+               ${content}
                </div>
-             </div>
             `
    
 };
@@ -203,9 +204,8 @@ BikeMap.prototype.initBikeMap = function () {
     let approvedIcon = buildMarkerIcon(approvedMarkerColor);
     this.marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
     
-    // request data on all racks in the database, make BikeRackCollection object,
-    // store all rack information in the arrays of BikeRackCollection object
-    
+    // request data on all racks in the database, make bikerack instances of them
+    // create markers for them and show them on the map
     this.loadRacks(this.showMarkers.bind(this)); 
     
     // initialize the search bar
@@ -224,8 +224,9 @@ BikeMap.prototype.initBikeMap = function () {
     // https://github.com/smeijer/leaflet-geosearch/issues/169
     this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
     
+    // when someone searches an address and presses enter or clicks on the 
+    // address in the search bar, add a temporary (gray) marker at that location
     this.mymap.on('geosearch/showlocation', (e) => {
-        console.log(e.location);
         let lat = e.location.y,
             lng = e.location.x,
             address = e.location.label;
@@ -238,6 +239,8 @@ BikeMap.prototype.initBikeMap = function () {
 BikeMap.prototype.loadRacks = function(callback) {
     // get data on ALL the markers in the database
     // when user visits page, map will load with ALL markers on it
+    // callback is a function for processing of the data once retrieved from
+    // the database
     let allRacksPromise = this.getRacks();
     allRacksPromise.done((data) => {
         callback(data);
@@ -258,9 +261,8 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
     // place on the map that was clicked
     
     // submit a location on the map for bike rack location consideration
-    // it will be added to the database as long as the coordinates are valid
-    console.log("add bike rack button clicked");
-    
+    // it will be added to the database with a status of pending
+    // as long as the coordinates are valid
     e.preventDefault();
     $.ajax({
         method: 'POST',
@@ -290,17 +292,15 @@ BikeMap.prototype.createBikeRack = function(state) {
 BikeMap.prototype.onMapClick = function (e) {
 
     // add the temporary  marker at coordinates
-    // maybe use geosearch event here TODO FIX
-    // when the user clicks on the map, add a temporary marker with the
-    // coordinates in the popup? right away
+    // when the user clicks on the map, add a temporary marker there
     // then look up the address (which is async) and when that is 
     // finished, add the address to the popup content
     let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng);
+    let target = document.getElementById('address'),
+            spinner = new Spinner(opts).spin(target);
     this.findAddress(e.latlng.lat, e.latlng.lng).then((address) => {
-        console.log("defining and placing spinner");
-        let target = document.getElementById('address'),
-            spinner = new Spinner(opts).spin(target),
-            content = popupContent(e.latlng.lat, e.latlng.lng, address);
+        
+        let content = popupContent(e.latlng.lat, e.latlng.lng, address, true);
         tempMarker.setPopupContent(content);
     })
 }
@@ -318,7 +318,7 @@ BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
     let markerIcon = buildMarkerIcon(tempMarkerColor),
-        content = popupContent(lat, lng, address);
+        content = popupContent(lat, lng, address, true);
         // if there is already a tempMarker, remove it
     if (this.tempMarker !== undefined) {
         this.mymap.removeLayer(this.tempMarker);
@@ -329,8 +329,9 @@ BikeMap.prototype.addTempMarker = function(lat, lng, address) {
         
     this.tempMarker.addTo(this.mymap);
             
-    // enable popup that shows coordinates and 'add bike rack' button
+    // enable popup that shows address, 'add bike rack' button
     this.tempMarker.bindPopup(content).openPopup();
+    
     return this.tempMarker;
 }
 
@@ -353,7 +354,7 @@ BikeMap.prototype.createMarker = function(state) {
     }
     
     // bind popup to marker
-    let content = popupContent(state.latitude, state.longitude, state.address);
+    let content = popupContent(state.latitude, state.longitude, state.address, false);
     marker.bindPopup(content)
 
     return marker;
@@ -380,7 +381,8 @@ BikeMap.prototype.getRacks = function(status) {
 
 
 BikeMap.prototype.showMarkers = function(data) {
-    // show markers for racks with particular status
+    // data is an array of bikerack states
+    // add markers to map for these bikeracks
     for (let i=0; i<data.length; i++) {
         // make instances of BikeRack for each
         let bikerack = new BikeRack(data[i]);

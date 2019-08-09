@@ -22,16 +22,4 @@ votes = Blueprint('votes', __name__)
 # maybe put the below in the bikes.py file becaus we are accessing bikeracks db
 # and not votes
 
-@votes.route('/get_rack', methods=['GET'])
-def get_rack():
-    if request.method == 'GET':
-        lat = request.args.get('latitude', 0, type=float) or None
-        lng = request.args.get('longitude', 0, type=float) or None
-        
-        # database connection
-        db = get_db()
-        coordinates = (lat, lng)
-        
-        rack = h.get_rack('bikeracks', db, coordinates)
-        
-        return rack
+

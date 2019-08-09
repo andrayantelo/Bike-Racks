@@ -87,8 +87,9 @@ def get_racks(table_name, database, status):
     
     result = [dict_from_row(row) for row in result]
     return jsonify(result)
-    
-def get_rack(table_name, database, coordinates):
+
+# potential function that aids upvoting/downvoting
+def get_single_rack(table_name, database, coordinates):
     # get data from the database for a single bikerack with coordinates=coordinates
     if validate_coordinates(coordinates):
         lat, lng = coordinates

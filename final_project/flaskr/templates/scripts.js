@@ -43,14 +43,9 @@ let emptyBikeState = function(params) {
     //   latitude: float,
     //   longitude: float,
     //   address: string,
-<<<<<<< HEAD
     //   uniqueId: interger,
     //   status: string,
     //   vote: {type: string, date: integer (unix time)}
-=======
-    //   uniqueId: integer,
-    //   status: string
->>>>>>> master
     // }
     if ($.isEmptyObject(params)) {
         return {}
@@ -145,10 +140,12 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-const arrowHTML = `
+const arrowHTML = `<div id="arrowsContainer">
                      <div class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">0%</span><div>
                      <div class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">0%</span></div>
-                 `
+                   </div>
+                   </div> <!-- /#options -->
+                  `
 
 function popupContent(lat, lng, address, temp) {
     if (address === null || address === undefined) {
@@ -162,19 +159,16 @@ function popupContent(lat, lng, address, temp) {
                <div id="options">
                  <button id="submitButton" type="submit">Add Bike Rack</button>
 
-               <div id="arrowsContainer"></div>
-               </div> <!-- /#options -->
+               
+               
                `
                
     if (!temp) {
+        console.log("temp is false");
         content += arrowHTML;
-    }
-
-    return `  <div class="popup">
-               ${content}
-
-               </div>
-            `
+    } else {content += `</div> <!-- /#options -->`}
+    
+    return `<div class="popup"> ${content} </div>`
    
 };
 
@@ -188,7 +182,9 @@ class BikeMap {
         
         
         this.allRacks = L.featureGroup([]);
-        this.allRacks.on('click', (e) => e.target.openPopup());
+        this.allRacks.on('click', (e) => {
+            this.removeMarker(this.tempMarker);
+            e.target.openPopup()});
         
         this.pendingRacks = L.featureGroup([]);
         this.approvedRacks = L.featureGroup([]);
@@ -210,12 +206,6 @@ class BikeMap {
             this.submitBikeRack(e, this.buildRack.bind(this));
             
         }.bind(this));
-        
-        // TODO figure out actual handler
-        this.$myMap.on('click', '#upvote', function(e) {
-            this.getRack();
-        }.bind(this));
-        // endTODO
         
         this.$showApproved.on('click', function(e) {
             this.toggleMarkers("approved", this.$showApproved, this.approvedRacks);
@@ -293,9 +283,13 @@ BikeMap.prototype.loadRacks = function(callback) {
 BikeMap.prototype.buildRack = function(state) {
     // build a rack from creating an instance of bikeRack to creating
     // a marker for it, and adding that marker to the map
+    // remove temp rack, because it's about to be replaced
+    this.removeMarker(this.tempMarker);
     this.createBikeRack(state);
     let marker = this.createMarker(state);
     this.addMarker(marker);
+    // open its popup
+    marker.openPopup();
 };
 
 
@@ -401,7 +395,7 @@ BikeMap.prototype.createMarker = function(state) {
     
     // bind popup to marker
     let content = popupContent(state.latitude, state.longitude, state.address, false);
-    marker.bindPopup(content)
+    marker.bindPopup(content);
 
     return marker;
 }
@@ -474,14 +468,16 @@ BikeMap.prototype.toggleMarkers = function(status, selector, group) {
     }
 };
 
-// TODO determine if needed:
-BikeMap.prototype.getRack = function() {
-    console.log("running getRack");
+// TODO determine if needed (depends on schema stuff):
+// when you click on the upvote button, the percentage next to the 
+
+BikeMap.prototype.getSingleRack = function() {
+    console.log("running getSingleRack");
     let latitude = $('#lat').text(),
         longitude = $('#lng').text();
     // request a rack from db, the rack's info gets returned
     // an emptyBikeState can be made with this info
-    let path = {{ url_for('votes.get_rack')|tojson }},
+    let path = {{ url_for('bikes.get_single_rack')|tojson }},
         params = $.param({latitude: latitude, longitude: longitude});
         
     return $.ajax({
@@ -491,9 +487,9 @@ BikeMap.prototype.getRack = function() {
     })
 }
 
-BikeMap.prototype.loadRack = function() {
-    console.log("running loadRack");
-    let getRackPromise = this.getRack();
+BikeMap.prototype.loadSingleRack = function() {
+    console.log("running loadSingleRack");
+    let getRackPromise = this.getSingleRack();
     getRackPromise.done((data) => {
 
         console.log(data);

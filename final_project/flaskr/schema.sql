@@ -17,6 +17,10 @@ votes is called the child key.
 In sqlite the datatype of a value is associated with the value itself,
 not with its container */
 
+/* TODO Should I have an upvote count and downvote count in the bikeracks database?
+Then you don't have to count up the number of upvotes for a particular rack in the 
+votes table every time. */
+
 DROP TABLE IF EXISTS bikeracks;
 DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS bikeracks_archive;
@@ -33,7 +37,18 @@ CREATE TABLE bikeracks (
     
 );
 
-/* vote_timestamp is type INTEGER as unix time, number of seconds since 1970-01-01 00:00:00 UTC */
+/* vote_timestamp is type INTEGER as unix time, number of seconds since 1970-01-01 00:00:00 UTC
+TODO A users table is going to change things here. a vote will be tied to a user
+potential users schema: id, username, password, and the users id will be a foreign key on 
+the votes table because:
+so when a user upvotes a bikerack, first we check, have they already upvoted this
+particular bikerack? and we check this by looking up all votes using their user id
+and checking if the rack_id is already there for this rack. Because the front end side
+doesn't know anything about rack ids, we'd first need to look up this rack in the
+database using its coordinates
+
+
+a user can vote only once per bikerack.  */
 
 CREATE TABLE votes (
     vote_timestamp INTEGER,
@@ -84,6 +99,9 @@ CREATE TABLE votes_history (
 the coordinates... Not needed. 
 - add all bikeracks to the bikeracks_history 
 - then you can have foreign key on it in votes_history
+
+TODO this weekend:
+- ask about users table, and foreign key idea
 */
 
 

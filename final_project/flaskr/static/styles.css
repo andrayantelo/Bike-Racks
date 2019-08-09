@@ -30,6 +30,7 @@
   flex-direction: row;
   flex-grow: 0.5;
   height: 50%;
+  justify-content: space-between;
 }
 
 #submitButton {

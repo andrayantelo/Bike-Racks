@@ -82,4 +82,19 @@ def store_rack():
         h.insert_rack('bikeracks', db, args)
         return Response(status=200)
     return render_template('base.html')
+
+# potential function for upvoting/downvoting    
+@bikes.route('/get_single_rack', methods=['GET'])
+def get_single_rack():
+    if request.method == 'GET':
+        lat = request.args.get('latitude', 0, type=float) or None
+        lng = request.args.get('longitude', 0, type=float) or None
+        
+        # database connection
+        db = get_db()
+        coordinates = (lat, lng)
+        
+        rack = h.get_single_rack('bikeracks', db, coordinates)
+        
+        return rack
     

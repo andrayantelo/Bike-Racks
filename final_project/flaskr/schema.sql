@@ -23,8 +23,10 @@ votes table every time. */
 
 DROP TABLE IF EXISTS bikeracks;
 DROP TABLE IF EXISTS votes;
-DROP TABLE IF EXISTS bikeracks_archive;
-DROP TABLE IF EXISTS votes_archive;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS bikeracks_history;
+DROP TABLE IF EXISTS votes_history;
+DROP TABLE IF EXISTS users_history; 
 
 CREATE TABLE bikeracks (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,7 +41,8 @@ CREATE TABLE bikeracks (
 
 /* vote_timestamp is type INTEGER as unix time, number of seconds since 1970-01-01 00:00:00 UTC
 TODO A users table is going to change things here. a vote will be tied to a user
-potential users schema: id, username, password, and the users id will be a foreign key on 
+potential users schema: id, username, password, email, password salt?, password hashed?, common name, date created
+and the users id will be a foreign key on 
 the votes table because:
 so when a user upvotes a bikerack, first we check, have they already upvoted this
 particular bikerack? and we check this by looking up all votes using their user id

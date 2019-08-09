@@ -43,8 +43,9 @@ let emptyBikeState = function(params) {
     //   latitude: float,
     //   longitude: float,
     //   address: string,
-    //   uniqueId: integer,
-    //   status: string
+    //   uniqueId: interger,
+    //   status: string,
+    //   vote: {type: string, date: integer (unix time)}
     // }
     if ($.isEmptyObject(params)) {
         return {}
@@ -54,7 +55,8 @@ let emptyBikeState = function(params) {
         longitude: params.lng,
         address: params.address,
         uniqueId: params.uniqueId,
-        status: params.status
+        status: params.status,
+        vote: {type: params.vote.type, date: params.vote.date}
     }
 };
 
@@ -63,6 +65,8 @@ class BikeRack {
     constructor(state) {
         this.state = state;
         this.initBikeRack();
+        
+
     }
     
     initBikeRack() {
@@ -70,6 +74,7 @@ class BikeRack {
     }
 
     setMarkerColor() {
+        // based on status
         let markerColor;
         let status = this.state.status;
         
@@ -86,15 +91,41 @@ class BikeRack {
         
         return markerColor;
     }
+    
+    // over the last week of votes, if 80% upvoted it, green 
+    // if less than 80%, red
+    // login authentication so that one person can only vote once
+    // fix popup content size
+    
 
-    addPhoto() {
-    // Add photo of bike rack
+    
+    addVote() {
+        // add a vote for a bikerack with particular id
+        // update the voting information for a bikerack in the db
+        // send a request to the database, we want to send the new voting
+        // information to the database for a bikerack with particular
+        // coordinates, TODO maybe we need to keep track of rack ids on 
+        // the front end side as well somehow. we get a rack's coordinates
+        // with the geosearch api, so where would we put the id. 
+        
+        // get rack from db
     }
-
-    addReview() {
-    // Add bike rack review
+    getRackVotes() {
+        // look up all the votes for this bikerack (by id) 
     }
-
+    removeOldVotes() {
+        // Probably don't need this on the UI side
+        // remove old votes for bikerack (past a certain date)
+    }
+    updateRackStatus() {
+        // update rack status based on votes
+    }
+    deleteAllVotes() {
+        // delete all the votes for a bikerack (by id)
+    }
+    
+    
+    
 };
 
 //BikeMap is the class for the overall website. It will include functions
@@ -109,10 +140,12 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-const arrowHTML = `
+const arrowHTML = `<div id="arrowsContainer">
                      <div class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">0%</span><div>
                      <div class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">0%</span></div>
-                 `
+                   </div>
+                   </div> <!-- /#options -->
+                  `
 
 function popupContent(lat, lng, address, temp) {
     if (address === null || address === undefined) {
@@ -125,18 +158,17 @@ function popupContent(lat, lng, address, temp) {
                </div>
                <div id="options">
                  <button id="submitButton" type="submit">Add Bike Rack</button>
-               <div id="arrowsContainer"></div>
-               </div> <!-- /#options -->
+
+               
+               
                `
                
     if (!temp) {
+        console.log("temp is false");
         content += arrowHTML;
-    }
-
-    return `  <div class="popup">
-               ${content}
-               </div>
-            `
+    } else {content += `</div> <!-- /#options -->`}
+    
+    return `<div class="popup"> ${content} </div>`
    
 };
 
@@ -150,7 +182,9 @@ class BikeMap {
         
         
         this.allRacks = L.featureGroup([]);
-        this.allRacks.on('click', (e) => e.target.openPopup());
+        this.allRacks.on('click', (e) => {
+            this.removeMarker(this.tempMarker);
+            e.target.openPopup()});
         
         this.pendingRacks = L.featureGroup([]);
         this.approvedRacks = L.featureGroup([]);
@@ -173,7 +207,6 @@ class BikeMap {
             
         }.bind(this));
         
-        // attach click handlers
         this.$showApproved.on('click', function(e) {
             this.toggleMarkers("approved", this.$showApproved, this.approvedRacks);
         }.bind(this));
@@ -250,9 +283,13 @@ BikeMap.prototype.loadRacks = function(callback) {
 BikeMap.prototype.buildRack = function(state) {
     // build a rack from creating an instance of bikeRack to creating
     // a marker for it, and adding that marker to the map
+    // remove temp rack, because it's about to be replaced
+    this.removeMarker(this.tempMarker);
     this.createBikeRack(state);
     let marker = this.createMarker(state);
     this.addMarker(marker);
+    // open its popup
+    marker.openPopup();
 };
 
 
@@ -269,7 +306,8 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
         url: {{ url_for('bikes.coordinates')|tojson }},
         data: {
             lat: $('#lat').text(),
-            lng: $('#lng').text()
+            lng: $('#lng').text(),
+            address: $('#address').text()
         },
         context: this
   }).done(function(state) {
@@ -295,12 +333,14 @@ BikeMap.prototype.onMapClick = function (e) {
     // when the user clicks on the map, add a temporary marker there
     // then look up the address (which is async) and when that is 
     // finished, add the address to the popup content
+
     let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng);
     let target = document.getElementById('address'),
             spinner = new Spinner(opts).spin(target);
     this.findAddress(e.latlng.lat, e.latlng.lng).then((address) => {
         
         let content = popupContent(e.latlng.lat, e.latlng.lng, address, true);
+
         tempMarker.setPopupContent(content);
     })
 }
@@ -355,7 +395,7 @@ BikeMap.prototype.createMarker = function(state) {
     
     // bind popup to marker
     let content = popupContent(state.latitude, state.longitude, state.address, false);
-    marker.bindPopup(content)
+    marker.bindPopup(content);
 
     return marker;
 }
@@ -428,6 +468,34 @@ BikeMap.prototype.toggleMarkers = function(status, selector, group) {
     }
 };
 
+// TODO determine if needed (depends on schema stuff):
+// when you click on the upvote button, the percentage next to the 
+
+BikeMap.prototype.getSingleRack = function() {
+    console.log("running getSingleRack");
+    let latitude = $('#lat').text(),
+        longitude = $('#lng').text();
+    // request a rack from db, the rack's info gets returned
+    // an emptyBikeState can be made with this info
+    let path = {{ url_for('bikes.get_single_rack')|tojson }},
+        params = $.param({latitude: latitude, longitude: longitude});
+        
+    return $.ajax({
+        method: 'GET',
+        url: path + '?' + params,
+        context:this,
+    })
+}
+
+BikeMap.prototype.loadSingleRack = function() {
+    console.log("running loadSingleRack");
+    let getRackPromise = this.getSingleRack();
+    getRackPromise.done((data) => {
+
+        console.log(data);
+    });
+};
+
 // for testing purposes
 BikeMap.prototype.storeRack = function (state) {
     
@@ -438,7 +506,8 @@ BikeMap.prototype.storeRack = function (state) {
             latitude: state.latitude,
             longitude: state.longitude,
             status: state.status,
-            address: state.address
+            address: state.address,
+            vote: {type: state.vote.type, date: state.vote.date}
         }, null, '\t'),
         dataType: 'json',
         contentType: 'application/json;charset=UTF-8',
@@ -448,6 +517,5 @@ BikeMap.prototype.storeRack = function (state) {
         console.log(data);
     })
 }
-
 
 

@@ -46,10 +46,12 @@ def create_app(test_config=None):
     
     # import and register the blueprint from the factory
     from . import bikes
-    app.register_blueprint(bikes.bp)
+    from . import votes
+    app.register_blueprint(bikes.bikes)
+    app.register_blueprint(votes.votes)
         
     @app.route('/')
-    def home_page(name=None):
+    def home(name=None):
         # update map with approved markers
         # render_template invokes the jinja template engine
         return render_template('base.html', name=name)

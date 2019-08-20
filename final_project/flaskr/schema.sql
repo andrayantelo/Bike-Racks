@@ -58,7 +58,7 @@ When a bikerack is added to bikeracks it also gets added to bikeracks_history
 that way we can link old votes back to their bikerack */
 
 CREATE TABLE bikeracks_history (
-    rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rack_id INTEGER PRIMARY KEY,
     status TEXT DEFAULT "pending",
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
@@ -74,7 +74,7 @@ vote_timestamp is type INTEGER as unix time, number of seconds since 1970-01-01 
  */
 
 CREATE TABLE votes_history (
-    vote_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    vote_id INTEGER PRIMARY KEY,
     vote_timestamp INTEGER,
     user_id INTEGER,
     vote_type INTEGER,

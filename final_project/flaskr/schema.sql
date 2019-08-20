@@ -25,8 +25,8 @@ CREATE TABLE bikeracks (
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
     address TEXT,
-    upvote_count INTEGER,
-    downvote_count INTEGER,
+    upvote_count INTEGER NOT NULL DEFAULT 0,
+    downvote_count INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT coordinates UNIQUE(latitude, longitude),
     CHECK (status in ("approved", "pending", "rejected"))
     

@@ -43,6 +43,7 @@ database using its coordinates
 a user can vote only once per bikerack.  */
 
 CREATE TABLE votes (
+    vote_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     vote_type INTEGER,
     rack_id INTEGER NOT NULL,
@@ -52,7 +53,7 @@ CREATE TABLE votes (
     CHECK (vote_type in (-1, 1))
 );
 
-/* history tables, identical to regular table,
+/* history tables, identical to regular table except without upvote_count and downvote_count,
 When a bikerack is added to bikeracks it also gets added to bikeracks_history
 that way we can link old votes back to their bikerack */
 
@@ -73,6 +74,7 @@ vote_timestamp is type INTEGER as unix time, number of seconds since 1970-01-01 
  */
 
 CREATE TABLE votes_history (
+    vote_id INTEGER PRIMARY KEY AUTOINCREMENT,
     vote_timestamp INTEGER,
     user_id INTEGER,
     vote_type INTEGER,

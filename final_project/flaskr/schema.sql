@@ -53,6 +53,9 @@ CREATE TABLE votes (
     CHECK (vote_type in (-1, 1))
 );
 
+/* want to be able to look up vote by a user for a particular rack*/
+CREATE INDEX rack_vote ON votes (user_id, rack_id);
+
 /* history tables, identical to regular table except without upvote_count and downvote_count,
 When a bikerack is added to bikeracks it also gets added to bikeracks_history
 that way we can link old votes back to their bikerack */
@@ -84,6 +87,9 @@ CREATE TABLE votes_history (
         ON DELETE NO ACTION
     CHECK (vote_type in (1, -1))
 );
+
+/*want to be able to look up votes from a certain period in time */
+CREATE INDEX old_votes ON votes_history (vote_timestamp);
 
 /* TODO Things to check:
 - check that the foreign key on the regular tables bikeracks and votes works 

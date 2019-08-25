@@ -285,9 +285,16 @@ BikeMap.prototype.buildRack = function(state) {
     // a marker for it, and adding that marker to the map
     // remove temp rack, because it's about to be replaced
     this.removeMarker(this.tempMarker);
+    // we do createBikeRack which creates an instance of bikerack which
+    // is where we keep track of what color the marker will be (but that's
+    // basically it so maybe we want to just include this functionality in
+    // the bikemap class TODO)
     this.createBikeRack(state);
     let marker = this.createMarker(state);
+    // add marker to the map
     this.addMarker(marker);
+    // add an id to the marker element
+    marker._icon.id = state.rack_id;
     // open its popup
     marker.openPopup();
 };
@@ -316,6 +323,9 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
 };
 
 BikeMap.prototype.createBikeRack = function(state) {
+    // TODO figure out if this is even needed. When a rack is added to the map
+    // an instance of BikeRack is created, but is never stored anywhere,
+    // and is not used. 
     // create an instance of BikeRack and return it's state
     let bikerack = new BikeRack(state),
         iconColor = bikerack.setMarkerColor();
@@ -428,11 +438,15 @@ BikeMap.prototype.showMarkers = function(data) {
         let bikerack = new BikeRack(data[i]);
         // TODO, store this information somewhere? And should I use
         // BikeRackCollection here?
-        
-        // create marker
+        // create marker (handles what color the marker will be)
         let marker = this.createMarker(bikerack.state)
+        
         // add marker to map
         this.addMarker(marker);
+        // add the rack_id as the marker element's id, this happens
+        // after adding the marker to the map because if you try to do it
+        // before, the marker doesn't exist yet. get undefined error
+        marker._icon.id = bikerack.state.rack_id;
     }
 }
 
@@ -469,7 +483,9 @@ BikeMap.prototype.toggleMarkers = function(status, selector, group) {
 };
 
 // TODO determine if needed (depends on schema stuff):
-// when you click on the upvote button, the percentage next to the 
+// probably not needed because we are going to try to add the rack_id as
+// the bikerack's marker element id so that we can look up rack information
+// using the rack_id instead of the coordinates 
 
 BikeMap.prototype.getSingleRack = function() {
     console.log("running getSingleRack");
@@ -507,7 +523,8 @@ BikeMap.prototype.storeRack = function (state) {
             longitude: state.longitude,
             status: state.status,
             address: state.address,
-            vote: {type: state.vote.type, date: state.vote.date}
+            upvote_count: state.vote.upvote,
+            downvote_count: state.vote.downvote
         }, null, '\t'),
         dataType: 'json',
         contentType: 'application/json;charset=UTF-8',

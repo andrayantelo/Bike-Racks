@@ -54,6 +54,7 @@ def collect_pending(table_name, database, lat, lng):
     # Return 50 pending bike rack results to be displayed on the map
     # table_name: string
     # database: db connection object
+    # TODO, actually make it so that 50 are collected
     
     query = "SELECT * FROM {} WHERE status = 'pending'".format(table_name)
     result = database.execute(query).fetchall()
@@ -62,8 +63,8 @@ def collect_pending(table_name, database, lat, lng):
     return jsonify(pending_racks)
 
 # function that returns row for a bikerack with particular coordinates
-def collect_bike_rack(table_name, database, lat, lng):
-    # returns an object containing the data on a bikerack, searches
+def get_rack_state(table_name, database, lat, lng):
+    # returns a dictionary containing the data on a bikerack, searches
     # database based on coordinates
      
     query = "SELECT * FROM {} WHERE latitude = ? AND longitude = ?".format(table_name)
@@ -76,6 +77,8 @@ def collect_bike_rack(table_name, database, lat, lng):
 def get_racks(table_name, database, status):
     # get data from database for approved bikeracks, searches database
     # based on status
+    # return a response object with the application/json mimetype, the content
+    # is an array of dictionary objects that contain the states of each rack
     
     if status == None:
         # return all racks
@@ -88,7 +91,8 @@ def get_racks(table_name, database, status):
     result = [dict_from_row(row) for row in result]
     return jsonify(result)
 
-# potential function that aids upvoting/downvoting
+# potential function that aids upvoting/downvoting TODO, won't need this if front
+# end keeps track of rack_ids
 def get_single_rack(table_name, database, coordinates):
     # get data from the database for a single bikerack with coordinates=coordinates
     if validate_coordinates(coordinates):

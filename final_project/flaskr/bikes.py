@@ -14,7 +14,7 @@ from flask import (
     Blueprint, render_template, request, session, jsonify, Response
 )
 
-from . import helpers as h
+from . import helpers as helper
 
 from flaskr.db import get_db
 # __name__ is passed as 2nd arg so that bp knows where it is defined
@@ -41,7 +41,7 @@ def coordinates():
         address = request.form.get('address', '')
         
         # First check if these coordinates are valid
-        if h.validate_coordinates((lat, lng)):
+        if helper.validate_coordinates((lat, lng)):
             # if valid, save in database
             print("saving into database")
             try:
@@ -50,7 +50,7 @@ def coordinates():
                 db.execute('INSERT INTO bikeracks (latitude, longitude, address) VALUES (?, ?, ?);', (lat, lng, address))
                 db.commit()
                 # return data for the added temporary marker
-                bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
+                bike_rack = helper.get_rack_state("bikeracks", db, lat, lng)
         
                 return bike_rack
             except Exception as e:
@@ -67,7 +67,7 @@ def get_racks():
         # make a connection to the database
         db = get_db()
         
-        racks = h.get_racks("bikeracks", db, status)
+        racks = helper.get_racks("bikeracks", db, status)
         
         return racks
 
@@ -79,11 +79,12 @@ def store_rack():
         db = get_db()
         print("request json {}".format(args))
         
-        h.insert_rack('bikeracks', db, args)
+        helper.insert_rack('bikeracks', db, args)
         return Response(status=200)
     return render_template('base.html')
 
-# potential function for upvoting/downvoting    
+# potential function for upvoting/downvoting TODO won't need this if 
+#    
 @bikes.route('/get_single_rack', methods=['GET'])
 def get_single_rack():
     if request.method == 'GET':
@@ -94,7 +95,7 @@ def get_single_rack():
         db = get_db()
         coordinates = (lat, lng)
         
-        rack = h.get_single_rack('bikeracks', db, coordinates)
+        rack = helper.get_single_rack('bikeracks', db, coordinates)
         
         return rack
     

@@ -2,10 +2,9 @@
 /* Why is 'status' blue 
 There are actually 3 states a bikerack can be in: "approved", "pending", and
 "rejected".
-for each vote also include it's time/date that it was voted
-separate table for votes, foreign key on bike rack id
-and this separate table has the data for voting: time/date, type of vote ("upvote" or "downvote"), index
-on the bikerack id (or time/date)
+separate table for votes, has foreign key on bike rack id
+and this separate table has the data for voting: type of vote (1 ("upvote") or -1 ("downvote")),
+user_id, index on the bikerack id (or user_id)
 The relationship between bikeracks and votes is one to many, one bikerack
 to many votes
 The bikeracks table is the parent table, and is the table that the
@@ -13,20 +12,12 @@ foreign key constraint refers to.
 The votes table is the child table, which is the table that a foreign key
 consraint is applied.
 The rack_id in bikeracks is the parent key, the rack_id column in
-votes is called the child key.
-In sqlite the datatype of a value is associated with the value itself,
-not with its container */
-
-/* TODO Should I have an upvote count and downvote count in the bikeracks database?
-Then you don't have to count up the number of upvotes for a particular rack in the 
-votes table every time. */
+votes is called the child key.*/
 
 DROP TABLE IF EXISTS bikeracks;
 DROP TABLE IF EXISTS votes;
-DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS bikeracks_history;
 DROP TABLE IF EXISTS votes_history;
-DROP TABLE IF EXISTS users_history; 
 
 CREATE TABLE bikeracks (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,18 +25,16 @@ CREATE TABLE bikeracks (
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
     address TEXT,
+    upvote_count INTEGER NOT NULL DEFAULT 0,
+    downvote_count INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT coordinates UNIQUE(latitude, longitude),
     CHECK (status in ("approved", "pending", "rejected"))
     
 );
 
-/* vote_timestamp is type INTEGER as unix time, number of seconds since 1970-01-01 00:00:00 UTC
-TODO A users table is going to change things here. a vote will be tied to a user
-potential users schema: id, username, password, email, password salt?, password hashed?, common name, date created
-and the users id will be a foreign key on 
-the votes table because:
+/* 
 so when a user upvotes a bikerack, first we check, have they already upvoted this
-particular bikerack? and we check this by looking up all votes using their user id
+particular bikerack? and we check this by looking up all votes using their user_id
 and checking if the rack_id is already there for this rack. Because the front end side
 doesn't know anything about rack ids, we'd first need to look up this rack in the
 database using its coordinates
@@ -54,21 +43,25 @@ database using its coordinates
 a user can vote only once per bikerack.  */
 
 CREATE TABLE votes (
-    vote_timestamp INTEGER,
-    vote_type TEXT,
+    vote_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    vote_type INTEGER,
     rack_id INTEGER NOT NULL,
     FOREIGN KEY (rack_id) REFERENCES bikeracks(rack_id)
         ON UPDATE CASCADE
         ON DELETE NO ACTION
-    CHECK (vote_type in ("upvote", "downvote"))
+    CHECK (vote_type in (-1, 1))
 );
 
-/* history tables, identical to regular table,
+/* want to be able to look up vote by a user for a particular rack*/
+CREATE UNIQUE INDEX rack_vote ON votes (user_id, rack_id);
+
+/* history tables, identical to regular table except without upvote_count and downvote_count,
 When a bikerack is added to bikeracks it also gets added to bikeracks_history
 that way we can link old votes back to their bikerack */
 
 CREATE TABLE bikeracks_history (
-    rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rack_id INTEGER PRIMARY KEY,
     status TEXT DEFAULT "pending",
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
@@ -78,28 +71,28 @@ CREATE TABLE bikeracks_history (
 );
 
 /* 
-Potential problem: if a bike rack is deleted from the bikeracks table, say with a
-rack_id of 3, and now exists in the bikeracks_archive table. Let's say another bikerack
-gets added to the bikeracks table with a rack_id of 3, and why not because the previous
-one isn't in that table anymore. we wouldn't be able to link the votes back to their original bikerack
-if this happens. Actually, a bike rack would never be added with an id that was already
-used because of AUTOINCREMENT
+votes_history table identical to votes table except it also has a timestamp of
+when the vote was made
+vote_timestamp is type INTEGER as unix time, number of seconds since 1970-01-01 00:00:00 UTC
  */
 
 CREATE TABLE votes_history (
+    vote_id INTEGER PRIMARY KEY,
     vote_timestamp INTEGER,
-    vote_type TEXT,
+    user_id INTEGER,
+    vote_type INTEGER,
     rack_id INTEGER NOT NULL,
     FOREIGN KEY (rack_id) REFERENCES bikeracks_history(rack_id)
         ON UPDATE CASCADE
         ON DELETE NO ACTION
-    CHECK (vote_type in ("upvote", "downvote"))
+    CHECK (vote_type in (1, -1))
 );
 
+/*want to be able to look up votes from a certain period in time */
+CREATE UNIQUE INDEX old_votes ON votes_history (vote_timestamp);
+
 /* TODO Things to check:
-- check that the foreign key on the regular tables bikeracks and votes works
-- Maybe instead of having a foreign key on votes be the rack_id, have it be
-the coordinates... Not needed. 
+- check that the foreign key on the regular tables bikeracks and votes works 
 - add all bikeracks to the bikeracks_history 
 - then you can have foreign key on it in votes_history
 

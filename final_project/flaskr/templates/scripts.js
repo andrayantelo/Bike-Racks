@@ -141,8 +141,8 @@ function buildMarkerIcon(markerColor) {
 };
 
 const arrowHTML = `<div id="arrowsContainer">
-                     <div class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">0%</span><div>
-                     <div class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">0%</span></div>
+                     <div class="arrow"><i id="upvoteArrow" class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">0%</span><div>
+                     <div class="arrow"><i id="downvoteArrow" class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">0%</span></div>
                    </div>
                    </div> <!-- /#options -->
                   `
@@ -205,6 +205,15 @@ class BikeMap {
             
             this.submitBikeRack(e, this.buildRack.bind(this));
             
+        }.bind(this));
+        
+        // upvote/downvote click bindings
+        this.$myMap.on('click', '#upvoteArrow', function(e) {
+            console.log("upvote!");
+        }.bind(this));
+        
+        this.$myMap.on('click', '#downvoteArrow', function(e) {
+            console.log("downvote!");
         }.bind(this));
         
         this.$showApproved.on('click', function(e) {

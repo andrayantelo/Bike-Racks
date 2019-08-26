@@ -142,9 +142,9 @@ function buildMarkerIcon(markerColor) {
 
 function arrowHTML(rack_id) { 
     return `<div id="arrowsContainer">
-              <div class="arrow"><i id=${"upvoteArrow_" + rack_id} class="fas fa-arrow-circle-up fa-2x arrowHover"></i>
+              <div><i id=${"upvoteArrow_" + rack_id} class="fas fa-arrow-circle-up fa-2x arrowHover arrow"></i>
                       <span id=${"upvoteCount_" + rack_id}>0%</span><div>
-                <div class="arrow"><i id=${"downvoteArrow_" + rack_id} class="fas fa-arrow-circle-down fa-2x arrowHover"></i>
+                <div><i id=${"downvoteArrow_" + rack_id} class="fas fa-arrow-circle-down fa-2x arrowHover arrow"></i>
                       <span id=${"downvoteCount_" + rack_id}>0%</span></div>
                 </div>
             </div> <!-- /#options -->`
@@ -206,13 +206,27 @@ class BikeMap {
             
         }.bind(this));
         
-        // upvote/downvote click bindings
-        this.$myMap.on('click', '#upvoteArrow', function(e) {
-            console.log("upvote!");
-        }.bind(this));
-        
-        this.$myMap.on('click', '#downvoteArrow', function(e) {
-            console.log("downvote!");
+        // arrow click binding
+        this.$myMap.on('click', '.arrow', function(e) {
+            console.log("vote!");
+            console.log(e.target.id);
+            // TODO
+            // when a user clicks on an arrow, we need to figure out if it
+            // was the downvote arrow or the upvote arrow which we can do with
+            // e.target.id
+            // then, we need to disable the clicking functionality for the 
+            // arrow that was clicked, and also add the 'voted' class to it
+            // and remove the arrowHover class from it
+            // to disable the clicking for the button, remove the arrow class
+            // from it
+            
+            // to summarize:
+            // remove: .arrow, .arrowHover
+            // add: .voted
+            
+            // BUT also, need to check if a vote was already made on this rack
+            
+            // the user can now only click on the opposite arrow for that rack
         }.bind(this));
         
         this.$showApproved.on('click', function(e) {

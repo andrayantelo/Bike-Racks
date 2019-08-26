@@ -59,6 +59,7 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
+# get racks based on status ('pending', 'rejected', 'approved')
 @bikes.route('/get_racks/', methods=['GET'])
 def get_racks():
     if request.method == 'GET':
@@ -71,9 +72,10 @@ def get_racks():
         
         return racks
 
-# manually insert racks into db    
+ 
 @bikes.route('/store_rack/', methods=['POST'])
 def store_rack():
+    # manually insert racks into db   
     if request.method == 'POST':
         args = request.json
         db = get_db()
@@ -83,19 +85,17 @@ def store_rack():
         return Response(status=200)
     return render_template('base.html')
 
-# potential function for upvoting/downvoting TODO won't need this if 
-#    
+ 
 @bikes.route('/get_single_rack', methods=['GET'])
 def get_single_rack():
+    # get rack based on rack_id 
     if request.method == 'GET':
-        lat = request.args.get('latitude', 0, type=float) or None
-        lng = request.args.get('longitude', 0, type=float) or None
+        rack_id = request.args.get('rack_id')
         
         # database connection
         db = get_db()
-        coordinates = (lat, lng)
         
-        rack = helper.get_single_rack('bikeracks', db, coordinates)
+        rack = helper.get_single_rack('bikeracks', db, rack_id)
         
         return rack
     

@@ -482,35 +482,24 @@ BikeMap.prototype.toggleMarkers = function(status, selector, group) {
     }
 };
 
-// TODO determine if needed (depends on schema stuff):
-// probably not needed because we are going to try to add the rack_id as
-// the bikerack's marker element id so that we can look up rack information
-// using the rack_id instead of the coordinates 
 
-BikeMap.prototype.getSingleRack = function() {
-    console.log("running getSingleRack");
-    let latitude = $('#lat').text(),
-        longitude = $('#lng').text();
-    // request a rack from db, the rack's info gets returned
-    // an emptyBikeState can be made with this info
+
+
+// -------------------------------@-------------------------------------
+
+BikeMap.prototype.getRack = function(state) {
+    // Retrieve rack state from db based on rack_id
+    let rack_id = state.rack_id
     let path = {{ url_for('bikes.get_single_rack')|tojson }},
-        params = $.param({latitude: latitude, longitude: longitude});
+        params = $.param({rack_id: rack_id});
         
     return $.ajax({
         method: 'GET',
         url: path + '?' + params,
-        context:this,
-    })
+        context: this,
+    }).done(data => console.log(data))
+        
 }
-
-BikeMap.prototype.loadSingleRack = function() {
-    console.log("running loadSingleRack");
-    let getRackPromise = this.getSingleRack();
-    getRackPromise.done((data) => {
-
-        console.log(data);
-    });
-};
 
 // for testing purposes
 BikeMap.prototype.storeRack = function (state) {

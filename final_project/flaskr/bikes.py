@@ -14,7 +14,7 @@ from flask import (
     Blueprint, render_template, request, session, jsonify, Response
 )
 
-from . import helpers as h
+from . import helpers as helper
 
 from flaskr.db import get_db
 # __name__ is passed as 2nd arg so that bp knows where it is defined
@@ -41,7 +41,7 @@ def coordinates():
         address = request.form.get('address', '')
         
         # First check if these coordinates are valid
-        if h.validate_coordinates((lat, lng)):
+        if helper.validate_coordinates((lat, lng)):
             # if valid, save in database
             print("saving into database")
             try:
@@ -50,7 +50,7 @@ def coordinates():
                 db.execute('INSERT INTO bikeracks (latitude, longitude, address) VALUES (?, ?, ?);', (lat, lng, address))
                 db.commit()
                 # return data for the added temporary marker
-                bike_rack = h.collect_bike_rack("bikeracks", db, lat, lng)
+                bike_rack = helper.get_rack_state("bikeracks", db, lat, lng)
         
                 return bike_rack
             except Exception as e:
@@ -59,6 +59,7 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
+# get racks based on status ('pending', 'rejected', 'approved')
 @bikes.route('/get_racks/', methods=['GET'])
 def get_racks():
     if request.method == 'GET':
@@ -67,34 +68,34 @@ def get_racks():
         # make a connection to the database
         db = get_db()
         
-        racks = h.get_racks("bikeracks", db, status)
+        racks = helper.get_racks("bikeracks", db, status)
         
         return racks
 
-# manually insert racks into db    
+ 
 @bikes.route('/store_rack/', methods=['POST'])
 def store_rack():
+    # manually insert racks into db   
     if request.method == 'POST':
         args = request.json
         db = get_db()
         print("request json {}".format(args))
         
-        h.insert_rack('bikeracks', db, args)
+        helper.insert_rack('bikeracks', db, args)
         return Response(status=200)
     return render_template('base.html')
 
-# potential function for upvoting/downvoting    
+ 
 @bikes.route('/get_single_rack', methods=['GET'])
 def get_single_rack():
+    # get rack based on rack_id 
     if request.method == 'GET':
-        lat = request.args.get('latitude', 0, type=float) or None
-        lng = request.args.get('longitude', 0, type=float) or None
+        rack_id = request.args.get('rack_id')
         
         # database connection
         db = get_db()
-        coordinates = (lat, lng)
         
-        rack = h.get_single_rack('bikeracks', db, coordinates)
+        rack = helper.get_single_rack('bikeracks', db, rack_id)
         
         return rack
     

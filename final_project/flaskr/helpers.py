@@ -54,6 +54,7 @@ def collect_pending(table_name, database, lat, lng):
     # Return 50 pending bike rack results to be displayed on the map
     # table_name: string
     # database: db connection object
+    # TODO, actually make it so that 50 are collected
     
     query = "SELECT * FROM {} WHERE status = 'pending'".format(table_name)
     result = database.execute(query).fetchall()
@@ -61,9 +62,10 @@ def collect_pending(table_name, database, lat, lng):
     
     return jsonify(pending_racks)
 
-# function that returns row for a bikerack with particular coordinates
-def collect_bike_rack(table_name, database, lat, lng):
-    # returns an object containing the data on a bikerack, searches
+
+def get_rack_state(table_name, database, lat, lng):
+    # Returns row for a bikerack with particular coordinates
+    # returns a dictionary containing the data on a bikerack, searches
     # database based on coordinates
      
     query = "SELECT * FROM {} WHERE latitude = ? AND longitude = ?".format(table_name)
@@ -75,7 +77,9 @@ def collect_bike_rack(table_name, database, lat, lng):
     
 def get_racks(table_name, database, status):
     # get data from database for approved bikeracks, searches database
-    # based on status
+    # based on status of rack ('pending', 'rejected', 'approved')
+    # return a response object with the application/json mimetype, the content
+    # is an array of dictionary objects that contain the states of each rack
     
     if status == None:
         # return all racks
@@ -88,14 +92,13 @@ def get_racks(table_name, database, status):
     result = [dict_from_row(row) for row in result]
     return jsonify(result)
 
-# potential function that aids upvoting/downvoting
-def get_single_rack(table_name, database, coordinates):
-    # get data from the database for a single bikerack with coordinates=coordinates
-    if validate_coordinates(coordinates):
-        lat, lng = coordinates
-        # return the rack
-        query = "SELECT * FROM {} WHERE latitude =? AND longitude=?".format(table_name)
-        result = database.execute(query, (lat, lng,)).fetchall()
+
+def get_single_rack(table_name, database, rack_id):
+    # get data from the database for a single bikerack with rack_id=rack_id
+    # get single rack from db based on rack_id
+    
+    query = "SELECT * FROM {} WHERE rack_id = ?".format(table_name)
+    result = database.execute(query, (rack_id,)).fetchall()
     result = [dict_from_row(row) for row in result]
     print(result)
     return jsonify(result)

@@ -140,32 +140,31 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-const arrowHTML = `<div id="arrowsContainer">
-                     <div class="arrow"><i class="fas fa-arrow-circle-up fa-2x"></i><span id="upvoteCount">0%</span><div>
-                     <div class="arrow"><i class="fas fa-arrow-circle-down fa-2x"></i><span id="downvoteCount">0%</span></div>
-                   </div>
-                   </div> <!-- /#options -->
-                  `
+function arrowHTML(rack_id) { 
+    return `<div id="arrowsContainer">
+              <div><i id=${"upvoteArrow_" + rack_id} class="fas fa-arrow-circle-up fa-2x arrowHover arrow"></i>
+                      <span id=${"upvoteCount_" + rack_id}>0%</span><div>
+                <div><i id=${"downvoteArrow_" + rack_id} class="fas fa-arrow-circle-down fa-2x arrowHover arrow"></i>
+                      <span id=${"downvoteCount_" + rack_id}>0%</span></div>
+                </div>
+            </div> <!-- /#options -->`
+};
 
-function popupContent(lat, lng, address, temp) {
-    if (address === null || address === undefined) {
-        address = ""
+function popupContent(markerState) {
+    if (markerState.address === null || markerState.address === undefined) {
+        markerState.address = ""
     }
-    let content = `<div id="address">${address}</div>
-               <div id="coordinates"><span id="lat">${lat}</span> <span>
+    let content = `<div id="address">${markerState.address}</div>
+               <div id="coordinates"><span id="lat">${markerState.latitude}</span> <span>
                  <span id="coordinateComma">,</span>
-                 </span> <span id="lng">${lng}</span>
+                 </span> <span id="lng">${markerState.longitude}</span>
                </div>
                <div id="options">
-                 <button id="submitButton" type="submit">Add Bike Rack</button>
-
+                 <button id="submitButton" type="submit">Add Bike Rack</button>`
                
-               
-               `
-               
-    if (!temp) {
-        console.log("temp is false");
-        content += arrowHTML;
+    if (!markerState.temp) {
+        let arrows = arrowHTML(markerState.rack_id);
+        content += arrows;
     } else {content += `</div> <!-- /#options -->`}
     
     return `<div class="popup"> ${content} </div>`
@@ -205,6 +204,29 @@ class BikeMap {
             
             this.submitBikeRack(e, this.buildRack.bind(this));
             
+        }.bind(this));
+        
+        // arrow click binding
+        this.$myMap.on('click', '.arrow', function(e) {
+            console.log("vote!");
+            console.log(e.target.id);
+            // TODO
+            // when a user clicks on an arrow, we need to figure out if it
+            // was the downvote arrow or the upvote arrow which we can do with
+            // e.target.id
+            // then, we need to disable the clicking functionality for the 
+            // arrow that was clicked, and also add the 'voted' class to it
+            // and remove the arrowHover class from it
+            // to disable the clicking for the button, remove the arrow class
+            // from it
+            
+            // to summarize:
+            // remove: .arrow, .arrowHover
+            // add: .voted
+            
+            // BUT also, need to check if a vote was already made on this rack
+            
+            // the user can now only click on the opposite arrow for that rack
         }.bind(this));
         
         this.$showApproved.on('click', function(e) {
@@ -348,8 +370,15 @@ BikeMap.prototype.onMapClick = function (e) {
     let target = document.getElementById('address'),
             spinner = new Spinner(opts).spin(target);
     this.findAddress(e.latlng.lat, e.latlng.lng).then((address) => {
-        
-        let content = popupContent(e.latlng.lat, e.latlng.lng, address, true);
+        let markerState = {
+            latitude: e.latlng.lat,
+            longitude: e.latlng.lng,
+            address: address,
+            rack_id: "",
+            temp: true,
+        }
+            
+        let content = popupContent(markerState);
 
         tempMarker.setPopupContent(content);
     })
@@ -368,7 +397,14 @@ BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
     let markerIcon = buildMarkerIcon(tempMarkerColor),
-        content = popupContent(lat, lng, address, true);
+        markerState = {
+            latitude: lat,
+            longitude: lng,
+            address: address,
+            temp: true,
+            rack_id: "",
+        },
+        content = popupContent(markerState);
         // if there is already a tempMarker, remove it
     if (this.tempMarker !== undefined) {
         this.mymap.removeLayer(this.tempMarker);
@@ -404,7 +440,14 @@ BikeMap.prototype.createMarker = function(state) {
     }
     
     // bind popup to marker
-    let content = popupContent(state.latitude, state.longitude, state.address, false);
+    let markerState = {
+        latitude: state.latitude,
+        longitude: state.longitude,
+        address: state.address,
+        temp: false,
+        rack_id: state.rack_id,
+    }
+    let content = popupContent(markerState);
     marker.bindPopup(content);
 
     return marker;

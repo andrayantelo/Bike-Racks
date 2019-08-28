@@ -79,6 +79,39 @@
         
       </div> <!-- /.container -->
       
+      <!-- TODO: Add SDKs for Firebase products that you want to use
+           https://firebase.google.com/docs/web/setup#config-web-app -->
+           
+      <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+      <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+      <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-app.js"></script>
+
+      <!-- Add Firebase products that you want to use -->
+      <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-auth.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-firestore.js"></script>
+      
+      <script type="text/javascript" src="static/secrets.json"></script>
+
+      <script type="text/javascript">
+        
+        // Your web app's Firebase configuration
+        var firebaseConfig = { 
+              apiKey: config.api_key,
+              authDomain: config.authDomain,
+              databaseURL: config.databaseURL,
+              projectId: config.projectId,
+              storageBucket: "",
+              messagingSenderId: config.messagingSenderId,
+              appId: config.appId,
+            };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+      </script>
+      
+      
+      
   </body>
   
   <!-- leaflet geo-search  -->

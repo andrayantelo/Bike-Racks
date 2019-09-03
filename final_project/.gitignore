@@ -1,1 +1,7 @@
-__pycache__
+const api_key = "AIzaSyByx-7sYf-uMpmlEqUHu4toihnhUX-8_-8",
+      authDomain = "bikemap-6ad66.firebaseapp.com",
+      databaseURL = "https://bikemap-6ad66.firebaseio.com",
+      projectId = "bikemap-6ad66",
+      messagingSenderId = "20948153147",
+      appId = "1:20948153147:web:0defc83e2fbbb462";
+secrets.json

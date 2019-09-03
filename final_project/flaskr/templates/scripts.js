@@ -197,9 +197,16 @@ class BikeMap {
         this.$showApproved = $('#showApproved');
         this.$showPending = $('#showPending');
         this.$showRejected = $('#showRejected');
+        this.$signOutButton = $('#sign-out');
+        this.$signInButton = $('#sign-in');
         
         // click bindings
+        this.$signOutButton.click(this.signOut.bind(this));
+        this.$signInButton.click(this.signIn.bind(this));
+        
         this.mymap.on('click', this.onMapClick.bind(this));
+        
+        
         this.$myMap.on('click', '#submitButton', function(e) {
             
             this.submitBikeRack(e, this.buildRack.bind(this));
@@ -245,7 +252,7 @@ class BikeMap {
         this.$showRejected.on('click', function(e) {
             this.toggleMarkers("rejected", this.$showRejected, this.rejectedRacks);
         }.bind(this));
-
+        
     }
 };
     
@@ -293,8 +300,77 @@ BikeMap.prototype.initBikeMap = function () {
             
         this.addTempMarker(lat, lng, address);
     })
+    
+    // Initialize Firebase
+    this.initFirebase();
 
 };
+
+BikeMap.prototype.initFirebase = function() {
+    // Initialize Firebase authentication
+    firebase.initializeApp(firebaseConfig);
+    
+    // shortcut to firebase SDK features
+    this.auth = firebase.auth();
+    
+    // Initiates Firebase auth and listen to auth state changes.
+    this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
+    // TODO probably don't need below
+    /*firebase.auth().getRedirectResult().then(function(result) {
+      if (result.credential) {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = result.credential.accessToken;
+        // ...
+      }
+      // The signed-in user info.
+      var user = result.user;
+      console.log(user);
+    }).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // The email of the user's account used.
+      var email = error.email;
+      // The firebase.auth.AuthCredential type that was used.
+      var credential = error.credential;
+      // ...
+    });*/
+    
+};
+
+BikeMap.prototype.onAuthStateChanged = function(user) {
+    if (user) { // user is signed in
+        console.log(user.uid);
+        // show sign out button
+        this.$signOutButton.removeAttr('hidden');
+        // hide sign in button
+        this.$signInButton.attr('hidden', true);
+        
+        // TODO enable add bike rack buttons and voting buttons on 
+        // marker popups
+        
+    }
+    else { // user is signed out 
+        // Hide sign out button
+        this.$signOutButton.attr('hidden', true);
+        // show sign in button
+        this.$signInButton.removeAttr('hidden');
+        
+        // TODO disable add bike rack and voting buttons
+    }
+    
+}
+
+BikeMap.prototype.signIn = function() {
+    let provider = new firebase.auth.GoogleAuthProvider();
+    this.auth.signInWithRedirect(provider);
+}
+
+BikeMap.prototype.signOut = function() {
+    
+    this.auth.signOut();
+}
+
 
 BikeMap.prototype.loadRacks = function(callback) {
     // get data on ALL the markers in the database
@@ -328,25 +404,36 @@ BikeMap.prototype.buildRack = function(state) {
 
 
 BikeMap.prototype.submitBikeRack = function(e, callback) {
-    // send a request to the server, sending the coordinates of the
-    // place on the map that was clicked
-    
-    // submit a location on the map for bike rack location consideration
-    // it will be added to the database with a status of pending
-    // as long as the coordinates are valid
-    e.preventDefault();
-    $.ajax({
-        method: 'POST',
-        url: {{ url_for('bikes.coordinates')|tojson }},
-        data: {
-            lat: $('#lat').text(),
-            lng: $('#lng').text(),
-            address: $('#address').text()
-        },
-        context: this
-  }).done(function(state) {
-      return callback(state);
-  })
+    // first of all, check if user is signed in 
+    if (!this.auth.currentUser) {
+        // redirect user to sign in
+        this.signIn()
+        
+    }
+    else {
+        // this means the user is signed in so proceed with the function
+
+        console.log("user: " + JSON.stringify(this.auth.currentUser.uid));
+        // send a request to the server, sending the coordinates of the
+        // place on the map that was clicked
+        
+        // submit a location on the map for bike rack location consideration
+        // it will be added to the database with a status of pending
+        // as long as the coordinates are valid
+        e.preventDefault();
+        $.ajax({
+            method: 'POST',
+            url: {{ url_for('bikes.coordinates')|tojson }},
+            data: {
+                lat: $('#lat').text(),
+                lng: $('#lng').text(),
+                address: $('#address').text()
+            },
+            context: this
+      }).done(function(state) {
+          return callback(state);
+      })
+  }
 };
 
 BikeMap.prototype.createBikeRack = function(state) {

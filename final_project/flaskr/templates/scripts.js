@@ -197,6 +197,8 @@ class BikeMap {
         this.$showApproved = $('#showApproved');
         this.$showPending = $('#showPending');
         this.$showRejected = $('#showRejected');
+        this.$signOutButton = $('#sign-out');
+        this.$signInButton = $('#sign-in');
         
         // click bindings
         this.mymap.on('click', this.onMapClick.bind(this));
@@ -205,6 +207,9 @@ class BikeMap {
             this.submitBikeRack(e, this.buildRack.bind(this));
             
         }.bind(this));
+        
+        this.$signOutButton.click(this.signOut.bind(this));
+        this.$signInButton.click(this.signIn.bind(this));
         
         // arrow click binding
         this.$myMap.on('click', '.arrowClick', function(e) {
@@ -293,8 +298,78 @@ BikeMap.prototype.initBikeMap = function () {
             
         this.addTempMarker(lat, lng, address);
     })
+    
+    // Initialize Firebase
+    this.initFirebase();
 
 };
+
+BikeMap.prototype.initFirebase = function() {
+    // Initialize Firebase authentication
+    firebase.initializeApp(firebaseConfig);
+    
+    // shortcut to firebase SDK features
+    this.auth = firebase.auth();
+    
+    // Initiates Firebase auth and listen to auth state changes.
+    this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
+    // TODO probably don't need below
+    /*firebase.auth().getRedirectResult().then(function(result) {
+      if (result.credential) {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = result.credential.accessToken;
+        // ...
+      }
+      // The signed-in user info.
+      var user = result.user;
+      console.log(user);
+    }).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // The email of the user's account used.
+      var email = error.email;
+      // The firebase.auth.AuthCredential type that was used.
+      var credential = error.credential;
+      // ...
+    });*/
+    
+};
+
+BikeMap.prototype.onAuthStateChanged = function(user) {
+    if (user) { // user is signed in
+        console.log(user.uid);
+        // show sign out button
+        this.$signOutButton.removeAttr('hidden');
+        // hide sign in button
+        this.$signInButton.attr('hidden', true);
+        
+        // TODO enable add bike rack buttons and voting buttons on 
+        // marker popups
+        
+    }
+    else { // user is signed out 
+        // Hide sign out button
+        this.$signOutButton.attr('hidden', true);
+        // show sign in button
+        this.$signInButton.removeAttr('hidden');
+        
+        // TODO disable add bike rack and voting buttons
+    }
+    
+}
+
+BikeMap.prototype.signIn = function() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+
+    this.auth.signInWithRedirect(provider);
+}
+
+BikeMap.prototype.signOut = function() {
+    
+    this.auth.signOut();
+}
+
 
 BikeMap.prototype.loadRacks = function(callback) {
     // get data on ALL the markers in the database

@@ -107,17 +107,19 @@
       <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
       <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
       
+      <script type="text/javascript" src="static/secrets.json"></script>
       <script type="text/javascript">
+      
         
         // Your web app's Firebase configuration
         var firebaseConfig = { 
-              apiKey: "AIzaSyByx-7sYf-uMpmlEqUHu4toihnhUX-8_-8",
-              authDomain: "bikemap-6ad66.firebaseapp.com",
-              databaseURL: "https://bikemap-6ad66.firebaseio.com",
-              projectId: "bikemap-6ad66",
+              apiKey: config.api_key,
+              authDomain: config.authDomain,
+              databaseURL: config.databaseURL,
+              projectId: config.projectId,
               storageBucket: "",
-              messagingSenderId: "20948153147",
-              appId: "1:20948153147:web:0defc83e2fbbb462",
+              messagingSenderId: config.messagingSenderId,
+              appId: config.appId,
             };
         
         

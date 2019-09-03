@@ -159,13 +159,21 @@ function popupContent(markerState) {
                  <span id="coordinateComma">,</span>
                  </span> <span id="lng">${markerState.longitude}</span>
                </div>
-               <div id="options">
-                 <button id="submitButton" type="submit">Add Bike Rack</button>`
-               
-    if (!markerState.temp) {
+               <div id="options">`
+    
+        
+    // if it is not a temporary marker then you want to include the voting buttons
+    // you also want to take away the submit button functionality, maybe just
+    // remove the button altogether
+    if (markerState.temp) {
+        let submitDiv = `<button id="submitButton" type="submit">Add Bike Rack</button>
+                         </div> <!-- /#options -->`
+        content += submitDiv
+    }
+    else if (!markerState.temp) {
         let arrows = arrowHTML(markerState.rack_id);
         content += arrows;
-    } else {content += `</div> <!-- /#options -->`}
+    } 
     
     return `<div class="popup"> ${content} </div>`
    

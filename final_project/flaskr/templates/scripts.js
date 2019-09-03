@@ -201,15 +201,17 @@ class BikeMap {
         this.$signInButton = $('#sign-in');
         
         // click bindings
+        this.$signOutButton.click(this.signOut.bind(this));
+        this.$signInButton.click(this.signIn.bind(this));
+        
         this.mymap.on('click', this.onMapClick.bind(this));
+        
+        
         this.$myMap.on('click', '#submitButton', function(e) {
             
             this.submitBikeRack(e, this.buildRack.bind(this));
             
         }.bind(this));
-        
-        this.$signOutButton.click(this.signOut.bind(this));
-        this.$signInButton.click(this.signIn.bind(this));
         
         // arrow click binding
         this.$myMap.on('click', '.arrowClick', function(e) {
@@ -250,7 +252,7 @@ class BikeMap {
         this.$showRejected.on('click', function(e) {
             this.toggleMarkers("rejected", this.$showRejected, this.rejectedRacks);
         }.bind(this));
-
+        
     }
 };
     
@@ -360,8 +362,7 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
 }
 
 BikeMap.prototype.signIn = function() {
-    var provider = new firebase.auth.GoogleAuthProvider();
-
+    let provider = new firebase.auth.GoogleAuthProvider();
     this.auth.signInWithRedirect(provider);
 }
 
@@ -403,25 +404,36 @@ BikeMap.prototype.buildRack = function(state) {
 
 
 BikeMap.prototype.submitBikeRack = function(e, callback) {
-    // send a request to the server, sending the coordinates of the
-    // place on the map that was clicked
-    
-    // submit a location on the map for bike rack location consideration
-    // it will be added to the database with a status of pending
-    // as long as the coordinates are valid
-    e.preventDefault();
-    $.ajax({
-        method: 'POST',
-        url: {{ url_for('bikes.coordinates')|tojson }},
-        data: {
-            lat: $('#lat').text(),
-            lng: $('#lng').text(),
-            address: $('#address').text()
-        },
-        context: this
-  }).done(function(state) {
-      return callback(state);
-  })
+    // first of all, check if user is signed in 
+    if (!this.auth.currentUser) {
+        // redirect user to sign in
+        this.signIn()
+        
+    }
+    else {
+        // this means the user is signed in so proceed with the function
+
+        console.log("user: " + JSON.stringify(this.auth.currentUser.uid));
+        // send a request to the server, sending the coordinates of the
+        // place on the map that was clicked
+        
+        // submit a location on the map for bike rack location consideration
+        // it will be added to the database with a status of pending
+        // as long as the coordinates are valid
+        e.preventDefault();
+        $.ajax({
+            method: 'POST',
+            url: {{ url_for('bikes.coordinates')|tojson }},
+            data: {
+                lat: $('#lat').text(),
+                lng: $('#lng').text(),
+                address: $('#address').text()
+            },
+            context: this
+      }).done(function(state) {
+          return callback(state);
+      })
+  }
 };
 
 BikeMap.prototype.createBikeRack = function(state) {

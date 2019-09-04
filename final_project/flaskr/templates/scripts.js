@@ -141,7 +141,7 @@ function buildMarkerIcon(markerColor) {
 };
 
 function arrowHTML(rack_id) { 
-    return `<div id="arrowsContainer">
+    return `<div class="arrowsContainer" id=${"rack_" + rack_id}>
               <div><i id=${"upvoteArrow_" + rack_id} data-votetype="upvote" class="fas fa-arrow-circle-up fa-2x arrowHover arrowClick"></i>
                       <span id=${"upvoteCount_" + rack_id}>0%</span><div>
                 <div><i id=${"downvoteArrow_" + rack_id} data-votetype="downvote" class="fas fa-arrow-circle-down fa-2x arrowHover arrowClick"></i>
@@ -292,7 +292,6 @@ BikeMap.prototype.initBikeMap = function () {
 };
 
 BikeMap.prototype.getVoteStatus = function(rack_id, user_id) {
-    // TODO
     // query the votes database and find out if the rack with rack_id=rack_id
     // and user_id=user_id has a vote
     // if yes return true
@@ -304,8 +303,24 @@ BikeMap.prototype.getVoteStatus = function(rack_id, user_id) {
         method: 'GET',
         url: path + '?' + params,
         context: this,
-    }).done(data => console.log(data))
+    }).done(voteStatus => voteStatus)
     
+}
+
+BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
+    // submit a vote to the database
+    // rack_id: integer
+    // user_id: string
+    // vote_type: integer
+    // the vote data gets returned
+    let path = {{ url_for('votes.submit_vote')|tojson }},
+        params = $.param({rack_id: rack_id, user_id: user_id, vote_type: vote_type});
+        
+    return $.ajax({
+        method: 'POST',
+        url: path +  '?' + params,
+        context: this,
+    }).done(data => console.log(data))
 }
 
 BikeMap.prototype.vote = function(e) {
@@ -320,7 +335,9 @@ BikeMap.prototype.vote = function(e) {
         // Before anything happens, first need to check if this rack already
         // has a vote by this user
         console.log("vote!");
-        console.log(e)
+
+        let rack_id = e.target.parentNode.parentNode.id.slice("rack_".length)
+        
         let voteElement = e.target;
         let $voteElement = $('#' + voteElement.id);
         

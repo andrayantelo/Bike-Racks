@@ -90,8 +90,8 @@ def store_rack():
 def get_single_rack():
     # get rack based on rack_id 
     if request.method == 'GET':
-        rack_id = request.args.get('rack_id')
-        
+        rack_id = request.args.get('rack_id') or None
+        print("get single rack with id: {}".format(rack_id))
         # database connection
         db = get_db()
         

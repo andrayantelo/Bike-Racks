@@ -45,11 +45,13 @@ def get_vote_status():
         
         query = "SELECT vote_type FROM votes WHERE rack_id = ? AND user_id = ?"
         
-        result = db.execute(query, (rack_id, user_id)).fetchall()
+        result = db.execute(query, (rack_id, user_id)).fetchone()
+        
         if result:
-            return 'true'
+            result = h.dict_from_row(result)
+            return jsonify(result)
         else:
-            return 'false'
+            return jsonify(None)
             
 @votes.route('/submit_vote', methods=['POST'])
 def submit_vote():

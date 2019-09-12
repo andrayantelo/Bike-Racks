@@ -96,7 +96,7 @@ def get_racks(table_name, database, status):
 def get_single_rack(table_name, database, rack_id):
     # get data from the database for a single bikerack with rack_id=rack_id
     # get single rack from db based on rack_id
-    
+    print("looking up rack with id: {}".format(rack_id))
     query = "SELECT * FROM {} WHERE rack_id = ?".format(table_name)
     result = database.execute(query, (rack_id,)).fetchall()
     result = [dict_from_row(row) for row in result]

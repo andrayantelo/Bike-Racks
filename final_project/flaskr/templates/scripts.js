@@ -158,8 +158,7 @@ function popupContent(state) {
                  <span id="coordinateComma">,</span>
                  </span> <span id="lng">${state.longitude}</span>
                </div>
-               <div id="options">
-                 `
+               <div id="options">`
                  
     if (state.address === null || state.address === undefined) {
         state.address = ""

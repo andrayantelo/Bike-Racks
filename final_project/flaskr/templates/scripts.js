@@ -227,29 +227,7 @@ class BikeMap {
         // arrow click binding
         this.$myMap.on('click', '.arrowClick', function(e) {
             console.log("vote!");
-            console.log(e)
-            console.log(e.target);
-            console.log(e.currentTarget);
-            console.log(e.target.id);
-            // TODO
-            // when a user clicks on an arrow, we need to figure out if it
-            // was the downvote arrow or the upvote arrow which we can do with
-            // e.target.id
-            // then, we need to disable the clicking functionality (remove
-            // the arrowClick class) for the 
-            // arrow that was clicked, and also add the 'voted' class to it
-            // and remove the arrowHover class from it
-            
-            // to summarize:
-            // remove: .arrowClick, .arrowHover
-            // add: .voted
-            
-            // BUT also, need to check if a vote was already made on this rack
-            // so first we will run a function that queries the database for
-            // the rack that received a votes so we need the rack_id
-            
-            
-            // the user can now only click on the opposite arrow for that rack
+            this.vote(e);
         }.bind(this));
         
         this.$showApproved.on('click', function(e) {
@@ -315,6 +293,9 @@ BikeMap.prototype.initBikeMap = function () {
     // Initialize Firebase
     this.initFirebase();
 
+};
+
+BikeMap.prototype.vote = function() {
 };
 
 BikeMap.prototype.initFirebase = function() {

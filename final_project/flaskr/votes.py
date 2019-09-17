@@ -12,14 +12,14 @@
 # the app when it is available in the factory function.
 
 from flask import (
-    Blueprint, request
+    Blueprint, request, jsonify, render_template
 )
 from . import helpers as h
 from flaskr.db import get_db
+import sqlite3
 
 votes = Blueprint('votes', __name__)
 
 # maybe put the below in the bikes.py file becaus we are accessing bikeracks db
 # and not votes
-
 

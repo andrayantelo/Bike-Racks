@@ -37,7 +37,7 @@ $(document).ready(function() {
     
 });
 
-// Helper Function(s)
+// Helper Function(s) TODO probably don't need emptyBikeState function
 let emptyBikeState = function(params) {
     // params = {
     //   latitude: float,
@@ -54,9 +54,10 @@ let emptyBikeState = function(params) {
         latitude: params.lat,
         longitude: params.lng,
         address: params.address,
-        uniqueId: params.uniqueId,
+        rackId: params.rackId,
         status: params.status,
-        vote: {type: params.vote.type, date: params.vote.date}
+        vote: params.vote.type,
+        uid: params.userId
     }
 };
 
@@ -150,22 +151,31 @@ function arrowHTML(rack_id) {
             </div> <!-- /#options -->`
 };
 
-function popupContent(markerState) {
-    if (markerState.address === null || markerState.address === undefined) {
-        markerState.address = ""
-    }
-    let content = `<div id="address">${markerState.address}</div>
-               <div id="coordinates"><span id="lat">${markerState.latitude}</span> <span>
+
+function popupContent(state) {
+    let content = `<div id="address">${state.address}</div>
+               <div id="coordinates"><span id="lat">${state.latitude}</span> <span>
                  <span id="coordinateComma">,</span>
-                 </span> <span id="lng">${markerState.longitude}</span>
+                 </span> <span id="lng">${state.longitude}</span>
                </div>
                <div id="options">
-                 <button id="submitButton" type="submit">Add Bike Rack</button>`
-               
-    if (!markerState.temp) {
-        let arrows = arrowHTML(markerState.rack_id);
+                 `
+                 
+    if (state.address === null || state.address === undefined) {
+        state.address = ""
+    }
+    // if user is online and this isn't a temporary marker include the submit button and the voting buttons
+    if (state.userId && !state.temp) {
+        let arrows = arrowHTML(state.rack_id);
+        //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
-    } else {content += `</div> <!-- /#options -->`}
+    }
+    // if the user is online and this IS a temporary marker include only the submit button
+    else if (state.userId && state.temp) {
+        content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
+    }
+    // if the user is not online then don't include any buttons (doesn't matter if temp marker or not)
+    else {content += `</div> <!-- /#options -->`}
     
     return `<div class="popup"> ${content} </div>`
    
@@ -315,26 +325,6 @@ BikeMap.prototype.initFirebase = function() {
     
     // Initiates Firebase auth and listen to auth state changes.
     this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
-    // TODO probably don't need below
-    /*firebase.auth().getRedirectResult().then(function(result) {
-      if (result.credential) {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        var token = result.credential.accessToken;
-        // ...
-      }
-      // The signed-in user info.
-      var user = result.user;
-      console.log(user);
-    }).catch(function(error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // The email of the user's account used.
-      var email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
-      var credential = error.credential;
-      // ...
-    });*/
     
 };
 
@@ -346,8 +336,12 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         // hide sign in button
         this.$signInButton.attr('hidden', true);
         
-        // TODO enable add bike rack buttons and voting buttons on 
-        // marker popups
+        // TODO load map with UI for online users (buttons available for
+        // submitting and voting)
+        
+        // first things first, reload the map
+        this.loadRacks(this.showMarkers.bind(this), user.uid); 
+        
         
     }
     else { // user is signed out 
@@ -372,14 +366,14 @@ BikeMap.prototype.signOut = function() {
 }
 
 
-BikeMap.prototype.loadRacks = function(callback) {
+BikeMap.prototype.loadRacks = function(callback, uid) {
     // get data on ALL the markers in the database
     // when user visits page, map will load with ALL markers on it
     // callback is a function for processing of the data once retrieved from
     // the database
     let allRacksPromise = this.getRacks();
     allRacksPromise.done((data) => {
-        callback(data);
+        callback(data, uid);
     })
 };
 
@@ -457,19 +451,26 @@ BikeMap.prototype.onMapClick = function (e) {
     // when the user clicks on the map, add a temporary marker there
     // then look up the address (which is async) and when that is 
     // finished, add the address to the popup content
-
+    let userId = undefined,
+        markerState;
+    if (this.auth.currentUser) {
+        userId = this.auth.currentUser.uid
+    }
+    
     let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng);
     let target = document.getElementById('address'),
             spinner = new Spinner(opts).spin(target);
+    
     this.findAddress(e.latlng.lat, e.latlng.lng).then((address) => {
-        let markerState = {
+        markerState = {
             latitude: e.latlng.lat,
             longitude: e.latlng.lng,
             address: address,
             rack_id: "",
             temp: true,
+            userId: userId,
         }
-            
+
         let content = popupContent(markerState);
 
         tempMarker.setPopupContent(content);
@@ -488,6 +489,7 @@ BikeMap.prototype.findAddress = function(lat, lng) {
 BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
+    
     let markerIcon = buildMarkerIcon(tempMarkerColor),
         markerState = {
             latitude: lat,
@@ -532,14 +534,8 @@ BikeMap.prototype.createMarker = function(state) {
     }
     
     // bind popup to marker
-    let markerState = {
-        latitude: state.latitude,
-        longitude: state.longitude,
-        address: state.address,
-        temp: false,
-        rack_id: state.rack_id,
-    }
-    let content = popupContent(markerState);
+
+    let content = popupContent(state);
     marker.bindPopup(content);
 
     return marker;
@@ -565,7 +561,7 @@ BikeMap.prototype.getRacks = function(status) {
 }
 
 
-BikeMap.prototype.showMarkers = function(data) {
+BikeMap.prototype.showMarkers = function(data, uid) {
     // data is an array of bikerack states
     // add markers to map for these bikeracks
     for (let i=0; i<data.length; i++) {
@@ -574,6 +570,8 @@ BikeMap.prototype.showMarkers = function(data) {
         // TODO, store this information somewhere? And should I use
         // BikeRackCollection here?
         // create marker (handles what color the marker will be)
+        bikerack.state.userId = uid;
+        
         let marker = this.createMarker(bikerack.state)
         
         // add marker to map

@@ -295,8 +295,92 @@ BikeMap.prototype.initBikeMap = function () {
 
 };
 
-BikeMap.prototype.vote = function() {
-};
+BikeMap.prototype.getVoteStatus = function(rack_id, user_id) {
+    // query the votes database and find out if the rack with rack_id=rack_id
+    // and user_id=user_id has a vote
+    // if yes return true and the vote_type
+    // if no return false
+    let path = {{ url_for('votes.get_vote_status')|tojson }},
+        params = $.param({rack_id: rack_id, user_id: user_id});
+        
+    return $.ajax({
+        method: 'GET',
+        url: path + '?' + params,
+        context: this,
+    })
+}
+
+BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
+    // submit a vote to the database
+    // rack_id: integer
+    // user_id: string
+    // vote_type: integer
+    // the vote data gets returned
+    let path = {{ url_for('votes.submit_vote')|tojson }},
+        params = $.param({rack_id: rack_id, user_id: user_id, vote_type: vote_type});
+        
+    return $.ajax({
+        method: 'POST',
+        url: path +  '?' + params,
+        context: this,
+    }).done(data => console.log(data))
+}
+
+BikeMap.prototype.vote = function(e) {
+    if (!this.auth.currentUser) {
+        // redirect user to sign in
+        this.signIn()
+        
+    }
+    else {
+        //e.stopPropagation(); TODO check if actually needed
+        
+        // Before anything happens, first need to check if this rack already
+        // has a vote by this user
+        let rack_id = e.target.parentNode.parentNode.id.slice("rack_".length),
+            user_id = this.auth.currentUser.uid,
+            voteStatusP = this.getVoteStatus(rack_id, user_id);
+        
+        // if the user already voted on this rack, do nothing
+        voteStatusP.then(voteStatus => {
+            
+            if (voteStatus) {
+                console.log("the user has voted on this rack");
+                return;
+            }
+            else {
+                let voteElement = e.target;
+                let $voteElement = $('#' + voteElement.id);
+                
+                let voteType = e.target.dataset.votetype;
+                
+                $voteElement.addClass('voted');
+                $voteElement.removeClass('arrowClick arrowHover');
+            
+                // TODO
+                // when a user clicks on an arrow, we need to figure out if it
+                // was the downvote arrow or the upvote arrow which we can do with
+                // e.target.dataset.votetype
+                // then, we need to disable the clicking functionality (remove
+                // the arrowClick class) for the 
+                // arrow that was clicked, and also add the 'voted' class to it
+                // and remove the arrowHover class from it
+                
+                // to summarize:
+                // remove: .arrowClick, .arrowHover
+                // add: .voted
+                
+                // BUT also, need to check if a vote was already made on this rack
+                // so first we will run a function that queries the database for
+                // the rack that received a votes so we need the rack_id
+                
+                
+                // the user can now only click on the opposite arrow for that rack
+               
+            }
+        })
+    }
+}
 
 BikeMap.prototype.initFirebase = function() {
     // Initialize Firebase authentication

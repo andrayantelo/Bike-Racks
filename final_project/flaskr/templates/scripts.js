@@ -352,6 +352,8 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         this.$signInButton.removeAttr('hidden');
         
         // TODO disable add bike rack and voting buttons
+        // reload the map again, so that popup buttons can be updated
+        this.loadRacks(this.showMarkers.bind(this));
     }
     
 }

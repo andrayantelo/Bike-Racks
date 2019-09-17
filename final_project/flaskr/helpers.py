@@ -83,13 +83,19 @@ def get_racks(table_name, database, status):
     
     if status == None:
         # return all racks
-        query = "SELECT * FROM {}".format(table_name)
+        # TODO this won't return anything if the bikerack has no votes
+        # I need to get voting information for the rack for the user currently logged in
+        # BUT if user is not logged in, then I just need the columns from bikeracks
+        query = "SELECT * FROM {} INNER JOIN votes ON bikeracks.rack_id=votes.rack_id".format(table_name)
+        print(query)
         result = database.execute(query).fetchall()
     else:
-        query = "SELECT * FROM {} WHERE status =?".format(table_name)
+        query = "SELECT * FROM {} INNER JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE status =?".format(table_name)
+        print(query)
         result = database.execute(query, (status,)).fetchall()
     
     result = [dict_from_row(row) for row in result]
+    print(result)
     return jsonify(result)
 
 

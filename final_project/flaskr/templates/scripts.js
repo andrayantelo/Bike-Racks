@@ -281,6 +281,21 @@ BikeMap.prototype.arrowHTML = function(rack_id) {
     }
 };
 
+BikeMap.prototype.buildPopupContent = function(markerStates) {
+    // this function needs the address, latitude, longitude, temp status,
+    // and rack_id for each marker
+    console.log(markerStates);
+    for (let i=0; i<markerStates.length; i++) {
+        
+        console.log(markerStates[i])
+    }
+    console.log('building popup content');
+    this.allRacks.eachLayer(layer => {
+        console.log(layer);
+        console.log(layer._popup)
+        });
+}
+
 BikeMap.prototype.popupContent = function(markerState) {
     if (markerState.address === null || markerState.address === undefined) {
         markerState.address = ""
@@ -308,7 +323,7 @@ BikeMap.prototype.popupContent = function(markerState) {
         content += arrows;
     } 
     
-    return `<div class="popup"> ${content} </div>`
+    return `<div id=${"popup-" + markerState.rack_id} class="popup"> ${content} </div>`
    
 };
 
@@ -441,6 +456,20 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         
         // TODO reload the map
         this.loadRacks(this.showMarkers.bind(this));
+        
+        // when the user signs in, the popups for the markers needs to be different
+        // it needs to be an active popup with arrows and submit button
+        // at this point we want to create the popup content for all of the
+        // markers on the map which we have stored in the featureGroup
+        // this.allRacks
+        // we need the states for each rack that a marker corresponds to
+        // we can get those with loadRacks
+        // this.loadRacks(this.showOnlineMarkers);
+        
+        // maybe instead of doing this, just change the popups
+        // let new_content = buildPopup()
+        // this.allRacks.bindpopup(new_content) or however it works
+        
         
     }
     else { // user is signed out 
@@ -634,6 +663,7 @@ BikeMap.prototype.createMarker = function(state) {
         address: state.address,
         temp: false,
         rack_id: state.rack_id,
+        user_id: state.user_id
     }
 
     let content = this.popupContent(markerState);
@@ -650,6 +680,7 @@ BikeMap.prototype.addMarker = function(marker) {
 BikeMap.prototype.getRacks = function(status) {
     // send a request to the server for data on racks with status=status
     //e.preventDefault();
+    
 
     let path = {{ url_for('bikes.get_racks')|tojson }},
         params = $.param({status: status});
@@ -665,13 +696,15 @@ BikeMap.prototype.getRacks = function(status) {
 BikeMap.prototype.showMarkers = function(data) {
     // data is an array of bikerack states
     // add markers to map for these bikeracks
+    // online is a boolean, true if user is signed in
+    // false otherwise (defaults to false)
+    
     for (let i=0; i<data.length; i++) {
         // make instances of BikeRack for each
         let bikerack = new BikeRack(data[i]);
+        console.log(data)
         // TODO, store this information somewhere? And should I use
         // BikeRackCollection here?
-        console.log("printing instance of bikerack on next line");
-        console.log(bikerack.state);
         // create marker (handles what color the marker will be)
         let marker = this.createMarker(bikerack.state)
         

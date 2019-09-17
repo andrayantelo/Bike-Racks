@@ -174,7 +174,9 @@ function popupContent(state) {
         content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
     }
     // if the user is not online then don't include any buttons (doesn't matter if temp marker or not)
-    else {content += `</div> <!-- /#options -->`}
+    else {
+        content += `</div> <!-- /#options -->`
+    }
     
     return `<div class="popup"> ${content} </div>`
    

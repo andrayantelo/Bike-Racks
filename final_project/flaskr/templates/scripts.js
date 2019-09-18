@@ -160,20 +160,22 @@ function arrowHTML(rack_id, voteStatus) {
     
     if (voteStatus.vote_type === 1) {
         upvoteArrowClass += "voted";
-        downvoteArrowClass += "arrowHover arrowClick";
+        downvoteArrowClass += "arrowHover";
     }
     else if (voteStatus.vote_type === -1) {
         downvoteArrowClass += "voted";
-        upvoteArrowClass += "arrowHover arrowClick";
+        upvoteArrowClass += "arrowHover";
     }
     else {
-        upvoteArrowClass += "arrowHover arrowClick";
-        downvoteArrowClass += "arrowHover arrowClick";
+        upvoteArrowClass += "arrowHover";
+        downvoteArrowClass += "arrowHover";
     }
+    console.log("upvoteArrowClasses: " + upvoteArrowClass);
+    console.log("downvoteArrowlasses: " + downvoteArrowClass);
     return `<div id="arrowsContainer">
-                     <div><i id=${"upvoteArrow_" + rack_id} class=${upvoteArrowClass}></i>
+                     <div><i id=${"upvoteArrow_" + rack_id} class="${upvoteArrowClass}"></i>
                       <span id=${"upvoteCount_" + rack_id}>${upvotePercentage}%</span><div>
-                      <div><i id=${"downvoteArrow_" + rack_id} class=${downvoteArrowClass}></i>
+                      <div><i id=${"downvoteArrow_" + rack_id} class="${downvoteArrowClass}"></i>
                       <span id=${"downvoteCount_" + rack_id}>${downvotePercentage}%</span></div>
                       </div>
                      </div> <!-- /#options -->`

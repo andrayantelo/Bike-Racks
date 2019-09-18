@@ -146,8 +146,7 @@ function arrowHTML(rack_id, voteStatus) {
     if (voteStatus === null) {
         voteStatus = {}
     }
-    console.log("inside arrowHTML");
-    console.log(voteStatus);
+    
     let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
         downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
         upvotePercentage = 0,
@@ -160,22 +159,21 @@ function arrowHTML(rack_id, voteStatus) {
     
     if (voteStatus.vote_type === 1) {
         upvoteArrowClass += "voted";
-        downvoteArrowClass += "arrowHover";
+        downvoteArrowClass += "arrowHover arrowClick";
     }
     else if (voteStatus.vote_type === -1) {
         downvoteArrowClass += "voted";
-        upvoteArrowClass += "arrowHover";
+        upvoteArrowClass += "arrowHover arrowClick";
     }
     else {
-        upvoteArrowClass += "arrowHover";
-        downvoteArrowClass += "arrowHover";
+        upvoteArrowClass += "arrowHover arrowClick";
+        downvoteArrowClass += "arrowHover arrowClick";
     }
-    console.log("upvoteArrowClasses: " + upvoteArrowClass);
-    console.log("downvoteArrowlasses: " + downvoteArrowClass);
-    return `<div id="arrowsContainer">
-                     <div><i id=${"upvoteArrow_" + rack_id} class="${upvoteArrowClass}"></i>
+    
+    return `<div id="arrowsContainer" id=${"rack_" + rack_id}>
+                     <div><i id=${"upvoteArrow_" + rack_id} data-votetype="upvote" class="${upvoteArrowClass}"></i>
                       <span id=${"upvoteCount_" + rack_id}>${upvotePercentage}%</span><div>
-                      <div><i id=${"downvoteArrow_" + rack_id} class="${downvoteArrowClass}"></i>
+                      <div><i id=${"downvoteArrow_" + rack_id} data-votetype="downvote" class="${downvoteArrowClass}"></i>
                       <span id=${"downvoteCount_" + rack_id}>${downvotePercentage}%</span></div>
                       </div>
                      </div> <!-- /#options -->`
@@ -183,6 +181,7 @@ function arrowHTML(rack_id, voteStatus) {
 
 
 function popupContent(state, voteStatus) {
+    
     let content = `<div id="address">${state.address}</div>
                <div id="coordinates"><span id="lat">${state.latitude}</span> <span>
                  <span id="coordinateComma">,</span>
@@ -193,16 +192,16 @@ function popupContent(state, voteStatus) {
     if (state.address === null || state.address === undefined) {
         state.address = ""
     }
-    // if user is online and this isn't a temporary marker include the submit button and the voting buttons
+    // if user is online and this isn't a temporary marker include the voting buttons
     if (state.user_id && !state.temp) {
-        console.log("user is online and marker is NOT temporary");
+        
         let arrows = arrowHTML(state.rack_id, voteStatus);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }
     // if the user is online and this IS a temporary marker include only the submit button
     else if (state.user_id && state.temp) {
-        console.log("user is online and marker is TEMP");
+        
         content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
     }
     // if the user is not online then don't include any buttons (doesn't matter if temp marker or not)
@@ -379,11 +378,18 @@ BikeMap.prototype.vote = function(e) {
                 return;
             }
             else {
-                let voteElement = e.target;
-                let $voteElement = $('#' + voteElement.id);
+                let voteElement = e.currentTarget,
+                    voteElementId = '#' + e.currentTarget.id,
+                    $voteElement = $(voteElementId),
+                    voteType = e.target.dataset.votetype;
                 
-                let voteType = e.target.dataset.votetype;
+                // opposite vote jquery selector
+                let oppVote = voteType === "upvote"? "downvote" : "upvote",
+                    oppVoteElementId = "#" + oppVote + rack_id;
                 
+                console.log(e.target.parentNode);
+                //console.log("opposite vote id: " + oppVoteElementId);
+                //console.log("e.target.dataset.votetype: " + voteType)
                 $voteElement.addClass('voted');
                 $voteElement.removeClass('arrowClick arrowHover');
             
@@ -492,6 +498,7 @@ BikeMap.prototype.buildRack = function(state) {
     marker._icon.id = state.rack_id;
     // open its popup
     marker.openPopup();
+    
 };
 
 
@@ -523,6 +530,8 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
             },
             context: this
       }).done(function(state) {
+          // include the user id in the state
+          state.user_id = this.auth.currentUser.uid;
           return callback(state);
       })
   }
@@ -549,25 +558,22 @@ BikeMap.prototype.onMapClick = function (e) {
     // when the user clicks on the map, add a temporary marker there
     // then look up the address (which is async) and when that is 
     // finished, add the address to the popup content
-    let userId = undefined,
-        markerState;
+    let user_id = undefined,
+        markerState = {};
     if (this.auth.currentUser) {
-        userId = this.auth.currentUser.uid
+        user_id = this.auth.currentUser.uid
     }
-    
+    markerState.user_id = user_id;
     let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng);
     let target = document.getElementById('address'),
             spinner = new Spinner(opts).spin(target);
     
     this.findAddress(e.latlng.lat, e.latlng.lng).then((address) => {
-        markerState = {
-            latitude: e.latlng.lat,
-            longitude: e.latlng.lng,
-            address: address,
-            rack_id: "",
-            temp: true,
-            userId: userId,
-        }
+        markerState.latitude = e.latlng.lat;
+        markerState.longitude = e.latlng.lng;
+        markerState.address = address;
+        markerState.rack_id = "";
+        markerState.temp = true;
 
         let content = popupContent(markerState);
 

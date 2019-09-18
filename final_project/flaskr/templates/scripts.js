@@ -141,18 +141,46 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-function arrowHTML(rack_id) { 
+function arrowHTML(rack_id, voteStatus) { 
+    // TODO there actually isn't CSS styling for arrowClick or arrowHover
+    if (voteStatus === null) {
+        voteStatus = {}
+    }
+    console.log("inside arrowHTML");
+    console.log(voteStatus);
+    let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
+        downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
+        upvotePercentage = 0,
+        downvotePercentage = 0;
+    // if you have a voteStatus of 1 , which is an upvote, then you want
+    // the upvote arrow to have a class of .voted, and you DON'T want it to have arrowHover and arrowClick
+    // if you have a voteStatus of -1, which is a downvote, then you want the downvote arrow
+    // to have a class of .voted, and you DON'T want it to have arrowHover and arrowClick
+    // if there is no vote, then BOTH upvote and downvote arrows have arrowHover and arrowClick
+    
+    if (voteStatus.vote_type === 1) {
+        upvoteArrowClass += "voted";
+        downvoteArrowClass += "arrowHover arrowClick";
+    }
+    else if (voteStatus.vote_type === -1) {
+        downvoteArrowClass += "voted";
+        upvoteArrowClass += "arrowHover arrowClick";
+    }
+    else {
+        upvoteArrowClass += "arrowHover arrowClick";
+        downvoteArrowClass += "arrowHover arrowClick";
+    }
     return `<div id="arrowsContainer">
-              <div><i id=${"upvoteArrow_" + rack_id} class="fas fa-arrow-circle-up fa-2x arrowHover arrowClick"></i>
-                      <span id=${"upvoteCount_" + rack_id}>0%</span><div>
-                <div><i id=${"downvoteArrow_" + rack_id} class="fas fa-arrow-circle-down fa-2x arrowHover arrowClick"></i>
-                      <span id=${"downvoteCount_" + rack_id}>0%</span></div>
-                </div>
-            </div> <!-- /#options -->`
+                     <div><i id=${"upvoteArrow_" + rack_id} class=${upvoteArrowClass}></i>
+                      <span id=${"upvoteCount_" + rack_id}>${upvotePercentage}%</span><div>
+                      <div><i id=${"downvoteArrow_" + rack_id} class=${downvoteArrowClass}></i>
+                      <span id=${"downvoteCount_" + rack_id}>${downvotePercentage}%</span></div>
+                      </div>
+                     </div> <!-- /#options -->`
 };
 
 
-function popupContent(state) {
+function popupContent(state, voteStatus) {
     let content = `<div id="address">${state.address}</div>
                <div id="coordinates"><span id="lat">${state.latitude}</span> <span>
                  <span id="coordinateComma">,</span>
@@ -164,13 +192,15 @@ function popupContent(state) {
         state.address = ""
     }
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
-    if (state.userId && !state.temp) {
-        let arrows = arrowHTML(state.rack_id);
+    if (state.user_id && !state.temp) {
+        console.log("user is online and marker is NOT temporary");
+        let arrows = arrowHTML(state.rack_id, voteStatus);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }
     // if the user is online and this IS a temporary marker include only the submit button
-    else if (state.userId && state.temp) {
+    else if (state.user_id && state.temp) {
+        console.log("user is online and marker is TEMP");
         content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
     }
     // if the user is not online then don't include any buttons (doesn't matter if temp marker or not)
@@ -333,8 +363,6 @@ BikeMap.prototype.vote = function(e) {
         
     }
     else {
-        //e.stopPropagation(); TODO check if actually needed
-        
         // Before anything happens, first need to check if this rack already
         // has a vote by this user
         let rack_id = e.target.parentNode.parentNode.id.slice("rack_".length),
@@ -602,11 +630,14 @@ BikeMap.prototype.createMarker = function(state) {
     }
     
     // bind popup to marker
-
-    let content = popupContent(state);
-    marker.bindPopup(content);
-
+    // look up voteStatus and pass it into popupContent TODO will this actually work?
+    this.getVoteStatus(state.rack_id, state.user_id).then(voteType => {
+        let content = popupContent(state, voteType);
+        marker.bindPopup(content);
+    });
     return marker;
+
+    
 }
 
 BikeMap.prototype.addMarker = function(marker) {
@@ -638,7 +669,7 @@ BikeMap.prototype.showMarkers = function(data, uid) {
         // TODO, store this information somewhere? And should I use
         // BikeRackCollection here?
         // create marker (handles what color the marker will be)
-        bikerack.state.userId = uid;
+        bikerack.state.user_id = uid;
         
         let marker = this.createMarker(bikerack.state)
         

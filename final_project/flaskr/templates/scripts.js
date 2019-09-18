@@ -142,7 +142,7 @@ function buildMarkerIcon(markerColor) {
 };
 
 function arrowHTML(rack_id, voteStatus) { 
-    // TODO there actually isn't CSS styling for arrowClick or arrowHover
+    let containerId = "rack_" + rack_id;
     if (voteStatus === null) {
         voteStatus = {}
     }
@@ -170,7 +170,7 @@ function arrowHTML(rack_id, voteStatus) {
         downvoteArrowClass += "arrowHover arrowClick";
     }
     
-    return `<div id="arrowsContainer" id=${"rack_" + rack_id}>
+    return `<div class="arrowsContainer" id=${containerId}>
                      <div><i id=${"upvoteArrow_" + rack_id} data-votetype="upvote" class="${upvoteArrowClass}"></i>
                       <span id=${"upvoteCount_" + rack_id}>${upvotePercentage}%</span><div>
                       <div><i id=${"downvoteArrow_" + rack_id} data-votetype="downvote" class="${downvoteArrowClass}"></i>
@@ -354,7 +354,10 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
         method: 'POST',
         url: path +  '?' + params,
         context: this,
-    }).done(data => console.log(data))
+    }).done(data => {
+        // reload the map
+        this.loadRacks(this.showMarkers.bind(this), user_id)
+    })
 }
 
 BikeMap.prototype.vote = function(e) {
@@ -387,7 +390,7 @@ BikeMap.prototype.vote = function(e) {
                 let oppVote = voteType === "upvote"? "downvote" : "upvote",
                     oppVoteElementId = "#" + oppVote + rack_id;
                 
-                console.log(e.target.parentNode);
+                console.log(e.target.parentNode.parentNode);
                 //console.log("opposite vote id: " + oppVoteElementId);
                 //console.log("e.target.dataset.votetype: " + voteType)
                 $voteElement.addClass('voted');

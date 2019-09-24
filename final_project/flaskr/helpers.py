@@ -49,14 +49,14 @@ def validate_coordinates(coordinates):
     # return true if all tests passed
     return True
     
-# function that collects the data of pending bikeracks from the database
+# function that collects the data of not_approved bikeracks from the database
 def collect_pending(table_name, database, lat, lng):
-    # Return 50 pending bike rack results to be displayed on the map
+    # Return 50 not_approved bike rack results to be displayed on the map
     # table_name: string
     # database: db connection object
     # TODO, actually make it so that 50 are collected
     
-    query = "SELECT * FROM {} WHERE status = 'pending'".format(table_name)
+    query = "SELECT * FROM {} WHERE status = 'not_approved'".format(table_name)
     result = database.execute(query).fetchall()
     pending_racks = [tuple(row) for row in result]
     
@@ -77,7 +77,7 @@ def get_rack_state(table_name, database, lat, lng):
     
 def get_racks(table_name, database, status):
     # get data from database for approved bikeracks, searches database
-    # based on status of rack ('pending', 'rejected', 'approved')
+    # based on status of rack ('not_approved', 'approved')
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
     
@@ -116,3 +116,13 @@ def insert_rack(table_name, database, rack):
         print("Error with key: {}".format(key_e))
     
     return
+  
+# get vote status for server side functions
+def get_vote_status(database, rack_id, user_id):
+    # make connection the database
+    db = get_db()
+        
+    query = "SELECT vote_type FROM votes WHERE rack_id = ? AND user_id = ?"
+        
+    result = db.execute(query, (rack_id, user_id)).fetchone()
+    return result

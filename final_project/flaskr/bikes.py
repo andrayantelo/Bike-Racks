@@ -59,7 +59,7 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
-# get racks based on status ('pending', 'rejected', 'approved')
+# get racks based on status ('not_approved', 'approved')
 @bikes.route('/get_racks/', methods=['GET'])
 def get_racks():
     if request.method == 'GET':

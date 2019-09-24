@@ -57,6 +57,7 @@ def coordinates():
                 print(e)
                 # TODO, narrow down exception
     # if it is not a post method then just show the map
+    print("rendering template base");
     return render_template('base.html')
 
 # get racks based on status ('pending', 'rejected', 'approved')

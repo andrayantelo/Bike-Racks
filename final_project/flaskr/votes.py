@@ -40,6 +40,7 @@ def get_vote_status():
         rack_id = request.args.get('rack_id') or None
         user_id = request.args.get('user_id') or None
         
+        print("looking up vote status for rack_id: {} and user_id: {}".format(rack_id, user_id))
         # make connection the database
         db = get_db()
         
@@ -80,3 +81,34 @@ def submit_vote():
     # TODO do I actually need below line
     # maybe return 500 here
     return "", 500
+    
+@votes.route('/update_vote', methods=['POST'])
+def update_vote():
+    # update a vote
+    
+    if request.method == 'POST':
+        try:
+            rack_id = request.args.get('rack_id') or None
+            user_id = request.args.get('user_id') or None
+            vote_type = request.args.get('vote_type') or None
+            
+            # connect to db
+            db = get_db()
+            
+            query = "UPDATE votes SET vote_type = ? WHERE rack_id = ? AND user_id = ?"
+            db.execute(query, (vote_type, rack_id, user_id))
+            db.commit()
+            #TODO select from join tables to return a complete rack state upon 
+            # updating a vote. that way, you can update the popup content of the marker
+            query = "SElECT * FROM votes JOIN bikeracks ON votes.rack_id=bikeracks.rack_id WHERE votes.user_id= ? and votes.rack_id =?"
+            resp = db.execute(query, (user_id, rack_id)).fetchone()
+            result = h.dict_from_row(resp)
+            
+            #resp = h.get_single_rack('bikeracks', db, rack_id)
+            #return resp
+            return jsonify(result)
+        except sqlite3.Error as e:
+            print("Database error:", e)
+            return "", 500
+        except KeyError as key_e:
+            print("Error with key: {}".format(key_e))

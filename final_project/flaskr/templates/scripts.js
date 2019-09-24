@@ -221,15 +221,17 @@ class BikeMap {
         //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         this.marker;
         
-        
         this.allRacks = L.featureGroup([]);
         this.allRacks.on('click', (e) => {
             this.removeMarker(this.tempMarker);
+            this.marker = e.layer;
             e.target.openPopup()});
         
         this.pendingRacks = L.featureGroup([]);
         this.approvedRacks = L.featureGroup([]);
         this.rejectedRacks = L.featureGroup([]);
+        
+        
         
         // temporary marker for when person clicks on random spot on map
         this.tempMarker = {};
@@ -360,6 +362,34 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
     })
 }
 
+BikeMap.prototype.updateVote = function(rack_id, user_id, vote_type) {
+    // update the vote in the db
+    let path = {{ url_for('votes.update_vote')|tojson }},
+        params = $.param({rack_id: rack_id, user_id: user_id, vote_type: vote_type});
+        
+    console.log(user_id);
+    console.log(rack_id);
+    return $.ajax({
+        method: 'POST',
+        url: path + '?' + params,
+        context: this
+    }).done(data => {
+        // reload the map
+        console.log("data returned from database:");
+        console.log(data);
+        this.loadRacks(this.showMarkers.bind(this), user_id)
+    })
+}
+
+BikeMap.prototype.updateMap = function(user_id) {
+    // get racks from db
+    // remove current markers on map
+    // create markers using data from db
+    // show markers
+    this.removeMarkers(this.allRacks);
+    this.loadRacks(this.showMarkers.bind(this), user_id);
+};
+
 BikeMap.prototype.vote = function(e) {
     if (!this.auth.currentUser) {
         // redirect user to sign in
@@ -369,15 +399,48 @@ BikeMap.prototype.vote = function(e) {
     else {
         // Before anything happens, first need to check if this rack already
         // has a vote by this user
-        let rack_id = e.target.parentNode.parentNode.id.slice("rack_".length),
+        console.log(e.target);
+        //console.log(e.target.id.slice(-2));
+        //console.log(e.currentTarget.id.slice(-2));
+        let rack_id = e.currentTarget.id.slice(-2),
             user_id = this.auth.currentUser.uid,
-            voteStatusP = this.getVoteStatus(rack_id, user_id);
-        
-        // if the user already voted on this rack, do nothing
+            voteStatusP = this.getVoteStatus(rack_id, user_id),
+            arrowDiv = e.target.id;
+       
+        // if the user already voted on this rack,
+        // need to update their vote in the database, and the UI changes
+        // that happen even if they didn't already make a vote still happen
         voteStatusP.then(voteStatus => {
-            
+            console.log("rack_id: " + rack_id);
             if (voteStatus) {
-                console.log("the user has voted on this rack");
+                console.log(voteStatus);
+                let voteType = voteStatus.vote_type,
+                    newVote =  e.target.dataset.votetype;
+                
+                let newVoteType = newVote === 'upvote' ? 1 : -1;
+                
+                if (voteType === -1 && newVote === "upvote") {
+                    // update vote to an upvote
+                    this.updateVote(rack_id, user_id, newVoteType).then(data => {
+                        
+                        console.log(arrowDiv);
+                        console.log("opening popup");
+                        console.log(this.marker);
+                        console.log(data)
+                        
+                    
+                        });
+                    
+                }
+                else if (voteType === 1 && newVote === "downvote") {
+                    this.updateVote(rack_id, user_id, newVoteType).then(data => {
+                        console.log("opening popup");
+                        console.log(this.marker);
+                        console.log(data);
+                        
+                        });
+                }
+                
                 return;
             }
             else {
@@ -577,7 +640,8 @@ BikeMap.prototype.onMapClick = function (e) {
         markerState.address = address;
         markerState.rack_id = "";
         markerState.temp = true;
-
+        
+       
         let content = popupContent(markerState);
 
         tempMarker.setPopupContent(content);
@@ -606,6 +670,7 @@ BikeMap.prototype.addTempMarker = function(lat, lng, address) {
             rack_id: "",
         },
         content = popupContent(markerState);
+        console.log("rack id being passed to popupcontent: " + markerState.rack_id);
         // if there is already a tempMarker, remove it
     if (this.tempMarker !== undefined) {
         this.mymap.removeLayer(this.tempMarker);
@@ -628,7 +693,9 @@ BikeMap.prototype.createMarker = function(state) {
     
     marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
     
+    // TODO remove all layers from allRacks before adding to allRacks
     // add marker to allRacks feature group and its feature group based on status
+    this.allRacks.eachLayer(layer => this.allRacks.removeLayer(layer));
     this.allRacks.addLayer(marker);
     if (state.status === "approved") {
         this.approvedRacks.addLayer(marker);
@@ -643,11 +710,13 @@ BikeMap.prototype.createMarker = function(state) {
     // bind popup to marker
     // look up voteStatus and pass it into popupContent TODO will this actually work?
     this.getVoteStatus(state.rack_id, state.user_id).then(voteType => {
+        
         let content = popupContent(state, voteType);
         marker.bindPopup(content);
+       
+        
     });
     return marker;
-
     
 }
 
@@ -672,6 +741,7 @@ BikeMap.prototype.getRacks = function(status) {
 
 
 BikeMap.prototype.showMarkers = function(data, uid) {
+    //this.removeMarkers(this.allRacks);
     // data is an array of bikerack states
     // add markers to map for these bikeracks
     for (let i=0; i<data.length; i++) {

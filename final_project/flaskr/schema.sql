@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS votes_history;
 
 CREATE TABLE bikeracks (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    marker_id INTEGER,
     status TEXT DEFAULT "not_approved",
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,

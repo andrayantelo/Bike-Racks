@@ -102,6 +102,9 @@ BikeMap.prototype.initBikeMap = function () {
     
     // Initialize Firebase
     this.initFirebase();
+    
+    // empty the allRacks featureGroup
+    this.allRacks.clearLayers();
 
 };
 
@@ -343,14 +346,14 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
 
 BikeMap.prototype.createMarker = function(state) {
     
-    /*if (this.allRacks.getLayer(state.marker_id)) {
+    if (this.allRacks.getLayer(state.marker_id)) {
         console.log("this marker is already on the map");
-        let marker = this.allRacks.getLayer(state.marker_id);
-        console.log(marker);
-        // update its content
-        marker._popup._content = this.popupContent(state);
-        return marker;
-    }*/
+        console.log(this.allRacks.getLayer(state.marker_id));
+        console.log(state.marker_id);
+        this.allRacks.getLayer(state.marker_id)._popup.setContent(this.popupContent(state));
+        console.log("supposedly updated the content of the marker");
+        return this.allRacks.getLayer(state.marker_id);
+    }
     console.log(state);
     let markerIcon = buildMarkerIcon(state.markerColor),
         marker;
@@ -359,7 +362,7 @@ BikeMap.prototype.createMarker = function(state) {
     // force an id on the marker
     L.stamp(marker);
     // store marker with it's rack in bikeracks table in db
-    //this.storeMarkerId(marker._leaflet_id, state.rack_id);
+    this.storeMarkerId(marker._leaflet_id, state.rack_id);
     
     // add marker to allRacks feature group and its feature group based on status
     this.allRacks.addLayer(marker);
@@ -375,6 +378,19 @@ BikeMap.prototype.createMarker = function(state) {
     marker.bindPopup(content);
 
     return marker;
+}
+
+BikeMap.prototype.storeMarkerId = function(marker_id, rack_id) {
+    // update marker id and put into bikeracks table for rack with rack_id=rack_id
+    console.log("storing marker");
+    let path = {{ url_for('bikes.add_marker_id')|tojson }},
+        params = $.param({marker_id: marker_id, rack_id: rack_id});
+        
+    return $.ajax({
+        method: 'POST',
+        url: path + '?' + params,
+        context: this,
+    })
 }
 
 

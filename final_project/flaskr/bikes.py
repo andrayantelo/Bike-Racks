@@ -99,4 +99,4 @@ def get_single_rack():
         rack = helper.get_single_rack('bikeracks', db, rack_id)
         
         return rack
-    
+        

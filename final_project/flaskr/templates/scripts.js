@@ -161,19 +161,17 @@ BikeMap.prototype.loadMap = function(userId) {
     // make bikerack instances with the states
     // create markers for each bikerack
     // display on map
-    
+    console.log(userId);
     this.getRacks(userId).done((data) => {
         console.log(data);
         // filter out the states that have users not equal to our online user
         let seen = [];
         const filteredData = data.filter(state => {
-            console.log(state);
-            console.log("checking inequality between : " + state.user_id + " and " + userId);
+
             /*console.log(state.user_id !== userId);
             console.log(state);*/
             
             if ( state.user_id === userId && (state.vote_type === 1 || state.vote_type === -1)) {
-                console.log("user voted on : " + JSON.stringify(state));
                 seen.push(state.rack_id);
                 return state
             }
@@ -182,8 +180,8 @@ BikeMap.prototype.loadMap = function(userId) {
             }
         });
         console.log(filteredData);
+        return this.buildRacks(filteredData, userId);
         
-        this.buildRacks(filteredData, userId);
         
     });
     
@@ -204,6 +202,7 @@ BikeMap.prototype.getRacks = function(userId, status) {
 
 BikeMap.prototype.buildRacks = function(states, userId) {
     // create an instances of BikeRack for all the states in states
+    console.log(states);
     let bikeracks = [];
 
     if (!Array.isArray(states)) {
@@ -211,7 +210,7 @@ BikeMap.prototype.buildRacks = function(states, userId) {
     }
     for (let i=0; i<states.length; i++) {
         // incluse user id in the state
-        states[i].user_id = userId;
+        //states[i].user_id = userId;
         // create instance of bike rack and set it's marker color
         let bikerack = new BikeRack(states[i]),
             iconColor = bikerack.setMarkerColor();
@@ -343,7 +342,15 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
 }
 
 BikeMap.prototype.createMarker = function(state) {
-    console.log("running createMarker");
+    
+    /*if (this.allRacks.getLayer(state.marker_id)) {
+        console.log("this marker is already on the map");
+        let marker = this.allRacks.getLayer(state.marker_id);
+        console.log(marker);
+        // update its content
+        marker._popup._content = this.popupContent(state);
+        return marker;
+    }*/
     console.log(state);
     let markerIcon = buildMarkerIcon(state.markerColor),
         marker;
@@ -352,11 +359,7 @@ BikeMap.prototype.createMarker = function(state) {
     // force an id on the marker
     L.stamp(marker);
     // store marker with it's rack in bikeracks table in db
-    this.storeMarkerId(marker._leaflet_id, state.rack_id);
-    
-    if (this.allRacks.hasLayer(marker)) {
-        console.log("this marker is already on the map");
-    }
+    //this.storeMarkerId(marker._leaflet_id, state.rack_id);
     
     // add marker to allRacks feature group and its feature group based on status
     this.allRacks.addLayer(marker);
@@ -374,22 +377,7 @@ BikeMap.prototype.createMarker = function(state) {
     return marker;
 }
 
-BikeMap.prototype.storeMarkerId = function(markerId, rack_id) {
-    console.log(markerId);
-    console.log("rack_id: " + rack_id);
-    
-    /*let path = {{ url_for('votes.submit_vote')|tojson }},
-        params = $.param({rack_id: rack_id, user_id: user_id, vote_type: vote_type});
-        
-    return $.ajax({
-        method: 'POST',
-        url: path +  '?' + params,
-        context: this,
-    }).done(data => {
-        // reload the map
-        this.loadMap(user_id);
-    })*/
-}
+
 
 BikeMap.prototype.addMarker = function(marker) {
     // add given marker to map
@@ -529,11 +517,10 @@ BikeMap.prototype.vote = function(e) {
     
 };
 
-BikeMap.prototype.arrowHTML = function(state) { 
-    
+BikeMap.prototype.arrowHTML = function(state, currentUserId) { 
+
     let containerId = "rack_" + state.rack_id;
-    
-    
+
     let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
         downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
         upvotePercentage = 0,
@@ -543,19 +530,29 @@ BikeMap.prototype.arrowHTML = function(state) {
     // if you have a voteStatus of -1, which is a downvote, then you want the downvote arrow
     // to have a class of .voted, and you DON'T want it to have arrowHover and arrowClick
     // if there is no vote, then BOTH upvote and downvote arrows have arrowHover and arrowClick
-  
-    if (state.vote_type === undefined) {
+    
+    // if the state of the rack's user id matches the current user, then we need 
+    // to include certain html for the arrows if they voted on this rack
+    if (state.user_id === currentUserId) {
+        if (state.vote_type === undefined) {
+            upvoteArrowClass += "arrowHover arrowClick";
+            downvoteArrowClass += "arrowHover arrowClick";
+        }
+        else if (state.vote_type === 1) {
+           upvoteArrowClass += "voted";
+           downvoteArrowClass += "arrowHover arrowClick";
+        }
+       else if (state.vote_type === -1) {
+            downvoteArrowClass += "voted";
+            upvoteArrowClass += "arrowHover arrowClick";
+        }
+    }
+    // if the state's user id does NOT match the current user, then the user has not voted on this rack yet
+    else {
         upvoteArrowClass += "arrowHover arrowClick";
         downvoteArrowClass += "arrowHover arrowClick";
     }
-    else if (state.vote_type === 1) {
-        upvoteArrowClass += "voted";
-        downvoteArrowClass += "arrowHover arrowClick";
-    }
-    else if (state.vote_type === -1) {
-        downvoteArrowClass += "voted";
-        upvoteArrowClass += "arrowHover arrowClick";
-    }
+    
 
     return `<div class="arrowsContainer" id=${containerId}>
                      <div><i id=${"u-" + state.rack_id} data-votetype="upvote" class="${upvoteArrowClass}"></i>
@@ -568,7 +565,6 @@ BikeMap.prototype.arrowHTML = function(state) {
 
 
 BikeMap.prototype.popupContent = function(state) {
-    console.log("running popupContent");
     let onlineStatus = this.auth.currentUser.uid;
     
     /* state : {
@@ -592,7 +588,7 @@ BikeMap.prototype.popupContent = function(state) {
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
     if (onlineStatus && state.status) {
         
-        let arrows = this.arrowHTML(state);
+        let arrows = this.arrowHTML(state, onlineStatus);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }

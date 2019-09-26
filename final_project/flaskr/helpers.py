@@ -75,21 +75,59 @@ def get_rack_state(table_name, database, lat, lng):
 
     return jsonify(result)
     
-def get_racks(table_name, database, status):
+def get_racks(table_name, database, status, user_id):
     # get data from database for approved bikeracks, searches database
     # based on status of rack ('not_approved', 'approved')
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
     
-    if status == None:
-        # return all racks
+    if status == None and user_id == None:
+        print("returning ALL racks")
+        # return all rows from bikeracks table
         query = "SELECT * FROM {}".format(table_name)
         result = database.execute(query).fetchall()
-    else:
+    elif status and user_id == None:
+        # select all rows with given status from bikeracks table
+        print("returning racks with particular status")
         query = "SELECT * FROM {} WHERE status =?".format(table_name)
         result = database.execute(query, (status,)).fetchall()
+    elif status == None and user_id:
+        # return all joined rows from bikeracks and votes
+        print("returning all racks for online user")
+        # get all the racks the user voted on
+        query = "SELECT * FROM bikeracks INNER JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id=?"
+        result = database.execute(query, (user_id,)).fetchall()
+        
+        # get all the racks the user did NOT vote on
+        query2 = """SELECT 
+                       *
+                    FROM bikeracks LEFT JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id is NULL OR votes.user_id!=?"""
+        result2 = database.execute(query2, (user_id,)).fetchall()
+        
+        result += result2
+    elif status and user_id:
+        print("returning all racks with particular status for online user")
+        # TODO probably need two queries here
+        # return all rows from joined tables with this status
+        query = """SELECT
+                       bikeracks.adddress,
+                       bikeracks.downvote_count,
+                       bikeracks.latitude,
+                       bikeracks.longitude,
+                       bikeracks.rack_id,
+                       bikeracks.status,
+                       bikeracks.upvote_count,
+                       votes.vote_type,
+                       votes.user_id
+                   FROM bikeracks LEFT JOIN votes on bikeracks.rack_id=votes.rack_id WHERE votes.user_id=? AND bikeracks.status=?"""
+        result = database.execute(query, (user_id, status,)).fetchall()
+    else:
+        return "", 500
     
     result = [dict_from_row(row) for row in result]
+    result2 = [dict_from_row(row) for row in result2]
+    final_result = [result, result2]
+    print(result)
     return jsonify(result)
 
 
@@ -119,10 +157,8 @@ def insert_rack(table_name, database, rack):
   
 # get vote status for server side functions
 def get_vote_status(database, rack_id, user_id):
-    # make connection the database
-    db = get_db()
         
     query = "SELECT vote_type FROM votes WHERE rack_id = ? AND user_id = ?"
         
-    result = db.execute(query, (rack_id, user_id)).fetchone()
+    result = database.execute(query, (rack_id, user_id)).fetchone()
     return result

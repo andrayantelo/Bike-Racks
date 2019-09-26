@@ -20,8 +20,14 @@ import sqlite3
 
 votes = Blueprint('votes', __name__)
 
-# maybe put the below in the bikes.py file becaus we are accessing bikeracks db
-# and not votes
+def get_vote_data(rack_id, user_id):
+    # return db row for row with rack_id=rack_id and user_id=user_id
+    db = get_db()
+    query = "SELECT * from votes WHERE rack_id = ? AND user_id = ?"
+    result = db.execute(query, (rack_id, user_id)).fetchall()
+    
+    result = [h.dict_from_row(row) for row in result]
+    return result
 
 @votes.route('/get_vote_status', methods=['GET'])
 def get_vote_status():

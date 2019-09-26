@@ -7,11 +7,14 @@ class BikeMap {
         this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
         // set map to display user's current location
         //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
+        
+        this.marker;
    
         this.allRacks = L.featureGroup([]);
         this.allRacks.on('click', (e) => {
             this.mymap.removeLayer(this.tempMarker);
-            e.target.openPopup()
+            this.marker = e.sourceTarget;
+            e.target.openPopup();
         });
         
         this.allApproved = L.featureGroup([]);
@@ -158,24 +161,45 @@ BikeMap.prototype.loadMap = function(userId) {
     // make bikerack instances with the states
     // create markers for each bikerack
     // display on map
-    this.getRacks().done((states) => {
-        this.buildRacks(states, userId);
+    
+    this.getRacks(userId).done((data) => {
+        console.log(data);
+        // filter out the states that have users not equal to our online user
+        let seen = [];
+        const filteredData = data.filter(state => {
+            console.log(state);
+            console.log("checking inequality between : " + state.user_id + " and " + userId);
+            /*console.log(state.user_id !== userId);
+            console.log(state);*/
+            
+            if ( state.user_id === userId && (state.vote_type === 1 || state.vote_type === -1)) {
+                console.log("user voted on : " + JSON.stringify(state));
+                seen.push(state.rack_id);
+                return state
+            }
+            else if (!seen.includes(state.rack_id)) {
+                return state.user_id !== userId
+            }
+        });
+        console.log(filteredData);
         
-    })
+        this.buildRacks(filteredData, userId);
+        
+    });
+    
 };
 
-BikeMap.prototype.getRacks = function(status) {
+BikeMap.prototype.getRacks = function(userId, status) {
     // send a request to the server for data on racks with status=status
     //e.preventDefault();
 
     let path = {{ url_for('bikes.get_racks')|tojson }},
-        params = $.param({status: status});
+        params = $.param({userId: userId, status: status});
         
     return $.ajax({
         method: 'GET',
-        url: path + '?' + params,
-        context: this,
-    })
+        url: path + '?' + params
+    });
 };
 
 BikeMap.prototype.buildRacks = function(states, userId) {
@@ -187,7 +211,7 @@ BikeMap.prototype.buildRacks = function(states, userId) {
     }
     for (let i=0; i<states.length; i++) {
         // incluse user id in the state
-        states[i].userId = userId;
+        states[i].user_id = userId;
         // create instance of bike rack and set it's marker color
         let bikerack = new BikeRack(states[i]),
             iconColor = bikerack.setMarkerColor();
@@ -199,6 +223,7 @@ BikeMap.prototype.buildRacks = function(states, userId) {
         marker._icon.id = states[i].rack_id;
         // open marker popup
         //marker.openPopup();
+        
     }
     return bikeracks;
 }
@@ -269,7 +294,7 @@ BikeMap.prototype.onMapClick = function (e) {
         }
         // remaking popup content here because we need to wait for the address
         // to be found
-        let content = popupContent(state);
+        let content = this.popupContent(state);
 
         tempMarker.setPopupContent(content);
     })
@@ -300,7 +325,7 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
             userId: userId
             
         },
-        content = popupContent(markerState);
+        content = this.popupContent(markerState);
         // if there is already a tempMarker, remove it
     if (this.tempMarker !== undefined) {
         this.mymap.removeLayer(this.tempMarker);
@@ -318,10 +343,20 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
 }
 
 BikeMap.prototype.createMarker = function(state) {
+    console.log("running createMarker");
+    console.log(state);
     let markerIcon = buildMarkerIcon(state.markerColor),
         marker;
     
-    marker = L.marker([state.latitude, state.longitude], {icon: markerIcon});
+    marker = L.marker([state.latitude, state.longitude], {icon: markerIcon}); 
+    // force an id on the marker
+    L.stamp(marker);
+    // store marker with it's rack in bikeracks table in db
+    this.storeMarkerId(marker._leaflet_id, state.rack_id);
+    
+    if (this.allRacks.hasLayer(marker)) {
+        console.log("this marker is already on the map");
+    }
     
     // add marker to allRacks feature group and its feature group based on status
     this.allRacks.addLayer(marker);
@@ -333,10 +368,27 @@ BikeMap.prototype.createMarker = function(state) {
     }
     
     // bind popup to marker
-    let content = popupContent(state);
+    let content = this.popupContent(state);
     marker.bindPopup(content);
 
     return marker;
+}
+
+BikeMap.prototype.storeMarkerId = function(markerId, rack_id) {
+    console.log(markerId);
+    console.log("rack_id: " + rack_id);
+    
+    /*let path = {{ url_for('votes.submit_vote')|tojson }},
+        params = $.param({rack_id: rack_id, user_id: user_id, vote_type: vote_type});
+        
+    return $.ajax({
+        method: 'POST',
+        url: path +  '?' + params,
+        context: this,
+    }).done(data => {
+        // reload the map
+        this.loadMap(user_id);
+    })*/
 }
 
 BikeMap.prototype.addMarker = function(marker) {
@@ -421,10 +473,141 @@ BikeMap.prototype.vote = function(e) {
         bikemap.signIn()
     }
     else {
-        console.log("user is signed in and voting");
+        
+        let rack_id = e.currentTarget.id.substring(2),
+            user_id = this.auth.currentUser.uid,
+            voteStatusP = this.getVoteStatus(rack_id, user_id),
+            arrowDiv = e.target.id;
+        console.log(e.currentTarget);
+        console.log(rack_id);
+        // if the user already voted on this rack,
+        // need to update their vote in the database, and the UI changes
+        // that happen even if they didn't already make a vote still happen
+        voteStatusP.then(voteStatus => {
+            if (voteStatus) {
+                // user already submitted a vote for this rack
+                let voteType = voteStatus.vote_type,
+                    newVote = e.target.dataset.votetype;
+                    
+                let newVoteType = newVote === "upvote"? 1: -1;
+                
+                // if the new vote is different from the old vote, submit the vote (update it)
+                if (voteType === 1 && newVoteType === -1 || voteType === -1 && newVoteType === 1) {
+                    
+                    this.submitVote(rack_id, user_id, newVoteType).done(vote => {
+                        this.loadMap(user_id).then(data => {
+                            if (this.marker) {
+                                this.marker.fire('click');
+                                this.marker.fire('click');
+                            }
+                        })
+                    });
+                }
+                // if the new vote is the same as the old vote, nothing happens
+
+            }
+            else {
+                // user is voting for rack for the first time
+                console.log("user is voting on rack for the first time");
+                let voteType = e.target.dataset.votetype;
+                voteType = voteType === "upvote"? 1 : -1;
+                
+                this.submitVote(rack_id, user_id, voteType).done(vote => {
+                    this.loadMap(user_id).then(data => {
+                        if (this.marker) {
+                            this.marker.fire('click');
+                            this.marker.fire('click');
+                        }
+                    })
+                });
+            }
+        })
     }
+    
+    
     
     
 };
 
+BikeMap.prototype.arrowHTML = function(state) { 
+    
+    let containerId = "rack_" + state.rack_id;
+    
+    
+    let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
+        downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
+        upvotePercentage = 0,
+        downvotePercentage = 0;
+    // if you have a voteStatus of 1 , which is an upvote, then you want
+    // the upvote arrow to have a class of .voted, and you DON'T want it to have arrowHover and arrowClick
+    // if you have a voteStatus of -1, which is a downvote, then you want the downvote arrow
+    // to have a class of .voted, and you DON'T want it to have arrowHover and arrowClick
+    // if there is no vote, then BOTH upvote and downvote arrows have arrowHover and arrowClick
+  
+    if (state.vote_type === undefined) {
+        upvoteArrowClass += "arrowHover arrowClick";
+        downvoteArrowClass += "arrowHover arrowClick";
+    }
+    else if (state.vote_type === 1) {
+        upvoteArrowClass += "voted";
+        downvoteArrowClass += "arrowHover arrowClick";
+    }
+    else if (state.vote_type === -1) {
+        downvoteArrowClass += "voted";
+        upvoteArrowClass += "arrowHover arrowClick";
+    }
+
+    return `<div class="arrowsContainer" id=${containerId}>
+                     <div><i id=${"u-" + state.rack_id} data-votetype="upvote" class="${upvoteArrowClass}"></i>
+                      <span id=${"upvoteCount_" + state.rack_id}>${upvotePercentage}%</span><div>
+                      <div><i id=${"d-" + state.rack_id} data-votetype="downvote" class="${downvoteArrowClass}"></i>
+                      <span id=${"downvoteCount_" + state.rack_id}>${downvotePercentage}%</span></div>
+                      </div>
+                     </div> <!-- /#options -->`
+};
+
+
+BikeMap.prototype.popupContent = function(state) {
+    console.log("running popupContent");
+    let onlineStatus = this.auth.currentUser.uid;
+    
+    /* state : {
+     *     address: address (string),
+     *     latitude: latitude (string),
+     *     longitude: longitude (string),
+     *     rack_id: rack_id (string),
+     *     status: string (is it a temp marker or not, can be determined based on whether this rack has a status or not),
+     *     user_id: user_id (string, empty? (or undefined) if user is not signed in)
+    }*/
+    if (state.address === null || state.address === undefined) {
+        state.address = ""
+    }
+    let content = `<div id="address">${state.address}</div>
+               <div id="coordinates"><span id="lat">${state.latitude}</span> <span>
+                 <span id="coordinateComma">,</span>
+                 </span> <span id="lng">${state.longitude}</span>
+               </div>
+               <div id="options">`
+    
+    // if user is online and this isn't a temporary marker include the submit button and the voting buttons
+    if (onlineStatus && state.status) {
+        
+        let arrows = this.arrowHTML(state);
+        //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
+        content += arrows;
+    }
+    // if the user is online and this IS a temporary marker include only the submit button
+    else if (onlineStatus && !state.status) {
+        
+        content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
+    }
+    // if the user is not online then don't include any buttons (doesn't matter if temp marker or not)
+    else {
+        
+        content += `</div> <!-- /#options -->`
+    }
+    
+    return `<div class="popup"> ${content} </div>`
+   
+};
 

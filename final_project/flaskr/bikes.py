@@ -64,11 +64,12 @@ def coordinates():
 def get_racks():
     if request.method == 'GET':
         status = request.args.get('status') or None
-
+        user_id = request.args.get('userId') or None
+        
         # make a connection to the database
         db = get_db()
         
-        racks = helper.get_racks("bikeracks", db, status)
+        racks = helper.get_racks("bikeracks", db, status, user_id)
         
         return racks
 

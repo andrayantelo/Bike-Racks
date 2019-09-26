@@ -46,57 +46,7 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
-function arrowHTML(rack_id) { 
-    return `<div id="arrowsContainer">
-              <div><i id=${"upvoteArrow_" + rack_id} class="fas fa-arrow-circle-up fa-2x arrowHover arrowClick"></i>
-                      <span id=${"upvoteCount_" + rack_id}>0%</span><div>
-                <div><i id=${"downvoteArrow_" + rack_id} class="fas fa-arrow-circle-down fa-2x arrowHover arrowClick"></i>
-                      <span id=${"downvoteCount_" + rack_id}>0%</span></div>
-                </div>
-            </div> <!-- /#options -->`
-};
 
-
-function popupContent(state) {
-    /* state : {
-     *     address: address (string),
-     *     latitude: latitude (string),
-     *     longitude: longitude (string),
-     *     rack_id: rack_id (string),
-     *     status: string (is it a temp marker or not, can be determined based on whether this rack has a status or not),
-     *     user_id: user_id (string, empty? (or undefined) if user is not signed in)
-    }*/
-    if (state.address === null || state.address === undefined) {
-        state.address = ""
-    }
-    let content = `<div id="address">${state.address}</div>
-               <div id="coordinates"><span id="lat">${state.latitude}</span> <span>
-                 <span id="coordinateComma">,</span>
-                 </span> <span id="lng">${state.longitude}</span>
-               </div>
-               <div id="options">`
-    
-    // if user is online and this isn't a temporary marker include the submit button and the voting buttons
-    if (state.userId && state.status) {
-        
-        let arrows = arrowHTML(state.rack_id);
-        //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
-        content += arrows;
-    }
-    // if the user is online and this IS a temporary marker include only the submit button
-    else if (state.userId && !state.status) {
-        
-        content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
-    }
-    // if the user is not online then don't include any buttons (doesn't matter if temp marker or not)
-    else {
-        
-        content += `</div> <!-- /#options -->`
-    }
-    
-    return `<div class="popup"> ${content} </div>`
-   
-};
 
 
 // -------------------------------@-------------------------------------

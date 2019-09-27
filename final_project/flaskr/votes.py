@@ -72,7 +72,7 @@ def submit_vote():
             vote_status = h.get_vote_status(db, rack_id, user_id)
             if vote_status:
                 # updating an existing vote
-                print('updating an existing vote')
+                
                 query = "UPDATE votes SET vote_type = ? WHERE rack_id = ? AND user_id = ?"
                 db.execute(query, (vote_type, rack_id, user_id))
                 db.commit()
@@ -88,7 +88,7 @@ def submit_vote():
                 
             else:
                 # voting for the first time
-                print('voting for the first time')
+                
                 query = "INSERT INTO votes (rack_id, user_id, vote_type) VALUES (?, ?, ?)"
                 db.execute(query, (rack_id, user_id, vote_type))
                 db.commit()
@@ -96,15 +96,11 @@ def submit_vote():
             # increment the upvote or downvote count
             if vote_type == 1:
                 # update the upvote_count in bikeracks for this rack, increment by 1
-                query = "UPDATE bikeracks SET upvote_count = upvote_count + 1 WHERE rack_id=?"
-                db.execute(query, (rack_id,))
-                db.commit()
+                h.increment_upvote_count(rack_id, db)
             elif vote_type == -1:
                 # update the downvote_count in bikeracks for this rack, increment by 1
-                query = "UPDATE bikeracks SET downvote_count = downvote_count + 1 WHERE rack_id=?"
-                db.execute(query, (rack_id,))
-                db.commit()
-            print('returning response')
+                h.increment_downvote_count(rack_id, db)
+            
             resp = get_vote_data(rack_id, user_id)
             return jsonify(resp)
         except sqlite3.Error as e:

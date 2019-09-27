@@ -299,7 +299,7 @@ BikeMap.prototype.onMapClick = function (e) {
         }
         // remaking popup content here because we need to wait for the address
         // to be found
-        let content = this.popupContent(state);
+        let content = this.popupContent(state, userId);
 
         tempMarker.setPopupContent(content);
     })
@@ -597,8 +597,14 @@ BikeMap.prototype.arrowHTML = function(state, currentUserId) {
 };
 
 
-BikeMap.prototype.popupContent = function(state) {
-    let onlineStatus = this.auth.currentUser.uid;
+BikeMap.prototype.popupContent = function(state, userId) {
+    let onlineStatus;
+    if (!userId && this.auth.currentUser) {
+        onlineStatus = this.auth.currentUser.uid;
+    }
+    else {
+        onlineStatus = false
+    }
     
     /* state : {
      *     address: address (string),

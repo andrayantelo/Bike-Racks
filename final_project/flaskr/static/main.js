@@ -26,6 +26,8 @@ var opts = {
 const tempMarkerColor = 'gray';
 const approvedMarkerColor = 'green';
 const notApprovedMarkerColor = 'red';
+const inBetweenMarkerColor = 'orange';
+
 let bikemap;
 
 $(document).ready(function() {

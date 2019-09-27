@@ -1,5 +1,6 @@
 from flask import jsonify
 import sqlite3
+from math import floor
 
 # Helper functions
 class Error(Exception):
@@ -223,5 +224,29 @@ def increment_downvote_count(rack_id, database):
     
     return
     
+def get_count_percentage(rack_id, database):
+    # return the percentage of downvote_count for a rack
+    try:
+        query = "SELECT downvote_count FROM bikeracks WHERE rack_id=?"
+        downvote_count = database.execute(query, (rack_id,)).fetchone()
+        downvote_count = dict_from_row(downvote_count)
+        
+        query = "SElECT upvote_count FROM bikeracks WHERE rack_id=?"
+        upvote_count = database.execute(query, (rack_id,)).fetchone()
+        upvote_count = dict_from_row(upvote_count)
+        
+        
+        upvote_count = upvote_count['upvote_count']
+        downvote_count = downvote_count['downvote_count']
+        total_votes = upvote_count + downvote_count
+        
+        downvote_percentage = floor((downvote_count / total_votes) * 100)
+        upvote_percentage = floor((upvote_count / total_votes)*100)
 
+        return {'downvote_percentage': downvote_percentage, 'upvote_percentage': upvote_percentage}
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
+    
     

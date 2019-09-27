@@ -116,5 +116,16 @@ def add_marker_id():
         #result = [helper.dict_from_row(row) for row in result]
         
         return render_template('base.html')
+
+# this is a test
+@bikes.route('/update_rack_status', methods=['GET'])
+def update_rack_status():
+    # update a rack's status (approved, not_approved) based on the upvote_count
+    # and downvote_count percentages
+    if request.method == 'GET':
+        rack_id = request.args.get('rack_id')
         
+        db = get_db()
+        percentages = helper.get_count_percentage(rack_id, db)
+        return jsonify(percentages)
     

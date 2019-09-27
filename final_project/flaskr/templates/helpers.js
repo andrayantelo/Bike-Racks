@@ -15,7 +15,7 @@ class BikeRack {
     }
 
     setMarkerColor() {
-        // based on status
+        // based on upvote and downvote count
         let markerColor,
             status = this.state.status;
         
@@ -85,6 +85,20 @@ function storeRack(state) {
         context: this
     }).done((data) => {
         console.log("printing data:");
+        console.log(data);
+    })
+}
+
+function getVotePercentages(rack_id) {
+    let params = $.param({rack_id: rack_id}),
+        path = {{ url_for('bikes.update_rack_status')|tojson }};
+    
+    $.ajax({
+        method: 'GET',
+        url: path + '?' + params,
+        context: this,
+        }).done((data) => {
+        console.log("printing vote percentages retrieved and calculated on server side:");
         console.log(data);
     })
 }

@@ -60,7 +60,6 @@ class BikeMap {
 };
     
 BikeMap.prototype.initBikeMap = function () {
-    console.log("Initializing BikeRax");
        
     // add a tile layer to the map
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -71,8 +70,8 @@ BikeMap.prototype.initBikeMap = function () {
     }).addTo(this.mymap);
        
     // add marker to map at Mountain View Public Librarys TODO, remove later
-    let approvedIcon = buildMarkerIcon(approvedMarkerColor);
-    this.marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
+    //let approvedIcon = buildMarkerIcon(approvedMarkerColor);
+    //this.marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
     
     // initialize the search bar
     this.provider = new GeoSearch.OpenStreetMapProvider();
@@ -164,9 +163,9 @@ BikeMap.prototype.loadMap = function(userId) {
     // make bikerack instances with the states
     // create markers for each bikerack
     // display on map
-    console.log(userId);
+    
     this.getRacks(userId).done((data) => {
-        console.log(data);
+        
         // filter out the states that have users not equal to our online user
         let seen = [];
         const filteredData = data.filter(state => {
@@ -182,7 +181,7 @@ BikeMap.prototype.loadMap = function(userId) {
                 return state.user_id !== userId
             }
         });
-        console.log(filteredData);
+        
         return this.buildRacks(filteredData, userId);
         
         
@@ -205,7 +204,7 @@ BikeMap.prototype.getRacks = function(userId, status) {
 
 BikeMap.prototype.buildRacks = function(states, userId) {
     // create an instances of BikeRack for all the states in states
-    console.log(states);
+    
     let bikeracks = [];
 
     if (!Array.isArray(states)) {
@@ -217,6 +216,7 @@ BikeMap.prototype.buildRacks = function(states, userId) {
         // create instance of bike rack and set it's marker color
         let bikerack = new BikeRack(states[i]),
             iconColor = bikerack.setMarkerColor();
+            
         // create a marker for bike rack
         let marker = this.createMarker(states[i]);
         // add marker to map
@@ -350,18 +350,23 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
 BikeMap.prototype.createMarker = function(state) {
     
     if (this.allRacks.getLayer(state.marker_id)) {
-        console.log("this marker is already on the map");
-        console.log(this.allRacks.getLayer(state.marker_id));
-        console.log(state.marker_id);
+
+        this.marker = this.allRacks.getLayer(state.marker_id);
         this.allRacks.getLayer(state.marker_id)._popup.setContent(this.popupContent(state));
-        console.log("supposedly updated the content of the marker");
+        
+        // ALSO update the marker icon
+        let newMarkerIcon = buildMarkerIcon(state.markerColor);
+        this.allRacks.getLayer(state.marker_id).setIcon(newMarkerIcon);
         return this.allRacks.getLayer(state.marker_id);
     }
-    console.log(state);
+   
     let markerIcon = buildMarkerIcon(state.markerColor),
         marker;
     
-    marker = L.marker([state.latitude, state.longitude], {icon: markerIcon}); 
+    marker = L.marker([state.latitude, state.longitude]); 
+    
+    marker.setIcon(markerIcon);
+    
     // force an id on the marker
     L.stamp(marker);
     // store marker with it's rack in bikeracks table in db
@@ -385,7 +390,7 @@ BikeMap.prototype.createMarker = function(state) {
 
 BikeMap.prototype.storeMarkerId = function(marker_id, rack_id) {
     // update marker id and put into bikeracks table for rack with rack_id=rack_id
-    console.log("storing marker");
+    
     let path = {{ url_for('bikes.add_marker_id')|tojson }},
         params = $.param({marker_id: marker_id, rack_id: rack_id});
         
@@ -472,9 +477,20 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
     })
 }
 
+BikeMap.prototype.updateRackStatus = function(rack_id) {
+    let params = $.param({rack_id: rack_id}),
+        path = {{ url_for('bikes.update_rack_status')|tojson }};
+    
+    return $.ajax({
+        method: 'GET',
+        url: path + '?' + params,
+        context: this,
+        })
+}
+
 
 BikeMap.prototype.vote = function(e) {
-    console.log('vote!');
+    
     if (!this.auth.currentUser) {
         // redirect user to sign in
         bikemap.signIn()
@@ -485,8 +501,7 @@ BikeMap.prototype.vote = function(e) {
             user_id = this.auth.currentUser.uid,
             voteStatusP = this.getVoteStatus(rack_id, user_id),
             arrowDiv = e.target.id;
-        console.log(e.currentTarget);
-        console.log(rack_id);
+        
         // if the user already voted on this rack,
         // need to update their vote in the database, and the UI changes
         // that happen even if they didn't already make a vote still happen
@@ -502,8 +517,10 @@ BikeMap.prototype.vote = function(e) {
                 if (voteType === 1 && newVoteType === -1 || voteType === -1 && newVoteType === 1) {
                     
                     this.submitVote(rack_id, user_id, newVoteType).done(vote => {
-                        this.loadMap(user_id)
-                      
+                        this.updateRackStatus(rack_id).done(status => {
+                            
+                            this.loadMap(user_id);
+                        });
                     });
                 }
                 // if the new vote is the same as the old vote, nothing happens
@@ -511,13 +528,15 @@ BikeMap.prototype.vote = function(e) {
             }
             else {
                 // user is voting for rack for the first time
-                console.log("user is voting on rack for the first time");
+                
                 let voteType = e.target.dataset.votetype;
                 voteType = voteType === "upvote"? 1 : -1;
                 
                 this.submitVote(rack_id, user_id, voteType).done(vote => {
-                    this.loadMap(user_id)
-                    
+                    this.updateRackStatus(rack_id).done(status => {
+                        
+                        this.loadMap(user_id);
+                    });
                 });
             }
         })
@@ -531,8 +550,7 @@ BikeMap.prototype.vote = function(e) {
 BikeMap.prototype.arrowHTML = function(state, currentUserId) { 
 
     let containerId = "rack_" + state.rack_id;
-    console.log(state);
-
+    
     let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
         downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
         upvotePercentage = Math.floor((state.upvote_count/(state.upvote_count + state.downvote_count))*100),

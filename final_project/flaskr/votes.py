@@ -64,8 +64,7 @@ def submit_vote():
             user_id = request.args.get('user_id') or None
             vote_type = request.args.get('vote_type') or None
             vote_type = int(vote_type)
-            print("vote_type: {}".format(vote_type))
-            print("type(vote_type): {}".format(type(vote_type)))
+            
             # connect to db
             db = get_db()
             

@@ -113,7 +113,7 @@ def get_racks(table_name, database, status, user_id):
                     FROM bikeracks LEFT JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id is NULL OR votes.user_id!=?"""
         result2 = database.execute(query2, (user_id,)).fetchall()
         
-        result += result2
+        #result += result2
     elif status and user_id:
         
         # TODO probably need two queries here
@@ -134,8 +134,8 @@ def get_racks(table_name, database, status, user_id):
         return "", 500
     
     result = [dict_from_row(row) for row in result]
-    result2 = [dict_from_row(row) for row in result2]
-    final_result = [result, result2]
+    #result2 = [dict_from_row(row) for row in result2]
+    #final_result = [result, result2]
     
     return jsonify(result)
 
@@ -248,5 +248,7 @@ def get_count_percentage(rack_id, database):
         print("Database error:", e)
     except KeyError as key_e:
         print("Error with key: {}".format(key_e))
+
+
     
     

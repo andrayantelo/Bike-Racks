@@ -79,18 +79,12 @@ def submit_vote():
                 # also update the vote count in bikeracks table
                 if vote_type == 1:
                     # update the downvote_count in bikeracks for this rack, decrement by 1
-                    query = "UPDATE bikeracks SET downvote_count=(SELECT MAX(downvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
-                    print(query)
-                    db.execute(query, (rack_id,rack_id,))
-                    db.commit()
+                    h.decrement_downvote_count(rack_id, db)
                     
                 # if the user downvoted
                 elif vote_type == -1:
                     # update the upvote_count in bikeracks for this rack, decrement by 1
-                    query = "UPDATE bikeracks SET upvote_count=(SELECT MAX(upvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
-                    print(query)
-                    db.execute(query, (rack_id, rack_id,))
-                    db.commit()
+                    h.decrement_upvote_count(rack_id, db)
                 
             else:
                 # voting for the first time

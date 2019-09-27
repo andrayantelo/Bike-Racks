@@ -170,3 +170,41 @@ def get_vote_status(database, rack_id, user_id):
         
     result = database.execute(query, (rack_id, user_id)).fetchone()
     return result
+    
+# decrement from downvote or upvote_count
+def decrement_upvote_count(rack_id, database):
+    try:
+        query = "UPDATE bikeracks SET upvote_count=(SELECT MAX(upvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
+        print(query)
+        database.execute(query, (rack_id,rack_id,))
+        database.commit()
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
+    
+    return
+    
+def decrement_downvote_count(rack_id, database):
+    try:
+        query = "UPDATE bikeracks SET downvote_count=(SELECT MAX(downvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
+        print(query)
+        database.execute(query, (rack_id,rack_id,))
+        database.commit()
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
+    
+    return
+    
+# increment downvote or upvote_count
+def increment_vote_count(vote_count_column_name, rack_id):
+    pass
+    #try:
+    ##    query = "UPDATE bikeracks SET ? = upvote_count + 1 WHERE rack_id=?"
+    ##    db.execute(query, (rack_id,))
+    #    db.commit()
+    
+    
+    

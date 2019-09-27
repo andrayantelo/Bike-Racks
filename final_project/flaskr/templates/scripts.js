@@ -224,7 +224,10 @@ BikeMap.prototype.buildRacks = function(states, userId) {
         // set marker element id
         marker._icon.id = states[i].rack_id;
         // open marker popup
-        //marker.openPopup();
+        if (states.length === 1) {
+            marker.openPopup();
+        };
+        
         
     }
     return bikeracks;
@@ -499,12 +502,8 @@ BikeMap.prototype.vote = function(e) {
                 if (voteType === 1 && newVoteType === -1 || voteType === -1 && newVoteType === 1) {
                     
                     this.submitVote(rack_id, user_id, newVoteType).done(vote => {
-                        this.loadMap(user_id).then(data => {
-                            if (this.marker) {
-                                this.marker.fire('click');
-                                this.marker.fire('click');
-                            }
-                        })
+                        this.loadMap(user_id)
+                      
                     });
                 }
                 // if the new vote is the same as the old vote, nothing happens
@@ -517,12 +516,8 @@ BikeMap.prototype.vote = function(e) {
                 voteType = voteType === "upvote"? 1 : -1;
                 
                 this.submitVote(rack_id, user_id, voteType).done(vote => {
-                    this.loadMap(user_id).then(data => {
-                        if (this.marker) {
-                            this.marker.fire('click');
-                            this.marker.fire('click');
-                        }
-                    })
+                    this.loadMap(user_id)
+                    
                 });
             }
         })
@@ -536,11 +531,15 @@ BikeMap.prototype.vote = function(e) {
 BikeMap.prototype.arrowHTML = function(state, currentUserId) { 
 
     let containerId = "rack_" + state.rack_id;
+    console.log(state);
 
     let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
         downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
-        upvotePercentage = 0,
-        downvotePercentage = 0;
+        upvotePercentage = Math.floor((state.upvote_count/(state.upvote_count + state.downvote_count))*100),
+        downvotePercentage = Math.floor((state.downvote_count/(state.upvote_count + state.downvote_count))*100);
+        
+        upvotePercentage = upvotePercentage? upvotePercentage: 0;
+        downvotePercentage = downvotePercentage? downvotePercentage: 0;
     // if you have a voteStatus of 1 , which is an upvote, then you want
     // the upvote arrow to have a class of .voted, and you DON'T want it to have arrowHover and arrowClick
     // if you have a voteStatus of -1, which is a downvote, then you want the downvote arrow

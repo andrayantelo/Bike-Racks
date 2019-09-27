@@ -105,7 +105,7 @@ def add_marker_id():
     if request.method == 'POST':
         marker_id = request.args.get('marker_id')
         rack_id = request.args.get('rack_id')
-        print("storing markerid {} for rack {}".format(marker_id, rack_id))
+        #print("storing markerid {} for rack {}".format(marker_id, rack_id))
         #database connection
         db = get_db()
         

@@ -84,18 +84,18 @@ def get_racks(table_name, database, status, user_id):
     
     if status is None and user_id is None:
         print("getting all racks for a user who is offline")
-        # return all rows from bikeracks table
+        # gat all racks from bikeracks table
         query = "SELECT * FROM {}".format(table_name)
         result = database.execute(query).fetchall()
     elif status and user_id is None:
-        # select all rows with given status from bikeracks table
+        # get all racks with given status from bikeracks table
         print("fetching all racks of a particular status {} for offline users".format(status))
         query = "SELECT * FROM {} WHERE status =?".format(table_name)
         result = database.execute(query, (status,)).fetchall()
     elif status is None and user_id:
         # return all joined rows from bikeracks and votes
         print("fetching all racks for an online user")
-        # get all the racks the user did NOT vote on
+        # get all the racks, including voting information for racks that user voted on
         query = """ SELECT *
                     FROM bikeracks as r
                     LEFT JOIN votes as v
@@ -106,7 +106,7 @@ def get_racks(table_name, database, status, user_id):
     elif status and user_id:
         print("fetching all racks of status {} for online user".format(status))
         
-        # return all rows from joined tables with this status
+        # get all the racks with status=status, including voting information for racks that user voted on
         query = """ SELECT *
                     FROM bikeracks as r
                     LEFT JOIN votes as v

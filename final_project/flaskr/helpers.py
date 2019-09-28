@@ -101,7 +101,7 @@ def get_racks(table_name, database, status, user_id):
                     LEFT JOIN votes as v
                     ON (r.rack_id=v.rack_id AND v.user_id=?)
                 """
-        result = database.execute(query2, (user_id,)).fetchall()
+        result = database.execute(query, (user_id,)).fetchall()
         
     elif status and user_id:
         print("fetching all racks of status {} for online user".format(status))

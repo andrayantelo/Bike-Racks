@@ -165,24 +165,33 @@ BikeMap.prototype.loadMap = function(userId) {
     // display on map
     
     this.getRacks(userId).done((data) => {
+        console.log("data received from db on load:");
+        console.log(data);
         
-        // filter out the states that have users not equal to our online user
-        let seen = [];
-        const filteredData = data.filter(state => {
-
-            /*console.log(state.user_id !== userId);
-            console.log(state);*/
-            
-            if ( state.user_id === userId && (state.vote_type === 1 || state.vote_type === -1)) {
-                seen.push(state.rack_id);
-                return state
-            }
-            else if (!seen.includes(state.rack_id)) {
-                return state.user_id !== userId
-            }
-        });
+        // filter out the states that have users not equal to our online user ONLY IF
+        // the user is currently online
+        if (userId) {
+            let seen = [];
+            const filteredData = data.filter(state => {
+    
+                /*console.log(state.user_id !== userId);
+                console.log(state);*/
+                
+                if ( state.user_id === userId && (state.vote_type === 1 || state.vote_type === -1)) {
+                    seen.push(state.rack_id);
+                    return state
+                }
+                else if (!seen.includes(state.rack_id)) {
+                    return state.user_id !== userId
+                }
+            });
+            console.log(filteredData);
+            return this.buildRacks(filteredData, userId);
+        }
         
-        return this.buildRacks(filteredData, userId);
+        return this.buildRacks(data, userId);
+        
+        
         
         
     });

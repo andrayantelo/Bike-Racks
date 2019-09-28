@@ -14,6 +14,8 @@ class BikeMap {
         this.allRacks.on('click', (e) => {
             this.mymap.removeLayer(this.tempMarker);
             this.marker = e.sourceTarget;
+            console.log('clicked on: ');
+            console.log(this.marker);
             e.target.openPopup();
         });
         
@@ -357,8 +359,9 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
 }
 
 BikeMap.prototype.createMarker = function(state) {
-    
-    this.allRacks.eachLayer(layer => {
+    let marker;
+    // if this marker already exists
+    marker = this.allRacks.eachLayer(layer => {
        if (layer.options.uniqueId == state.rack_id) {
           
            layer._popup.setContent(this.popupContent(state));
@@ -369,29 +372,32 @@ BikeMap.prototype.createMarker = function(state) {
        }
     });
    
-   
-    let markerIcon = buildMarkerIcon(state.markerColor),
-        marker;
-    
-    marker = L.marker([state.latitude, state.longitude], {uniqueId: state.rack_id}); 
-    
-    marker.setIcon(markerIcon);
-    
-    
-    // add marker to allRacks feature group and its feature group based on status
-    this.allRacks.addLayer(marker);
-    if (state.status === "approved") {
-        this.allApproved.addLayer(marker);
+    if (marker) {
+        return marker;
     }
-    else if (state.status === "not_approved") {
-        this.allNotApproved.addLayer(marker);
-    }
+    else {
+        let markerIcon = buildMarkerIcon(state.markerColor);
+        
+        marker = L.marker([state.latitude, state.longitude], {uniqueId: state.rack_id}); 
+        
+        marker.setIcon(markerIcon);
+        
+        
+        // add marker to allRacks feature group and its feature group based on status
+        this.allRacks.addLayer(marker);
+        if (state.status === "approved") {
+            this.allApproved.addLayer(marker);
+        }
+        else if (state.status === "not_approved") {
+            this.allNotApproved.addLayer(marker);
+        }
+        
+        // bind popup to marker
+        let content = this.popupContent(state);
+        marker.bindPopup(content);
     
-    // bind popup to marker
-    let content = this.popupContent(state);
-    marker.bindPopup(content);
-
-    return marker;
+        return marker;
+    }
 }
 
 BikeMap.prototype.addMarker = function(marker) {

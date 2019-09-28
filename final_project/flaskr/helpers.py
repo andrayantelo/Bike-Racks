@@ -95,48 +95,32 @@ def get_racks(table_name, database, status, user_id):
     elif status == None and user_id:
         # return all joined rows from bikeracks and votes
         print("fetching all racks for an online user")
-        # get all the racks the user voted on
-        query = "SELECT * FROM bikeracks INNER JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id=?"
-        result = database.execute(query, (user_id,)).fetchall()
-        
         # get all the racks the user did NOT vote on
-        query2 = """SELECT 
-                       bikeracks.address,
-                       bikeracks.downvote_count,
-                       bikeracks.latitude,
-                       bikeracks.longitude,
-                       bikeracks.rack_id,
-                       bikeracks.status,
-                       bikeracks.upvote_count,
-                       votes.vote_type,
-                       votes.user_id
-                    FROM bikeracks LEFT JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id is NULL OR votes.user_id!=?"""
-        result2 = database.execute(query2, (user_id,)).fetchall()
+        query = """ SELECT *
+                    FROM bikeracks as r
+                    LEFT JOIN votes as v
+                    ON (r.rack_id=v.rack_id AND v.user_id=?)
+                """
+        result = database.execute(query2, (user_id,)).fetchall()
         
-        result += result2
     elif status and user_id:
         print("fetching all racks of status {} for online user".format(status))
-        # TODO probably need two queries here
+        
         # return all rows from joined tables with this status
-        query = """SELECT 
-                       bikeracks.address,
-                       bikeracks.downvote_count,
-                       bikeracks.latitude,
-                       bikeracks.longitude,
-                       bikeracks.rack_id,
-                       bikeracks.status,
-                       bikeracks.upvote_count,
-                       votes.vote_type,
-                       votes.user_id
-                   FROM bikeracks LEFT JOIN votes on bikeracks.rack_id=votes.rack_id WHERE votes.user_id=? AND bikeracks.status=?"""
+        query = """ SELECT *
+                    FROM bikeracks as r
+                    LEFT JOIN votes as v
+                    ON r.rack_id=v.rack_id
+                    WHERE v.user_id=? 
+                    AND r.status=?
+                """
         result = database.execute(query, (user_id, status,)).fetchall()
     else:
         return "", 500
     
+    
     result = [dict_from_row(row) for row in result]
-    #result2 = [dict_from_row(row) for row in result2]
-    #final_result = [result, result2]
-    print(len(result))
+
     return jsonify(result)
 
 

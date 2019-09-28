@@ -43,7 +43,7 @@ a user can vote only once per bikerack.  */
 
 CREATE TABLE votes (
     vote_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
+    user_id TEXT,
     vote_type INTEGER,
     rack_id INTEGER NOT NULL,
     FOREIGN KEY (rack_id) REFERENCES bikeracks(rack_id)

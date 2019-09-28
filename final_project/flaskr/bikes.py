@@ -99,23 +99,6 @@ def get_single_rack():
         rack = helper.get_single_rack('bikeracks', db, rack_id)
         
         return rack
-        
-@bikes.route('/add_marker_id', methods=['POST'])
-def add_marker_id():
-    if request.method == 'POST':
-        marker_id = request.args.get('marker_id')
-        rack_id = request.args.get('rack_id')
-        #print("storing markerid {} for rack {}".format(marker_id, rack_id))
-        #database connection
-        db = get_db()
-        
-        query = 'UPDATE bikeracks SET marker_id = ? WHERE rack_id=?'
-        result = db.execute(query, (marker_id, rack_id,))
-        db.commit()
-        
-        #result = [helper.dict_from_row(row) for row in result]
-        
-        return render_template('base.html')
 
 # this is a test
 @bikes.route('/update_rack_status', methods=['GET'])

@@ -358,28 +358,25 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
 
 BikeMap.prototype.createMarker = function(state) {
     
-    if (this.allRacks.getLayer(state.marker_id)) {
-
-        this.marker = this.allRacks.getLayer(state.marker_id);
-        this.allRacks.getLayer(state.marker_id)._popup.setContent(this.popupContent(state));
-        
-        // ALSO update the marker icon
-        let newMarkerIcon = buildMarkerIcon(state.markerColor);
-        this.allRacks.getLayer(state.marker_id).setIcon(newMarkerIcon);
-        return this.allRacks.getLayer(state.marker_id);
-    }
+    this.allRacks.eachLayer(layer => {
+       if (layer.options.uniqueId == state.rack_id) {
+          
+           layer._popup.setContent(this.popupContent(state));
+           // Also update the marker icon
+           let newMarkerIcon = buildMarkerIcon(state.markerColor);
+           layer.setIcon(newMarkerIcon);
+           return layer;
+       }
+    });
+   
    
     let markerIcon = buildMarkerIcon(state.markerColor),
         marker;
     
-    marker = L.marker([state.latitude, state.longitude]); 
+    marker = L.marker([state.latitude, state.longitude], {uniqueId: state.rack_id}); 
     
     marker.setIcon(markerIcon);
     
-    // force an id on the marker
-    L.stamp(marker);
-    // store marker with it's rack in bikeracks table in db
-    this.storeMarkerId(marker._leaflet_id, state.rack_id);
     
     // add marker to allRacks feature group and its feature group based on status
     this.allRacks.addLayer(marker);
@@ -396,21 +393,6 @@ BikeMap.prototype.createMarker = function(state) {
 
     return marker;
 }
-
-BikeMap.prototype.storeMarkerId = function(marker_id, rack_id) {
-    // update marker id and put into bikeracks table for rack with rack_id=rack_id
-    
-    let path = {{ url_for('bikes.add_marker_id')|tojson }},
-        params = $.param({marker_id: marker_id, rack_id: rack_id});
-        
-    return $.ajax({
-        method: 'POST',
-        url: path + '?' + params,
-        context: this,
-    })
-}
-
-
 
 BikeMap.prototype.addMarker = function(marker) {
     // add given marker to map
@@ -499,7 +481,7 @@ BikeMap.prototype.updateRackStatus = function(rack_id) {
 
 
 BikeMap.prototype.vote = function(e) {
-    
+    console.log('voting');
     if (!this.auth.currentUser) {
         // redirect user to sign in
         bikemap.signIn()
@@ -516,6 +498,7 @@ BikeMap.prototype.vote = function(e) {
         // that happen even if they didn't already make a vote still happen
         voteStatusP.then(voteStatus => {
             if (voteStatus) {
+                console.log('rack already has a vote, updating vote');
                 // user already submitted a vote for this rack
                 let voteType = voteStatus.vote_type,
                     newVote = e.target.dataset.votetype;
@@ -537,7 +520,7 @@ BikeMap.prototype.vote = function(e) {
             }
             else {
                 // user is voting for rack for the first time
-                
+                console.log('voting for this rack for the first time');
                 let voteType = e.target.dataset.votetype;
                 voteType = voteType === "upvote"? 1 : -1;
                 

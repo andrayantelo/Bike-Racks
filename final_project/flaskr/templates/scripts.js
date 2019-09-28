@@ -361,14 +361,14 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
 BikeMap.prototype.createMarker = function(state) {
     let marker;
     // if this marker already exists
-    marker = this.allRacks.eachLayer(layer => {
+    this.allRacks.eachLayer(layer => {
        if (layer.options.uniqueId == state.rack_id) {
           
            layer._popup.setContent(this.popupContent(state));
            // Also update the marker icon
            let newMarkerIcon = buildMarkerIcon(state.markerColor);
            layer.setIcon(newMarkerIcon);
-           return layer;
+           marker = layer;
        }
     });
    
@@ -491,54 +491,55 @@ BikeMap.prototype.vote = function(e) {
     if (!this.auth.currentUser) {
         // redirect user to sign in
         bikemap.signIn()
+        return
     }
-    else {
-        
-        let rack_id = e.currentTarget.id.substring(2),
-            user_id = this.auth.currentUser.uid,
-            voteStatusP = this.getVoteStatus(rack_id, user_id),
-            arrowDiv = e.target.id;
-        
-        // if the user already voted on this rack,
-        // need to update their vote in the database, and the UI changes
-        // that happen even if they didn't already make a vote still happen
-        voteStatusP.then(voteStatus => {
-            if (voteStatus) {
-                console.log('rack already has a vote, updating vote');
-                // user already submitted a vote for this rack
-                let voteType = voteStatus.vote_type,
-                    newVote = e.target.dataset.votetype;
-                    
-                let newVoteType = newVote === "upvote"? 1: -1;
-                
-                // if the new vote is different from the old vote, submit the vote (update it)
-                if (voteType === 1 && newVoteType === -1 || voteType === -1 && newVoteType === 1) {
-                    
-                    this.submitVote(rack_id, user_id, newVoteType).done(vote => {
-                        this.updateRackStatus(rack_id).done(status => {
-                            
-                            this.loadMap(user_id);
-                        });
-                    });
-                }
-                // if the new vote is the same as the old vote, nothing happens
 
-            }
-            else {
-                // user is voting for rack for the first time
-                console.log('voting for this rack for the first time');
-                let voteType = e.target.dataset.votetype;
-                voteType = voteType === "upvote"? 1 : -1;
+        
+    let rack_id = e.currentTarget.id.substring(2),
+        user_id = this.auth.currentUser.uid,
+        voteStatusP = this.getVoteStatus(rack_id, user_id),
+        arrowDiv = e.target.id;
+    
+    // if the user already voted on this rack,
+    // need to update their vote in the database, and the UI changes
+    // that happen even if they didn't already make a vote still happen
+    voteStatusP.then(voteStatus => {
+        if (voteStatus) {
+            console.log('rack already has a vote, updating vote');
+            // user already submitted a vote for this rack
+            let voteType = voteStatus.vote_type,
+                newVote = e.target.dataset.votetype;
                 
-                this.submitVote(rack_id, user_id, voteType).done(vote => {
+            let newVoteType = newVote === "upvote"? 1: -1;
+            
+            // if the new vote is different from the old vote, submit the vote (update it)
+            if (voteType === 1 && newVoteType === -1 || voteType === -1 && newVoteType === 1) {
+                
+                this.submitVote(rack_id, user_id, newVoteType).done(vote => {
                     this.updateRackStatus(rack_id).done(status => {
                         
                         this.loadMap(user_id);
                     });
                 });
             }
-        })
-    }
+            // if the new vote is the same as the old vote, nothing happens
+
+        }
+        else {
+            // user is voting for rack for the first time
+            console.log('voting for this rack for the first time');
+            let voteType = e.target.dataset.votetype;
+            voteType = voteType === "upvote"? 1 : -1;
+            
+            this.submitVote(rack_id, user_id, voteType).done(vote => {
+                this.updateRackStatus(rack_id).done(status => {
+                    
+                    this.loadMap(user_id);
+                });
+            });
+        }
+    })
+
     
     
     

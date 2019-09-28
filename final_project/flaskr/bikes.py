@@ -69,7 +69,7 @@ def get_racks():
         # make a connection to the database
         db = get_db()
         
-        racks = helper.get_racks("bikeracks", db, status, user_id)
+        racks = helper.get_racks(db, status, user_id)
         
         return racks
 

@@ -76,7 +76,7 @@ def get_rack_state(table_name, database, lat, lng):
 
     return jsonify(result)
     
-def get_racks(table_name, database, status, user_id):
+def get_racks(database, status, user_id):
     # get data from database for approved bikeracks, searches database
     # based on status of rack ('not_approved', 'approved')
     # return a response object with the application/json mimetype, the content
@@ -85,12 +85,12 @@ def get_racks(table_name, database, status, user_id):
     if status is None and user_id is None:
         print("getting all racks for a user who is offline")
         # gat all racks from bikeracks table
-        query = "SELECT * FROM {}".format(table_name)
+        query = "SELECT * FROM bikeracks"
         result = database.execute(query).fetchall()
     elif status and user_id is None:
         # get all racks with given status from bikeracks table
         print("fetching all racks of a particular status {} for offline users".format(status))
-        query = "SELECT * FROM {} WHERE status =?".format(table_name)
+        query = "SELECT * FROM bikeracks WHERE status =?"
         result = database.execute(query, (status,)).fetchall()
     elif status is None and user_id:
         # return all joined rows from bikeracks and votes

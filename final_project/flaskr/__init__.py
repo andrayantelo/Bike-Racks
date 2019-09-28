@@ -55,6 +55,10 @@ def create_app(test_config=None):
         # update map with approved markers
         # render_template invokes the jinja template engine
         return render_template('base.html', name=name)
+        
+    @app.route('/favicon.ico')
+    def favicon():
+        return ('', 204)
     
     #@app.route('/tests')
     #def test_page(name=None):

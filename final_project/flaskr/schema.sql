@@ -1,7 +1,6 @@
 /* The sqlite database schema */
 /* Why is 'status' blue 
-There are actually 3 states a bikerack can be in: "approved", "pending", and
-"rejected".
+There are actually 2 states a bikerack can be in: "approved" or "not_approved"
 separate table for votes, has foreign key on bike rack id
 and this separate table has the data for voting: type of vote (1 ("upvote") or -1 ("downvote")),
 user_id, index on the bikerack id (or user_id)
@@ -21,14 +20,15 @@ DROP TABLE IF EXISTS votes_history;
 
 CREATE TABLE bikeracks (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    status TEXT DEFAULT "pending",
+    marker_id INTEGER,
+    status TEXT DEFAULT "not_approved",
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
     address TEXT,
     upvote_count INTEGER NOT NULL DEFAULT 0,
     downvote_count INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT coordinates UNIQUE(latitude, longitude),
-    CHECK (status in ("approved", "pending", "rejected"))
+    CHECK (status in ("approved", "not_approved"))
     
 );
 
@@ -62,12 +62,12 @@ that way we can link old votes back to their bikerack */
 
 CREATE TABLE bikeracks_history (
     rack_id INTEGER PRIMARY KEY,
-    status TEXT DEFAULT "pending",
+    status TEXT DEFAULT "not_approved",
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
     address TEXT,
     CONSTRAINT coordinates UNIQUE(latitude, longitude),
-    CHECK (status in ("approved", "pending", "rejected"))
+    CHECK (status in ("approved", "not_approved"))
 );
 
 /* 

@@ -59,16 +59,17 @@ def coordinates():
     # if it is not a post method then just show the map
     return render_template('base.html')
 
-# get racks based on status ('pending', 'rejected', 'approved')
+# get racks based on status ('not_approved', 'approved')
 @bikes.route('/get_racks/', methods=['GET'])
 def get_racks():
     if request.method == 'GET':
         status = request.args.get('status') or None
-
+        user_id = request.args.get('userId') or None
+        
         # make a connection to the database
         db = get_db()
         
-        racks = helper.get_racks("bikeracks", db, status)
+        racks = helper.get_racks("bikeracks", db, status, user_id)
         
         return racks
 
@@ -98,4 +99,60 @@ def get_single_rack():
         rack = helper.get_single_rack('bikeracks', db, rack_id)
         
         return rack
+        
+@bikes.route('/add_marker_id', methods=['POST'])
+def add_marker_id():
+    if request.method == 'POST':
+        marker_id = request.args.get('marker_id')
+        rack_id = request.args.get('rack_id')
+        #print("storing markerid {} for rack {}".format(marker_id, rack_id))
+        #database connection
+        db = get_db()
+        
+        query = 'UPDATE bikeracks SET marker_id = ? WHERE rack_id=?'
+        result = db.execute(query, (marker_id, rack_id,))
+        db.commit()
+        
+        #result = [helper.dict_from_row(row) for row in result]
+        
+        return render_template('base.html')
+
+# this is a test
+@bikes.route('/update_rack_status', methods=['GET'])
+def update_rack_status():
+    # update a rack's status (approved, not_approved) based on the upvote_count
+    # and downvote_count percentages
+    if request.method == 'GET':
+        rack_id = request.args.get('rack_id')
+        
+        db = get_db()
+        percentages = helper.get_count_percentage(rack_id, db)
+        upvote_ratio = percentages['upvote_percentage']
+        downvote_ratio = percentages['downvote_percentage']
+        
+        current_rack_status = db.execute("SELECT status FROM bikeracks WHERE rack_id=?", (rack_id,)).fetchone()
+        current_rack_status = helper.dict_from_row(current_rack_status)
+        current_rack_status = current_rack_status['status']
+
+        
+        # if the rack has more than 50 % downvotes, and the rack's status is approved,
+        # we change the status to not approved
+        if downvote_ratio > 50 and current_rack_status == 'approved':
+            # change status to not approved
+            
+            db.execute("UPDATE bikeracks SET status = 'not_approved' WHERE rack_id=?", (rack_id,))
+            db.commit()
+        # if the rack has more than or equal to 50 % upvotes, and the rack status is currently not approved
+        # we change the status to approved
+        elif upvote_ratio >= 50 and current_rack_status == 'not_approved':
+            
+            # change status to approved
+            db.execute("UPDATE bikeracks SET status = 'approved' WHERE rack_id=?", (rack_id,))
+            db.commit()
+        after_rack_status = db.execute("SELECT status FROM bikeracks WHERE rack_id=?", (rack_id,)).fetchone()
+        after_rack_status = helper.dict_from_row(after_rack_status)
+        after_rack_status = after_rack_status['status']
+        
+        result = {'before': current_rack_status, 'after': after_rack_status}
+        return jsonify(result)
     

@@ -1,5 +1,6 @@
 from flask import jsonify
 import sqlite3
+from math import floor
 
 # Helper functions
 class Error(Exception):
@@ -49,14 +50,14 @@ def validate_coordinates(coordinates):
     # return true if all tests passed
     return True
     
-# function that collects the data of pending bikeracks from the database
+# function that collects the data of not_approved bikeracks from the database
 def collect_pending(table_name, database, lat, lng):
-    # Return 50 pending bike rack results to be displayed on the map
+    # Return 50 not_approved bike rack results to be displayed on the map
     # table_name: string
     # database: db connection object
     # TODO, actually make it so that 50 are collected
     
-    query = "SELECT * FROM {} WHERE status = 'pending'".format(table_name)
+    query = "SELECT * FROM {} WHERE status = 'not_approved'".format(table_name)
     result = database.execute(query).fetchall()
     pending_racks = [tuple(row) for row in result]
     
@@ -75,21 +76,67 @@ def get_rack_state(table_name, database, lat, lng):
 
     return jsonify(result)
     
-def get_racks(table_name, database, status):
+def get_racks(table_name, database, status, user_id):
     # get data from database for approved bikeracks, searches database
-    # based on status of rack ('pending', 'rejected', 'approved')
+    # based on status of rack ('not_approved', 'approved')
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
     
-    if status == None:
-        # return all racks
+    if status == None and user_id == None:
+       
+        # return all rows from bikeracks table
         query = "SELECT * FROM {}".format(table_name)
         result = database.execute(query).fetchall()
-    else:
+    elif status and user_id == None:
+        # select all rows with given status from bikeracks table
+        
         query = "SELECT * FROM {} WHERE status =?".format(table_name)
         result = database.execute(query, (status,)).fetchall()
+    elif status == None and user_id:
+        # return all joined rows from bikeracks and votes
+        
+        # get all the racks the user voted on
+        query = "SELECT * FROM bikeracks INNER JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id=?"
+        result = database.execute(query, (user_id,)).fetchall()
+        
+        # get all the racks the user did NOT vote on
+        query2 = """SELECT 
+                       bikeracks.address,
+                       bikeracks.downvote_count,
+                       bikeracks.latitude,
+                       bikeracks.longitude,
+                       bikeracks.rack_id,
+                       bikeracks.status,
+                       bikeracks.upvote_count,
+                       votes.vote_type,
+                       votes.user_id
+                    FROM bikeracks LEFT JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id is NULL OR votes.user_id!=?"""
+        result2 = database.execute(query2, (user_id,)).fetchall()
+        
+        #result += result2
+    elif status and user_id:
+        
+        # TODO probably need two queries here
+        # return all rows from joined tables with this status
+        query = """SELECT 
+                       bikeracks.address,
+                       bikeracks.downvote_count,
+                       bikeracks.latitude,
+                       bikeracks.longitude,
+                       bikeracks.rack_id,
+                       bikeracks.status,
+                       bikeracks.upvote_count,
+                       votes.vote_type,
+                       votes.user_id
+                   FROM bikeracks LEFT JOIN votes on bikeracks.rack_id=votes.rack_id WHERE votes.user_id=? AND bikeracks.status=?"""
+        result = database.execute(query, (user_id, status,)).fetchall()
+    else:
+        return "", 500
     
     result = [dict_from_row(row) for row in result]
+    #result2 = [dict_from_row(row) for row in result2]
+    #final_result = [result, result2]
+    
     return jsonify(result)
 
 
@@ -116,3 +163,92 @@ def insert_rack(table_name, database, rack):
         print("Error with key: {}".format(key_e))
     
     return
+  
+# get vote status for server side functions
+def get_vote_status(database, rack_id, user_id):
+        
+    query = "SELECT vote_type FROM votes WHERE rack_id = ? AND user_id = ?"
+        
+    result = database.execute(query, (rack_id, user_id)).fetchone()
+    return result
+    
+# decrement from downvote or upvote_count
+def decrement_upvote_count(rack_id, database):
+    try:
+        query = "UPDATE bikeracks SET upvote_count=(SELECT MAX(upvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
+        print(query)
+        database.execute(query, (rack_id,rack_id,))
+        database.commit()
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
+    
+    return
+    
+def decrement_downvote_count(rack_id, database):
+    try:
+        query = "UPDATE bikeracks SET downvote_count=(SELECT MAX(downvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
+        
+        database.execute(query, (rack_id,rack_id,))
+        database.commit()
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
+    
+    return
+    
+# increment downvote or upvote_count
+def increment_upvote_count(rack_id, database):
+    try:
+        query = "UPDATE bikeracks SET upvote_count = upvote_count + 1 WHERE rack_id=?"
+        database.execute(query, (rack_id,))
+        database.commit()
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
+    
+    return
+    
+def increment_downvote_count(rack_id, database):
+    try:
+        query = "UPDATE bikeracks SET downvote_count = downvote_count + 1 WHERE rack_id=?"
+        database.execute(query, (rack_id,))
+        database.commit()
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
+    
+    return
+    
+def get_count_percentage(rack_id, database):
+    # return the percentage of downvote_count for a rack
+    try:
+        query = "SELECT downvote_count FROM bikeracks WHERE rack_id=?"
+        downvote_count = database.execute(query, (rack_id,)).fetchone()
+        downvote_count = dict_from_row(downvote_count)
+        
+        query = "SElECT upvote_count FROM bikeracks WHERE rack_id=?"
+        upvote_count = database.execute(query, (rack_id,)).fetchone()
+        upvote_count = dict_from_row(upvote_count)
+        
+        
+        upvote_count = upvote_count['upvote_count']
+        downvote_count = downvote_count['downvote_count']
+        total_votes = upvote_count + downvote_count
+        
+        downvote_percentage = floor((downvote_count / total_votes) * 100)
+        upvote_percentage = floor((upvote_count / total_votes)*100)
+
+        return {'downvote_percentage': downvote_percentage, 'upvote_percentage': upvote_percentage}
+    except sqlite3.Error as e:
+        print("Database error:", e)
+    except KeyError as key_e:
+        print("Error with key: {}".format(key_e))
+
+
+    
+    

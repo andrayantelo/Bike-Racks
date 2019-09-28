@@ -110,7 +110,7 @@ def get_racks(table_name, database, status, user_id):
                        bikeracks.upvote_count,
                        votes.vote_type,
                        votes.user_id
-                    FROM bikeracks LEFT JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id is NULL OR votes.user_id!=?"""
+                    FROM bikeracks LEFT JOIN votes ON (bikeracks.rack_id=votes.rack_id AND votes.user_id=?)"""
         result2 = database.execute(query2, (user_id,)).fetchall()
         
         result += result2
@@ -134,10 +134,11 @@ def get_racks(table_name, database, status, user_id):
         return "", 500
     
     result = [dict_from_row(row) for row in result]
+    result2 = [dict_from_row(row) for row in result]
     #result2 = [dict_from_row(row) for row in result2]
     #final_result = [result, result2]
     print(len(result))
-    return jsonify(result)
+    return jsonify(result2)
 
 
 def get_single_rack(table_name, database, rack_id):

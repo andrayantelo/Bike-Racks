@@ -96,18 +96,24 @@ def get_racks(table_name, database, status, user_id):
         # return all joined rows from bikeracks and votes
         print("fetching all racks for an online user")
         # get all the racks the user did NOT vote on
-        query = """SELECT *
+        query = """ SELECT *
                     FROM bikeracks as r
-                    LEFT JOIN votes as v ON (r.rack_id=v.rack_id AND v.user_id=?)"""
+                    LEFT JOIN votes as v
+                    ON (r.rack_id=v.rack_id AND v.user_id=?)
+                """
         result = database.execute(query2, (user_id,)).fetchall()
         
     elif status and user_id:
         print("fetching all racks of status {} for online user".format(status))
         
         # return all rows from joined tables with this status
-        query = """SELECT *
-                   FROM bikeracks as r
-                   LEFT JOIN votes as v on r.rack_id=v.rack_id WHERE v.user_id=? AND r.status=?"""
+        query = """ SELECT *
+                    FROM bikeracks as r
+                    LEFT JOIN votes as v
+                    ON r.rack_id=v.rack_id
+                    WHERE v.user_id=? 
+                    AND r.status=?
+                """
         result = database.execute(query, (user_id, status,)).fetchall()
     else:
         return "", 500

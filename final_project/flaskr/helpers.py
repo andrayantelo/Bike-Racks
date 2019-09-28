@@ -121,7 +121,7 @@ def get_racks(table_name, database, status, user_id):
     
     result = [dict_from_row(row) for row in result]
 
-    return jsonify(result2)
+    return jsonify(result)
 
 
 def get_single_rack(table_name, database, rack_id):

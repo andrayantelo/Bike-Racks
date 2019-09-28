@@ -83,18 +83,18 @@ def get_racks(table_name, database, status, user_id):
     # is an array of dictionary objects that contain the states of each rack
     
     if status == None and user_id == None:
-       
+        print("getting all racks for a user who is offline")
         # return all rows from bikeracks table
         query = "SELECT * FROM {}".format(table_name)
         result = database.execute(query).fetchall()
     elif status and user_id == None:
         # select all rows with given status from bikeracks table
-        
+        print("fetching all racks of a particular status {} for offline users".format(status))
         query = "SELECT * FROM {} WHERE status =?".format(table_name)
         result = database.execute(query, (status,)).fetchall()
     elif status == None and user_id:
         # return all joined rows from bikeracks and votes
-        
+        print("fetching all racks for an online user")
         # get all the racks the user voted on
         query = "SELECT * FROM bikeracks INNER JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id=?"
         result = database.execute(query, (user_id,)).fetchall()
@@ -113,9 +113,9 @@ def get_racks(table_name, database, status, user_id):
                     FROM bikeracks LEFT JOIN votes ON bikeracks.rack_id=votes.rack_id WHERE votes.user_id is NULL OR votes.user_id!=?"""
         result2 = database.execute(query2, (user_id,)).fetchall()
         
-        #result += result2
+        result += result2
     elif status and user_id:
-        
+        print("fetching all racks of status {} for online user".format(status))
         # TODO probably need two queries here
         # return all rows from joined tables with this status
         query = """SELECT 
@@ -136,7 +136,7 @@ def get_racks(table_name, database, status, user_id):
     result = [dict_from_row(row) for row in result]
     #result2 = [dict_from_row(row) for row in result2]
     #final_result = [result, result2]
-    
+    print(len(result))
     return jsonify(result)
 
 

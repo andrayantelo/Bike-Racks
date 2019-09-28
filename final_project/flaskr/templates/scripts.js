@@ -364,7 +364,7 @@ BikeMap.prototype.createMarker = function(state) {
         icon = buildMarkerIcon(state.markerColor);
     // if this marker already exists
     this.allRacks.eachLayer(layer => {
-       if (layer.options.uniqueId == state.rack_id) {
+       if (layer.options.uniqueId === state.rack_id) {
           
            marker = layer;
        }

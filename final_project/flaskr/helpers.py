@@ -64,12 +64,12 @@ def collect_pending(table_name, database, lat, lng):
     return jsonify(pending_racks)
 
 
-def get_rack_state(table_name, database, lat, lng):
+def get_rack_state(database, lat, lng):
     # Returns row for a bikerack with particular coordinates
     # returns a dictionary containing the data on a bikerack, searches
     # database based on coordinates
      
-    query = "SELECT * FROM {} WHERE latitude = ? AND longitude = ?".format(table_name)
+    query = "SELECT * FROM bikeracks WHERE latitude = ? AND longitude = ?"
     
     result = database.execute(query, (lat, lng)).fetchone()
     result = dict_from_row(result)

@@ -50,7 +50,7 @@ def coordinates():
                 db.execute('INSERT INTO bikeracks (latitude, longitude, address) VALUES (?, ?, ?);', (lat, lng, address))
                 db.commit()
                 # return data for the added temporary marker
-                bike_rack = helper.get_rack_state("bikeracks", db, lat, lng)
+                bike_rack = helper.get_rack_state(db, lat, lng)
         
                 return bike_rack
             except Exception as e:
@@ -80,7 +80,6 @@ def store_rack():
     if request.method == 'POST':
         args = request.json
         db = get_db()
-        print("request json {}".format(args))
         
         helper.insert_rack('bikeracks', db, args)
         return Response(status=200)

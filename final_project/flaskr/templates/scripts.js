@@ -394,7 +394,6 @@ BikeMap.prototype.createMarker = function(state) {
         let content = this.popupContent(state);
         marker.bindPopup(content);
     
-        return marker;
     }
     return marker;
 }

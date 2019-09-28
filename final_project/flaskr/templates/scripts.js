@@ -372,10 +372,8 @@ BikeMap.prototype.createMarker = function(state) {
        }
     });
    
-    if (marker) {
-        return marker;
-    }
-    else {
+    
+    if (!marker) {
         let markerIcon = buildMarkerIcon(state.markerColor);
         
         marker = L.marker([state.latitude, state.longitude], {uniqueId: state.rack_id}); 
@@ -398,6 +396,7 @@ BikeMap.prototype.createMarker = function(state) {
     
         return marker;
     }
+    return marker;
 }
 
 BikeMap.prototype.addMarker = function(marker) {

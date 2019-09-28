@@ -359,27 +359,24 @@ BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
 }
 
 BikeMap.prototype.createMarker = function(state) {
-    let marker;
+    let marker,
+        content = this.popupContent(state),
+        icon = buildMarkerIcon(state.markerColor);
     // if this marker already exists
     this.allRacks.eachLayer(layer => {
        if (layer.options.uniqueId == state.rack_id) {
           
-           layer._popup.setContent(this.popupContent(state));
-           // Also update the marker icon
-           let newMarkerIcon = buildMarkerIcon(state.markerColor);
-           layer.setIcon(newMarkerIcon);
            marker = layer;
        }
     });
    
     
-    if (!marker) {
-        let markerIcon = buildMarkerIcon(state.markerColor);
-        
+    if (marker) {
+        marker._popup.setContent(content);
+    }
+    else {
+        // we didn't find a marker, make a new one
         marker = L.marker([state.latitude, state.longitude], {uniqueId: state.rack_id}); 
-        
-        marker.setIcon(markerIcon);
-        
         
         // add marker to allRacks feature group and its feature group based on status
         this.allRacks.addLayer(marker);
@@ -391,10 +388,10 @@ BikeMap.prototype.createMarker = function(state) {
         }
         
         // bind popup to marker
-        let content = this.popupContent(state);
         marker.bindPopup(content);
     
     }
+    marker.setIcon(icon)
     return marker;
 }
 

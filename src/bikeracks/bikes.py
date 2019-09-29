@@ -16,7 +16,7 @@ from flask import (
 
 from . import helpers as helper
 
-from flaskr.db import get_db
+from bikeracks.db import get_db
 # __name__ is passed as 2nd arg so that bp knows where it is defined
 # __name__ evaluates to to the name of the current module
 bikes = Blueprint('bikes', __name__)

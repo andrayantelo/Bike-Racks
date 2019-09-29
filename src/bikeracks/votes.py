@@ -15,7 +15,7 @@ from flask import (
     Blueprint, request, jsonify, render_template
 )
 from . import helpers as h
-from flaskr.db import get_db
+from bikeracks.db import get_db
 import sqlite3
 
 votes = Blueprint('votes', __name__)

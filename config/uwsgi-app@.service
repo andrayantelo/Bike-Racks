@@ -9,7 +9,7 @@ ExecStart=/usr/bin/uwsgi \
         --ini /etc/uwsgi/%i.ini \
         --socket /var/run/uwsgi/%i.sock \
         --virtualenv /var/www/%i/env \
-        --stats /tmp/%i-stats.sock
+        --stats /tmp/uwsgi-%i-stats.sock
 User=www-data
 Group=www-data
 Restart=on-failure

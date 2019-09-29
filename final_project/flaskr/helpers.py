@@ -83,7 +83,10 @@ def get_racks(database, status, user_id):
         # return all joined rows from bikeracks and votes
         print("fetching all racks for an online user")
         # get all the racks, including voting information for racks that user voted on
-        query = """ SELECT *
+        query = """ SELECT 
+                        r.*
+                        v.vote_type,
+                        v.user_id
                     FROM bikeracks as r
                     LEFT JOIN votes as v
                     ON (r.rack_id=v.rack_id AND v.user_id=?)
@@ -94,7 +97,10 @@ def get_racks(database, status, user_id):
         print("fetching all racks of status {} for online user".format(status))
         
         # get all the racks with status=status, including voting information for racks that user voted on
-        query = """ SELECT *
+        query = """ SELECT 
+                        r.*,
+                        v.vote_type,
+                        v.user_id
                     FROM bikeracks as r
                     LEFT JOIN votes as v
                     ON r.rack_id=v.rack_id

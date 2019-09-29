@@ -84,7 +84,7 @@ def get_racks(database, status, user_id):
         print("fetching all racks for an online user")
         # get all the racks, including voting information for racks that user voted on
         query = """ SELECT 
-                        r.*
+                        r.*,
                         v.vote_type,
                         v.user_id
                     FROM bikeracks as r

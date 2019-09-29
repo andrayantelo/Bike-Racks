@@ -1,5 +1,5 @@
 # App specific
-*.sqlite
+instance
 
 # Python junk
 __pycache__

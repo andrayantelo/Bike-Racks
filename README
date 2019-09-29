@@ -11,6 +11,9 @@ pip install -r requirements.txt
 ```
 cd src
 FLASK_APP=bikeracks flask init-db
+# The app will eventuall run as www-data and needs write access
+sudo chgrp www-data ../instance/bikeracks.sqlite
+sudo chmod 644 ../instance/bikeracks.sqlite
 ```
 
 # To develop

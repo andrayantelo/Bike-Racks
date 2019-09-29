@@ -49,19 +49,6 @@ def validate_coordinates(coordinates):
         
     # return true if all tests passed
     return True
-    
-# function that collects the data of not_approved bikeracks from the database
-def collect_pending(table_name, database, lat, lng):
-    # Return 50 not_approved bike rack results to be displayed on the map
-    # table_name: string
-    # database: db connection object
-    # TODO, actually make it so that 50 are collected
-    
-    query = "SELECT * FROM {} WHERE status = 'not_approved'".format(table_name)
-    result = database.execute(query).fetchall()
-    pending_racks = [tuple(row) for row in result]
-    
-    return jsonify(pending_racks)
 
 
 def get_rack_state(database, lat, lng):
@@ -124,18 +111,18 @@ def get_racks(database, status, user_id):
     return jsonify(result)
 
 
-def get_single_rack(table_name, database, rack_id):
+def get_single_rack(database, rack_id):
     # get data from the database for a single bikerack with rack_id=rack_id
     # get single rack from db based on rack_id
     
-    query = "SELECT * FROM {} WHERE rack_id = ?".format(table_name)
+    query = "SELECT * FROM bikeracks WHERE rack_id = ?"
     result = database.execute(query, (rack_id,)).fetchall()
     result = [dict_from_row(row) for row in result]
     print(result)
     return jsonify(result)
 
 # below function is to easily add racks to db for testing TODO 
-def insert_rack(table_name, database, rack):
+def insert_rack(database, rack):
     # insert into table table_name, the rack (dict)
     try:
         query = "INSERT INTO bikeracks (latitude, longitude, status, address) values (?, ?, ?, ?)"

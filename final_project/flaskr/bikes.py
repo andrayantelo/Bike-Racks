@@ -95,7 +95,7 @@ def get_single_rack():
         # database connection
         db = get_db()
         
-        rack = helper.get_single_rack('bikeracks', db, rack_id)
+        rack = helper.get_single_rack(db, rack_id)
         
         return rack
 

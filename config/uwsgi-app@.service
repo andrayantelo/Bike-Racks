@@ -7,9 +7,9 @@ Requires=uwsgi-app@%i.socket
 [Service]
 ExecStart=/usr/bin/uwsgi \
         --ini /etc/uwsgi/%i.ini \
-        --socket /var/run/uwsgi/%i.socket \
+        --socket /var/run/uwsgi/%i.sock \
         --virtualenv /var/www/%i/env \
-        --stats /tmp/%i-stats.socket
+        --stats /tmp/%i-stats.sock
 User=www-data
 Group=www-data
 Restart=on-failure

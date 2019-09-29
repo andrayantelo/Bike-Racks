@@ -47,7 +47,7 @@ def close_db(e=None):
         
 # following functions will run SQL commands
     
-# open_resouce() opens a file relative to the flaskr package, which is
+# open_resouce() opens a file relative to the bikeracks package, which is
 # useful since you won't necessarily know where that location is when
 # deploying the application later. get_db returns a database connection,
 # which is used to execute the commands read from the file.

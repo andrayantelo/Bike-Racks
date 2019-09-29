@@ -1,5 +1,5 @@
 # __init__ file contains the application factory and tells
-# Python that flaskr should be treated as a package
+# Python that bikeracks should be treated as a package
 import os
 from flask import Flask, render_template
 
@@ -12,14 +12,14 @@ from flask import Flask, render_template
 def create_app(test_config=None):
     # create and configure the app
     # instance_relative_config tells the app that configuration files
-    # are relative to the instance folder (located outside flaskr and
+    # are relative to the instance folder (located outside bikeracks and
     # can hold local data that shouldn't be committed to version control)
     app = Flask(__name__, instance_relative_config=True)
     # DATABASE is the path where the SQLite db file will be saved
     # it's in the instance dir
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        DATABASE=os.path.join(app.instance_path, 'bikeracks.sqlite'),
     )
     # overrides the default configuration with values taken from
     # config.py

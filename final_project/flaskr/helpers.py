@@ -49,54 +49,43 @@ def validate_coordinates(coordinates):
         
     # return true if all tests passed
     return True
-    
-# function that collects the data of not_approved bikeracks from the database
-def collect_pending(table_name, database, lat, lng):
-    # Return 50 not_approved bike rack results to be displayed on the map
-    # table_name: string
-    # database: db connection object
-    # TODO, actually make it so that 50 are collected
-    
-    query = "SELECT * FROM {} WHERE status = 'not_approved'".format(table_name)
-    result = database.execute(query).fetchall()
-    pending_racks = [tuple(row) for row in result]
-    
-    return jsonify(pending_racks)
 
 
-def get_rack_state(table_name, database, lat, lng):
+def get_rack_state(database, lat, lng):
     # Returns row for a bikerack with particular coordinates
     # returns a dictionary containing the data on a bikerack, searches
     # database based on coordinates
      
-    query = "SELECT * FROM {} WHERE latitude = ? AND longitude = ?".format(table_name)
+    query = "SELECT * FROM bikeracks WHERE latitude = ? AND longitude = ?"
     
     result = database.execute(query, (lat, lng)).fetchone()
     result = dict_from_row(result)
 
     return jsonify(result)
     
-def get_racks(table_name, database, status, user_id):
+def get_racks(database, status, user_id):
     # get data from database for approved bikeracks, searches database
     # based on status of rack ('not_approved', 'approved')
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
     
-    if status == None and user_id == None:
+    if status is None and user_id is None:
         print("getting all racks for a user who is offline")
-        # return all rows from bikeracks table
-        query = "SELECT * FROM {}".format(table_name)
+        # get all racks from bikeracks table
+        query = "SELECT * FROM bikeracks"
         result = database.execute(query).fetchall()
-    elif status and user_id == None:
-        # select all rows with given status from bikeracks table
+    elif status and user_id is None:
+        # get all racks with given status from bikeracks table
         print("fetching all racks of a particular status {} for offline users".format(status))
-        query = "SELECT * FROM {} WHERE status =?".format(table_name)
+        query = "SELECT * FROM bikeracks WHERE status =?"
         result = database.execute(query, (status,)).fetchall()
-    elif status == None and user_id:
+    elif status is None and user_id:
         # return all joined rows from bikeracks and votes
         print("fetching all racks for an online user")
-        # get all the racks the user did NOT vote on
-        query = """ SELECT *
+        # get all the racks, including voting information for racks that user voted on
+        query = """ SELECT 
+                        r.*,
+                        v.vote_type
                     FROM bikeracks as r
                     LEFT JOIN votes as v
                     ON (r.rack_id=v.rack_id AND v.user_id=?)
@@ -106,8 +95,10 @@ def get_racks(table_name, database, status, user_id):
     elif status and user_id:
         print("fetching all racks of status {} for online user".format(status))
         
-        # return all rows from joined tables with this status
-        query = """ SELECT *
+        # get all the racks with status=status, including voting information for racks that user voted on
+        query = """ SELECT 
+                        r.*,
+                        v.vote_type
                     FROM bikeracks as r
                     LEFT JOIN votes as v
                     ON r.rack_id=v.rack_id
@@ -124,21 +115,21 @@ def get_racks(table_name, database, status, user_id):
     return jsonify(result)
 
 
-def get_single_rack(table_name, database, rack_id):
+def get_single_rack(database, rack_id):
     # get data from the database for a single bikerack with rack_id=rack_id
     # get single rack from db based on rack_id
     
-    query = "SELECT * FROM {} WHERE rack_id = ?".format(table_name)
+    query = "SELECT * FROM bikeracks WHERE rack_id = ?"
     result = database.execute(query, (rack_id,)).fetchall()
     result = [dict_from_row(row) for row in result]
     print(result)
     return jsonify(result)
 
 # below function is to easily add racks to db for testing TODO 
-def insert_rack(table_name, database, rack):
+def insert_rack(database, rack):
     # insert into table table_name, the rack (dict)
     try:
-        query = "INSERT INTO {} (latitude, longitude, status, address) values (?, ?, ?, ?)".format(table_name)
+        query = "INSERT INTO bikeracks (latitude, longitude, status, address) values (?, ?, ?, ?)"
         database.execute(query, (rack['latitude'], rack['longitude'], rack['status'], rack['address']))
         database.commit()
     except sqlite3.Error as e:

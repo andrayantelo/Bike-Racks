@@ -20,7 +20,7 @@ FLASK_ENV=development FLASK_APP=bikeracks flask run --host 0.0.0.0 --port 9000
 
 # Production serving
 ```
-sudo uwsgi --plugin python3 --virtualenv ../env -s /tmp/bikeracks.sock --manage-script-name --mount /bikeracks='bikeracks:create_app()' --uid www-data --gid www-data
+sudo uwsgi --ini uwsgi.ini
 ```
 
 Then configure e.g. Nginx to do wsgi passthrough as needed, e.g.:

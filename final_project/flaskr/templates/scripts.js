@@ -169,16 +169,9 @@ BikeMap.prototype.loadMap = function(userId) {
     this.getRacks(userId).done((data) => {
         console.log("data received from db on load:");
         console.log(data);
-        
-        // filter out the states that have users not equal to our online user ONLY IF
-        // the user is currently online
 
         
         return this.buildRacks(data, userId);
-        
-        
-        
-        
     });
     
 };
@@ -525,9 +518,8 @@ BikeMap.prototype.vote = function(e) {
 };
 
 BikeMap.prototype.arrowHTML = function(state, currentUserId) { 
-
     let containerId = "rack_" + state.rack_id;
-    
+    console.log(state.address);
     let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
         downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
         upvotePercentage = Math.floor((state.upvote_count/(state.upvote_count + state.downvote_count))*100),
@@ -543,19 +535,18 @@ BikeMap.prototype.arrowHTML = function(state, currentUserId) {
     
     // if the state of the rack's user id matches the current user, then we need 
     // to include certain html for the arrows if they voted on this rack
-    if (state.user_id === currentUserId) {
-        if (state.vote_type === undefined) {
-            upvoteArrowClass += "arrowHover arrowClick";
-            downvoteArrowClass += "arrowHover arrowClick";
-        }
-        else if (state.vote_type === 1) {
-           upvoteArrowClass += "voted";
-           downvoteArrowClass += "arrowHover arrowClick";
-        }
-       else if (state.vote_type === -1) {
-            downvoteArrowClass += "voted";
-            upvoteArrowClass += "arrowHover arrowClick";
-        }
+    if (state.vote_type === undefined) {
+        upvoteArrowClass += "arrowHover arrowClick";
+        downvoteArrowClass += "arrowHover arrowClick";
+    }
+    else if (state.vote_type === 1) {
+       console.log('adding voted class');
+       upvoteArrowClass += "voted";
+       downvoteArrowClass += "arrowHover arrowClick";
+    }
+   else if (state.vote_type === -1) {
+        downvoteArrowClass += "voted";
+        upvoteArrowClass += "arrowHover arrowClick";
     }
     // if the state's user id does NOT match the current user, then the user has not voted on this rack yet
     else {
@@ -609,7 +600,7 @@ BikeMap.prototype.popupContent = function(state) {
         content += arrows;
     }
     // if the user is online and this IS a temporary marker include only the submit button
-    else if (onlineStatus && !state.status) {
+    else if (onlineStatus && !state.status && state.address) {
         
         content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
     }

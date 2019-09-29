@@ -102,8 +102,8 @@ def get_racks(database, status, user_id):
                     FROM bikeracks as r
                     LEFT JOIN votes as v
                     ON (r.rack_id=v.rack_id
-                    AND v.user_id=? 
-                    AND r.status=?)
+                    AND v.user_id=?) 
+                    WHERE r.status=?)
                 """
         result = database.execute(query, (user_id, status,)).fetchall()
     else:

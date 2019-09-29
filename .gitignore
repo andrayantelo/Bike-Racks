@@ -1,0 +1,9 @@
+# App specific
+*.sqlite
+
+# Python junk
+__pycache__
+env
+
+# Vim files
+*.swp

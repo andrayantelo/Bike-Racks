@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="initial-scale=1, width=device-width" name="viewport"/>
+    
+    <!-- Leaflet CSS -->
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+           integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+           crossorigin=""/>
+    
+    <!-- Bootstrap CSS --> 
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css" rel="stylesheet"/>
+    
+    <!-- App's own CSS -->
+    <link href="static/styles.css" rel="stylesheet"/>
+    
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.js"
+            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+            crossorigin="anonymous"></script>
+            
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+            crossorigin=""></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+    
+  </head>
+  
+  <body>
+
+      <!-- Navigation Bar -->
+      <nav class="navbar navbar-expand-lg navbar-light">
+          <a class="navbar-brand" href=#>Bike Racks</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>  
+          </button>
+          <div class="navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                  <li class="nav-item">
+                  <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary" id="addMarkerButton" data-toggle="modal" data-target="#coordinateModal">
+                      Add Bike Rack
+                    </button>
+                  </li>
+              </ul>
+          </div>
+      </nav>
+    
+      <!-- Modal, has to be at top level which is why it's not in the container div-->
+      <div class="modal fade" id="coordinateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div> <!-- /.modal-header -->
+      <div class="modal-body">
+        <!-- Input coordinates form -->
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Coordinates</span>
+            </div> <!--/.input-group-prepend -->
+            <input id="latitude" type="number" step="any" aria-label="Latitude" class="form-control" placeholder="Latitude">
+            <input id="longitude" type="number" step="any" aria-label="Longitude" class="form-control" placeholder="Longitude">
+        </div> <!-- /.coordinate-input-group -->
+        
+      </div> <!-- /.modal-body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="submitButton" type="submit">Submit</button>
+      </div> <!-- /.modal-footer -->
+    </div> <!-- /.modal-content -->
+  </div> <!-- /.modal-dialog -->
+</div> <!-- /.modal fade -->
+
+       
+      <div class="container"> 
+          <div id="mapid"></div>
+          
+          
+      </div> <!-- /.container -->
+      
+  </body>
+  
+  <!-- App's own JS -->
+  <script src="static/scripts.js"></script>
+  
+</html>

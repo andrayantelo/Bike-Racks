@@ -71,7 +71,7 @@ def get_racks(database, status, user_id):
     
     if status is None and user_id is None:
         print("getting all racks for a user who is offline")
-        # gat all racks from bikeracks table
+        # get all racks from bikeracks table
         query = "SELECT * FROM bikeracks"
         result = database.execute(query).fetchall()
     elif status and user_id is None:

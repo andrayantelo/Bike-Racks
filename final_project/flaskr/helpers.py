@@ -138,7 +138,7 @@ def get_single_rack(table_name, database, rack_id):
 def insert_rack(table_name, database, rack):
     # insert into table table_name, the rack (dict)
     try:
-        query = "INSERT INTO {} (latitude, longitude, status, address) values (?, ?, ?, ?)".format(table_name)
+        query = "INSERT INTO bikeracks (latitude, longitude, status, address) values (?, ?, ?, ?)"
         database.execute(query, (rack['latitude'], rack['longitude'], rack['status'], rack['address']))
         database.commit()
     except sqlite3.Error as e:

@@ -81,7 +81,7 @@ def store_rack():
         args = request.json
         db = get_db()
         
-        helper.insert_rack('bikeracks', db, args)
+        helper.insert_rack(db, args)
         return Response(status=200)
     return render_template('base.html')
 

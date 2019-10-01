@@ -1,0 +1,10 @@
+# App specific
+instance
+
+# Python junk
+__pycache__
+env
+*.egg-info
+
+# Vim files
+*.swp

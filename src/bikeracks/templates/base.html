@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="initial-scale=1, width=device-width" name="viewport"/>
+    <title>ASS</title>
+    
+    <!-- Leaflet CSS -->
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+           integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+           crossorigin=""/>
+    
+    <!-- Bootstrap CSS --> 
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css" rel="stylesheet"/>
+    
+    <!-- App's own CSS -->
+    <link href="static/styles.css" rel="stylesheet"/>
+    
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.js"
+            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+            crossorigin="anonymous"></script>
+            
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+            crossorigin=""></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.js"></script>
+    
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    
+
+    
+  </head>
+  
+  <body>
+
+      <!-- Navigation Bar -->
+      <nav class="navbar navbar-expand-md navbar-light">
+          <a class="navbar-brand" href=#>Bike Racks</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>  
+          </button>
+          <div class="navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav ml-auto">
+                  <li class="nav-item">
+                      <div class="user-container">
+                          <div hidden id="user-pic"></div>
+                          <div hidden id="user-name"></div>
+                          <button class="btn btn-primary navbar-btn" hidden id="sign-out">
+                              <span class="sign-text">Sign Out</span>
+                          </button>
+                          <button class="btn btn-primary navbar-btn" hidden id="sign-in">
+                              <span class="sign-text">Sign in with Google</span>
+                          </button>
+                            
+                      </div>
+                  </li>
+                  <li class="nav-item">
+                      <!-- dropdown with options to show pending bike racks,
+                           approved bikes, rejected, or all -->
+                      <div class="dropdown">
+                          
+                          <button class="btn btn-secondary dropdown-toggle" type="button"
+                                  id="dropdownMenuButton" data-toggle="dropdown"
+                                  aria-haspopup="true" aria-expanded="false">
+                                  Show Racks
+                          </button>
+                            <div class="dropdown-menu">
+                                
+                                <a id="showApproved" class="onmap dropdown-item" href="#">Approved</a>
+                                <a id="showNotApproved" class="onmap dropdown-item" href="#">Not Approved</a>
+                            </div>
+                      </div>
+                      
+                  </li>
+                
+              </ul> 
+          </div> <!-- /.navbar-collapse -->
+      </nav> 
+
+      <div class="container"> 
+          <div id="mapid"></div>
+        
+      </div> <!-- /.container -->
+      
+      <!-- TODO: Add SDKs for Firebase products that you want to use
+           https://firebase.google.com/docs/web/setup#config-web-app -->
+           
+      <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+      <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+      <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-app.js"></script>
+
+      <!-- Add Firebase products that you want to use -->
+      <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-auth.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-firestore.js"></script>
+      
+      <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+      <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+      
+      <script type="text/javascript">
+        
+        // Your web app's Firebase configuration
+        var firebaseConfig = { 
+              apiKey: "AIzaSyByx-7sYf-uMpmlEqUHu4toihnhUX-8_-8",
+              authDomain: "bikemap-6ad66.firebaseapp.com",
+              databaseURL: "https://bikemap-6ad66.firebaseio.com",
+              projectId: "bikemap-6ad66",
+              storageBucket: "",
+              messagingSenderId: "20948153147",
+              appId: "1:20948153147:web:0defc83e2fbbb462",
+            };
+        
+        
+      </script>
+      
+      
+      
+  </body>
+  
+  <!-- leaflet geo-search  -->
+  
+  <link href="https://unpkg.com/leaflet-geosearch@2.6.0/assets/css/leaflet.css" rel="stylesheet"/> 
+  <script src="https://unpkg.com/leaflet-geosearch@2.6.0/dist/bundle.min.js"></script>
+  
+  
+  <!-- Awesome Markers JS -->
+  <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.min.js"></script>
+  
+  <!-- Spin JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+  
+  <!-- App's own JS -->
+  <script src="dynamic/helpers.js"></script>
+  <script src="dynamic/scripts.js"></script> 
+  <script src="static/main.js"></script>
+
+  
+  
+</html>

@@ -31,7 +31,7 @@ sudo uwsgi --ini config/uwsgi-bikeracks.ini
 Then configure e.g. Nginx to do wsgi passthrough as needed, e.g.:
 
 ```
-# Virtual Host configuration for area51
+# Virtual Host configuration for bikeracks
 server {
 	listen 80;
 	listen [::]:80;

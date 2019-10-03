@@ -4,7 +4,7 @@
 class BikeMap {
     constructor(mymap) {
         // show mountain view for now
-        this.mymap = L.map('mapid').setView([37.3861, -122.0839], 13);
+        this.mymap = L.map('mapid', { zoomControl: false }).setView([37.3861, -122.0839], 13);
         // set map to display user's current location
         //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         
@@ -70,6 +70,11 @@ BikeMap.prototype.initBikeMap = function () {
         id: 'mapbox.streets',
         accessToken: 'pk.eyJ1IjoiYW5kcmF5YW50ZWxvIiwiYSI6ImNqczB1YTJ6ajFuNGo0M2x2eTVpNms1MHEifQ.1SbExoA1iGNdOKDRoG4Qng'
     }).addTo(this.mymap);
+    
+    L.control.zoom({
+        position: 'topleft'
+    }).addTo(this.mymap);
+    
        
     // add marker to map at Mountain View Public Librarys TODO, remove later
     //let approvedIcon = buildMarkerIcon(approvedMarkerColor);
@@ -90,6 +95,7 @@ BikeMap.prototype.initBikeMap = function () {
     // it doesn't work
     // https://github.com/smeijer/leaflet-geosearch/issues/169
     this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
+    //this.searchControl.getContainer().onclick =(e) => e.stopPropagation();
     
     // when someone searches an address and presses enter or clicks on the 
     // address in the search bar, add a temporary (gray) marker at that location

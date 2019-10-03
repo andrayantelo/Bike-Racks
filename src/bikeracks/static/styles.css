@@ -51,8 +51,18 @@
   color: #5fb6f5;
 }
 
+.leaflet-bar {
+  color: red;
+}
 
+@media only screen
+and (min-device-width : 320px) 
+and (max-device-width : 415px) {
 
-
+    .leaflet-control-geosearch.bar {
+      width: 35vmax;
+      float: right;
+    }
+}
 
 

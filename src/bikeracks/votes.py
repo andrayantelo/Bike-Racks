@@ -114,4 +114,24 @@ def submit_vote():
 @votes.route('/unvote', methods=['POST'])
 def unvote():
     # remove a vote that the user had previously made
+    if request.method == 'POST':
+        try:
+            rack_id = request.args.get('rack_id') or None
+            user_id = request.args.get('user_id') or None
+            vote_type = request.args.get('vote_type') or None
+            
+            # connect to db
+            db = get_db()
+            
+            # remove user's vote for this rack from votes table and update bikeracks vote count
+            
+            #remove user's vote 
+            query = """
+                    DELETE FROM
+                        votes
+                    WHERE
+                        user_id=? AND
+                        vote_type=? AND
+                        rack_id=?
+                    """
 

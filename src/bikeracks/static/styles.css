@@ -76,7 +76,7 @@ and (max-width : 345px)  {
 and (min-width : 345px)
 and (max-width : 515px) {
     .leaflet-control-geosearch.bar {
-      width: 70%;
+      width: 75%;
       float: right;
     }
 }

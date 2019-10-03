@@ -526,8 +526,8 @@ BikeMap.prototype.vote = function(e) {
 BikeMap.prototype.arrowHTML = function(state, currentUserId) { 
     let containerId = "rack_" + state.rack_id;
     
-    let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
-        downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
+    let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x arrow ",
+        downvoteArrowClass = "fas fa-arrow-circle-down fa-2x arrow ",
         upvotePercentage = Math.floor((state.upvote_count/(state.upvote_count + state.downvote_count))*100),
         downvotePercentage = Math.floor((state.downvote_count/(state.upvote_count + state.downvote_count))*100);
         

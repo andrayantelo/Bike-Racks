@@ -52,3 +52,4 @@ server {
 	}
 }
 ```
+![Alt text](https://raw.githubusercontent.com/andrayantelo/Bike-Racks/master/resized.png)

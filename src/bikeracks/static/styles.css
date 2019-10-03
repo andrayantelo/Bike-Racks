@@ -56,13 +56,31 @@
 }
 
 @media only screen
-and (min-device-width : 320px) 
-and (max-device-width : 415px) {
-
+and (max-width: 320) {
     .leaflet-control-geosearch.bar {
-      width: 35vmax;
+      width: 20%;
       float: right;
     }
 }
+
+@media only screen
+and (max-width : 345px)  {
+
+    .leaflet-control-geosearch.bar {
+      width: 65%;
+      float: right;
+    }
+}
+
+@media only screen
+and (min-width : 345px)
+and (max-width : 515px) {
+    .leaflet-control-geosearch.bar {
+      width: 70%;
+      float: right;
+    }
+}
+
+
 
 

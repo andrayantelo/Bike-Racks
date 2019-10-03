@@ -111,5 +111,7 @@ def submit_vote():
     # maybe return 500 here
     return "", 500
     
-
+@votes.route('/unvote', methods=['POST'])
+def unvote():
+    # remove a vote that the user had previously made
 

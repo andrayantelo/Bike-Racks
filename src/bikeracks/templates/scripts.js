@@ -465,6 +465,13 @@ BikeMap.prototype.updateRackStatus = function(rack_id) {
         })
 }
 
+BikeMap.prototype.unvote = function(voteType, rack_id, user_id) {
+    // Remove a vote of voteType for rack with rackId and for user with userId
+    console.log("unvote");
+    console.log("user is attempting to " + voteType);
+    
+}
+
 
 BikeMap.prototype.vote = function(e) {
     console.log('voting');
@@ -487,6 +494,11 @@ BikeMap.prototype.vote = function(e) {
         if (voteStatus) {
             console.log('rack already has a vote, updating vote');
             // user already submitted a vote for this rack
+            
+            // IF the vote type of the arrow that the user clicked matches
+            // the vote that they have given this rack - UNVOTE
+            // remove their vote from the db, remove .voted class from the arrow
+            // that was clicked on
             let voteType = voteStatus.vote_type,
                 newVote = e.target.dataset.votetype;
                 
@@ -502,7 +514,11 @@ BikeMap.prototype.vote = function(e) {
                     });
                 });
             }
-            // if the new vote is the same as the old vote, nothing happens
+            // if the new vote is the same as the old vote, UNVOTE
+            else {
+                console.log("the new vote is the same as the old vote");
+                this.unvote(newVoteType, rack_id, user_id);
+            }
 
         }
         else {
@@ -550,11 +566,11 @@ BikeMap.prototype.arrowHTML = function(state, currentUserId) {
     }
     else if (state.vote_type === 1) {
        console.log('adding voted class');
-       upvoteArrowClass += "voted";
+       upvoteArrowClass += "voted arrowClick";
        downvoteArrowClass += "arrowHover arrowClick";
     }
    else if (state.vote_type === -1) {
-        downvoteArrowClass += "voted";
+        downvoteArrowClass += "voted arrowClick";
         upvoteArrowClass += "arrowHover arrowClick";
     }
     // if the state's user id does NOT match the current user, then the user has not voted on this rack yet

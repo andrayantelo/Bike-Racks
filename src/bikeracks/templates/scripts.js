@@ -4,7 +4,10 @@
 class BikeMap {
     constructor(mymap) {
         // show mountain view for now
-        this.mymap = L.map('mapid', { zoomControl: false }).setView([37.3861, -122.0839], 13);
+        this.mymap = L.map('mapid', { 
+            zoomControl: false,
+            gestureHandling: true
+        }).setView([37.3861, -122.0839], 13);
         // set map to display user's current location
         //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         

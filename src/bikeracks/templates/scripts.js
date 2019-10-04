@@ -12,6 +12,8 @@ class BikeMap {
         //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         
         this.marker;
+        // markers clustergroup
+        this.markers = L.markerClusterGroup();
    
         this.allRacks = L.featureGroup([]);
         this.allRacks.on('click', (e) => {
@@ -215,10 +217,16 @@ BikeMap.prototype.buildRacks = function(states, userId) {
             
         // create a marker for bike rack
         let marker = this.createMarker(states[i]);
-        // add marker to map
-        this.addMarker(marker);
+        
+        // add marker to map (by adding the cluster group)
+        this.mymap.addLayer(this.markers)
+        //this.addMarker(marker);
         // set marker element id
+        
+        // below line doesn't work with marker cluster
         marker._icon.id = states[i].rack_id;
+        
+        
         // open marker popup
         if (states.length === 1) {
             marker.openPopup();
@@ -374,6 +382,8 @@ BikeMap.prototype.createMarker = function(state) {
         
         // bind popup to marker
         marker.bindPopup(content);
+        // add marker to cluster group
+        this.markers.addLayer(marker)
     
     }
     marker.setIcon(icon)
@@ -381,6 +391,7 @@ BikeMap.prototype.createMarker = function(state) {
 }
 
 BikeMap.prototype.addMarker = function(marker) {
+    
     // add given marker to map
     marker.addTo(this.mymap);
 }

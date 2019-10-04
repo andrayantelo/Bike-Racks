@@ -218,14 +218,8 @@ BikeMap.prototype.buildRacks = function(states, userId) {
         // create a marker for bike rack
         let marker = this.createMarker(states[i]);
         
-        // add marker to map (by adding the cluster group)
-        this.mymap.addLayer(this.markers)
+        
         //this.addMarker(marker);
-        // set marker element id
-        
-        // below line doesn't work with marker cluster
-        marker._icon.id = states[i].rack_id;
-        
         
         // open marker popup
         if (states.length === 1) {
@@ -234,6 +228,8 @@ BikeMap.prototype.buildRacks = function(states, userId) {
         
         
     }
+    // add marker to map (by adding the cluster group)
+    this.mymap.addLayer(this.markers)
     return bikeracks;
 }
 

@@ -117,6 +117,9 @@ BikeMap.prototype.initBikeMap = function () {
     
     // empty the allRacks featureGroup
     this.allRacks.clearLayers();
+    
+    // add marker to map (by adding the cluster group)
+    this.mymap.addLayer(this.markers)
 
 };
 
@@ -228,8 +231,7 @@ BikeMap.prototype.buildRacks = function(states, userId) {
         
         
     }
-    // add marker to map (by adding the cluster group)
-    this.mymap.addLayer(this.markers)
+    
     return bikeracks;
 }
 

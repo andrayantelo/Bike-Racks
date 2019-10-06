@@ -134,8 +134,10 @@ def insert_rack(database, rack):
         database.commit()
     except sqlite3.Error as e:
         print("Database error:", e)
+        return "", 500
     except KeyError as key_e:
         print("Error with key: {}".format(key_e))
+        return "", 500
     
     return
   
@@ -156,8 +158,10 @@ def decrement_upvote_count(rack_id, database):
         database.commit()
     except sqlite3.Error as e:
         print("Database error:", e)
+        return "", 500
     except KeyError as key_e:
         print("Error with key: {}".format(key_e))
+        return "", 500
     
     return
     
@@ -169,8 +173,10 @@ def decrement_downvote_count(rack_id, database):
         database.commit()
     except sqlite3.Error as e:
         print("Database error:", e)
+        return "", 500
     except KeyError as key_e:
         print("Error with key: {}".format(key_e))
+        return "", 500
     
     return
     
@@ -182,8 +188,10 @@ def increment_upvote_count(rack_id, database):
         database.commit()
     except sqlite3.Error as e:
         print("Database error:", e)
+        return "", 500
     except KeyError as key_e:
         print("Error with key: {}".format(key_e))
+        return "", 500
     
     return
     
@@ -194,8 +202,10 @@ def increment_downvote_count(rack_id, database):
         database.commit()
     except sqlite3.Error as e:
         print("Database error:", e)
+        return "", 500
     except KeyError as key_e:
         print("Error with key: {}".format(key_e))
+        return "", 500
     
     return
     
@@ -221,8 +231,10 @@ def get_count_percentage(rack_id, database):
         return {'downvote_percentage': downvote_percentage, 'upvote_percentage': upvote_percentage}
     except sqlite3.Error as e:
         print("Database error:", e)
+        return "", 500
     except KeyError as key_e:
         print("Error with key: {}".format(key_e))
+        return "", 500
 
 
     

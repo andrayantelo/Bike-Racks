@@ -107,6 +107,7 @@ def submit_vote():
             return "", 500
         except KeyError as key_e:
             print("Error with key: {}".format(key_e))
+            return "", 500
     # TODO do I actually need below line
     # maybe return 500 here
     return "", 500
@@ -138,9 +139,9 @@ def unvote():
             
             # decrement the vote count in the bikeracks row for this rack
             if int(vote_type) == 1:
-                vote_count = "upvote_count"
+                 count_column_name= "upvote_count"
             else:
-                vote_count = "downvote_count"
+                count_column_name = "downvote_count"
             
             query = """
                         UPDATE
@@ -149,7 +150,7 @@ def unvote():
                             {}={} - 1
                         WHERE
                             rack_id=?
-                    """.format(vote_count, vote_count)
+                    """.format(count_column_name, count_column_name)
             
             db.execute(query, (rack_id,))
             
@@ -160,4 +161,5 @@ def unvote():
             return "", 500
         except KeyError as key_e:
             print("Error with key: {}".format(key_e))
+            return "", 500
 

@@ -545,7 +545,7 @@ BikeMap.prototype.vote = function(e) {
     
 };
 
-BikeMap.prototype.arrowHTML = function(state, voterStatus) { 
+BikeMap.prototype.arrowHTML = function(state) { 
     let containerId = "rack_" + state.rack_id;
    
     let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x arrow ",
@@ -567,11 +567,11 @@ BikeMap.prototype.arrowHTML = function(state, voterStatus) {
         upvoteArrowClass += "arrowHover arrowClick";
         downvoteArrowClass += "arrowHover arrowClick";
     }
-    else if (state.vote_type === 1 && voterStatus) {
+    else if (state.vote_type === 1) {
        upvoteArrowClass += "voted arrowClick";
        downvoteArrowClass += "arrowHover arrowClick";
     }
-   else if (state.vote_type === -1 && voterStatus) {
+   else if (state.vote_type === -1) {
         downvoteArrowClass += "voted arrowClick";
         upvoteArrowClass += "arrowHover arrowClick";
     }
@@ -602,7 +602,6 @@ BikeMap.prototype.popupContent = function(state) {
         onlineStatus = false
     }
     
-    voterStatus = onlineStatus === state.user_id;
     
     /* state : {
      *     address: address (string),
@@ -625,7 +624,7 @@ BikeMap.prototype.popupContent = function(state) {
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
     if (onlineStatus && state.status) {
         
-        let arrows = this.arrowHTML(state, voterStatus);
+        let arrows = this.arrowHTML(state);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }

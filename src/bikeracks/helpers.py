@@ -85,8 +85,7 @@ def get_racks(database, status, user_id):
         # get all the racks, including voting information for racks that user voted on
         query = """ SELECT 
                         r.*,
-                        v.vote_type,
-                        v.user_id
+                        v.vote_type
                     FROM bikeracks as r
                     LEFT JOIN votes as v
                     ON (r.rack_id=v.rack_id AND v.user_id=?)
@@ -99,8 +98,7 @@ def get_racks(database, status, user_id):
         # get all the racks with status=status, including voting information for racks that user voted on
         query = """ SELECT 
                         r.*,
-                        v.vote_type,
-                        v.user_id
+                        v.vote_type
                     FROM bikeracks as r
                     LEFT JOIN votes as v
                     ON (r.rack_id=v.rack_id

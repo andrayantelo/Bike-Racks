@@ -12,6 +12,8 @@ class BikeMap {
         //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         
         this.marker;
+        // markers clustergroup
+        this.markers = L.markerClusterGroup();
    
         this.allRacks = L.featureGroup([]);
         this.allRacks.on('click', (e) => {
@@ -115,6 +117,9 @@ BikeMap.prototype.initBikeMap = function () {
     
     // empty the allRacks featureGroup
     this.allRacks.clearLayers();
+    
+    // add marker to map (by adding the cluster group)
+    this.mymap.addLayer(this.markers)
 
 };
 
@@ -215,10 +220,10 @@ BikeMap.prototype.buildRacks = function(states, userId) {
             
         // create a marker for bike rack
         let marker = this.createMarker(states[i]);
-        // add marker to map
-        this.addMarker(marker);
-        // set marker element id
-        marker._icon.id = states[i].rack_id;
+        
+        
+        //this.addMarker(marker);
+        
         // open marker popup
         if (states.length === 1) {
             marker.openPopup();
@@ -226,6 +231,7 @@ BikeMap.prototype.buildRacks = function(states, userId) {
         
         
     }
+    
     return bikeracks;
 }
 
@@ -374,6 +380,8 @@ BikeMap.prototype.createMarker = function(state) {
         
         // bind popup to marker
         marker.bindPopup(content);
+        // add marker to cluster group
+        this.markers.addLayer(marker)
     
     }
     marker.setIcon(icon)
@@ -381,6 +389,7 @@ BikeMap.prototype.createMarker = function(state) {
 }
 
 BikeMap.prototype.addMarker = function(marker) {
+    
     // add given marker to map
     marker.addTo(this.mymap);
 }
@@ -529,8 +538,8 @@ BikeMap.prototype.vote = function(e) {
 BikeMap.prototype.arrowHTML = function(state, currentUserId) { 
     let containerId = "rack_" + state.rack_id;
     
-    let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x ",
-        downvoteArrowClass = "fas fa-arrow-circle-down fa-2x ",
+    let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x arrow ",
+        downvoteArrowClass = "fas fa-arrow-circle-down fa-2x arrow ",
         upvotePercentage = Math.floor((state.upvote_count/(state.upvote_count + state.downvote_count))*100),
         downvotePercentage = Math.floor((state.downvote_count/(state.upvote_count + state.downvote_count))*100);
         

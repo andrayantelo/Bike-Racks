@@ -542,9 +542,9 @@ BikeMap.prototype.vote = function(e) {
     
 };
 
-BikeMap.prototype.arrowHTML = function(state, currentUserId) { 
+BikeMap.prototype.arrowHTML = function(state, voterStatus) { 
     let containerId = "rack_" + state.rack_id;
-    
+   
     let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x arrow ",
         downvoteArrowClass = "fas fa-arrow-circle-down fa-2x arrow ",
         upvotePercentage = Math.floor((state.upvote_count/(state.upvote_count + state.downvote_count))*100),
@@ -564,12 +564,12 @@ BikeMap.prototype.arrowHTML = function(state, currentUserId) {
         upvoteArrowClass += "arrowHover arrowClick";
         downvoteArrowClass += "arrowHover arrowClick";
     }
-    else if (state.vote_type === 1) {
+    else if (state.vote_type === 1 && voterStatus) {
        console.log('adding voted class');
        upvoteArrowClass += "voted arrowClick";
        downvoteArrowClass += "arrowHover arrowClick";
     }
-   else if (state.vote_type === -1) {
+   else if (state.vote_type === -1 && voterStatus) {
         downvoteArrowClass += "voted arrowClick";
         upvoteArrowClass += "arrowHover arrowClick";
     }
@@ -591,13 +591,16 @@ BikeMap.prototype.arrowHTML = function(state, currentUserId) {
 
 
 BikeMap.prototype.popupContent = function(state) {
-    let onlineStatus;
+    let onlineStatus,
+        voterStatus;
     if (this.auth.currentUser) {
         onlineStatus = this.auth.currentUser.uid;
     }
     else {
         onlineStatus = false
     }
+    
+    voterStatus = onlineStatus === state.user_id;
     
     /* state : {
      *     address: address (string),
@@ -620,7 +623,7 @@ BikeMap.prototype.popupContent = function(state) {
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
     if (onlineStatus && state.status) {
         
-        let arrows = this.arrowHTML(state, onlineStatus);
+        let arrows = this.arrowHTML(state, voterStatus);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }

@@ -113,26 +113,51 @@ def submit_vote():
     
 @votes.route('/unvote', methods=['POST'])
 def unvote():
-    pass
     # remove a vote that the user had previously made
-    #if request.method == 'POST':
-    #    try:
-    #        rack_id = request.args.get('rack_id') or None
-    #        user_id = request.args.get('user_id') or None
-    #        vote_type = request.args.get('vote_type') or None
+    if request.method == 'POST':
+        try:
+            rack_id = request.args.get('rack_id') or None
+            user_id = request.args.get('user_id') or None
+            vote_type = request.args.get('vote_type') or None
             
             # connect to db
-    #        db = get_db()
+            db = get_db()
             
             # remove user's vote for this rack from votes table and update bikeracks vote count
             
             #remove user's vote 
-    #        query = """
-    #                DELETE FROM
-    #                    votes
-    #                WHERE
-    #                    user_id=? AND
-    #                    vote_type=? AND
-    #                    rack_id=?
-    #                """
+            query = """
+                    DELETE FROM
+                        votes
+                    WHERE
+                        user_id=? AND
+                        vote_type=? AND
+                        rack_id=?
+                    """
+            db.execute(query, (user_id, vote_type, rack_id))
+            
+            # decrement the vote count in the bikeracks row for this rack
+            if int(vote_type) == 1:
+                vote_count = "upvote_count"
+            else:
+                vote_count = "downvote_count"
+            
+            query = """
+                        UPDATE
+                            bikeracks
+                        SET
+                            {}={} - 1
+                        WHERE
+                            rack_id=?
+                    """.format(vote_count, vote_count)
+            
+            db.execute(query, (rack_id,))
+            
+            db.commit()
+            return "OK", 200
+        except sqlite3.Error as e:
+            print("Database error:", e)
+            return "", 500
+        except KeyError as key_e:
+            print("Error with key: {}".format(key_e))
 

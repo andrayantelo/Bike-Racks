@@ -176,10 +176,7 @@ BikeMap.prototype.loadMap = function(userId) {
     // display on map
     
     this.getRacks(userId).done((data) => {
-        console.log("data received from db on load:");
-        console.log(data);
 
-        
         return this.buildRacks(data, userId);
     });
     
@@ -467,8 +464,15 @@ BikeMap.prototype.updateRackStatus = function(rack_id) {
 
 BikeMap.prototype.unvote = function(voteType, rack_id, user_id) {
     // Remove a vote of voteType for rack with rackId and for user with userId
-    console.log("unvote");
-    console.log("user is attempting to " + voteType);
+    
+    let params = $.param({rack_id: rack_id, vote_type: voteType, user_id: user_id}),
+        path = {{ url_for('votes.unvote')|tojson }};
+        
+    return $.ajax({
+        method: 'POST',
+        url: path + '?' + params,
+        context: this,
+    })
     
 }
 
@@ -492,7 +496,6 @@ BikeMap.prototype.vote = function(e) {
     // that happen even if they didn't already make a vote still happen
     voteStatusP.then(voteStatus => {
         if (voteStatus) {
-            console.log('rack already has a vote, updating vote');
             // user already submitted a vote for this rack
             
             // IF the vote type of the arrow that the user clicked matches
@@ -516,14 +519,14 @@ BikeMap.prototype.vote = function(e) {
             }
             // if the new vote is the same as the old vote, UNVOTE
             else {
-                console.log("the new vote is the same as the old vote");
-                this.unvote(newVoteType, rack_id, user_id);
+                this.unvote(newVoteType, rack_id, user_id).done(resp => {
+                    this.loadMap(user_id);
+                });
             }
 
         }
         else {
             // user is voting for rack for the first time
-            console.log('voting for this rack for the first time');
             let voteType = e.target.dataset.votetype;
             voteType = voteType === "upvote"? 1 : -1;
             
@@ -565,7 +568,6 @@ BikeMap.prototype.arrowHTML = function(state, voterStatus) {
         downvoteArrowClass += "arrowHover arrowClick";
     }
     else if (state.vote_type === 1 && voterStatus) {
-       console.log('adding voted class');
        upvoteArrowClass += "voted arrowClick";
        downvoteArrowClass += "arrowHover arrowClick";
     }

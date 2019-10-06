@@ -596,7 +596,7 @@ BikeMap.prototype.popupContent = function(state) {
     let onlineStatus,
         voterStatus;
     if (this.auth.currentUser) {
-        onlineStatus = this.auth.currentUser.uid;
+        onlineStatus = true;
     }
     else {
         onlineStatus = false

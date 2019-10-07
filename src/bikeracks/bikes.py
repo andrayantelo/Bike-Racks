@@ -38,22 +38,23 @@ def coordinates():
     lng = request.form.get('lng', 0, type=float)
     address = request.form.get('address', '')
     
-    # First check if these coordinates are valid
-    if helper.validate_coordinates((lat, lng)):
-        # if valid, save in database
-        try:
-            # connect to database to be able to store new coordinates for temporary bikerack
-            db = get_db()
-            db.execute('INSERT INTO bikeracks (latitude, longitude, address) VALUES (?, ?, ?);', (lat, lng, address))
-            db.commit()
-            # return data for the added temporary marker
-            bike_rack = helper.get_rack_state(db, lat, lng)
-    
-            return bike_rack
-        except Exception as e:
-            print(e)
-            return "", 500
-            # TODO, narrow down exception
+    if not helper.validate_coordinates((lat, lng)):
+        return "Invalid Coordinates" 500
+
+    # if valid, save in database
+    try:
+        # connect to database to be able to store new coordinates for temporary bikerack
+        db = get_db()
+        db.execute('INSERT INTO bikeracks (latitude, longitude, address) VALUES (?, ?, ?);', (lat, lng, address))
+        db.commit()
+        # return data for the added temporary marker
+        bike_rack = helper.get_rack_state(db, lat, lng)
+
+        return bike_rack
+    except Exception as e:
+        print(e)
+        return "", 500
+        # TODO, narrow down exception
 
 
 # get racks based on status ('not_approved', 'approved')

@@ -34,7 +34,7 @@ def get_vote_status():
     # return true if user with user_id = user_id has voted for 
     # rack with rack_id=rack_id, false otherwise
 
-    rack_id = request.args.get('rack_id', None, type=int)
+    rack_id = request.args.get('rack_id', type=int)
     user_id = request.args.get('user_id', type=str)
     
     if not rack_id:
@@ -57,9 +57,9 @@ def submit_vote():
     # insert a vote into the vote db for rack with rack_id = rack_id, vote by
     # user with user_id = user_id and vote_type=vote_type
 
-    rack_id = request.args.get('rack_id', None, type=int)
+    rack_id = request.args.get('rack_id', type=int)
     user_id = request.args.get('user_id', type=str)
-    vote_type = request.args.get('vote_type', None, type=int)
+    vote_type = request.args.get('vote_type', type=int)
     
     if not rack_id:
         return "No rack_id specified", 400
@@ -106,9 +106,9 @@ def submit_vote():
 def unvote():
     # remove a vote that the user had previously made
 
-    rack_id = request.args.get('rack_id', None, type=int)
+    rack_id = request.args.get('rack_id', type=int)
     user_id = request.args.get('user_id', type=str)
-    vote_type = request.args.get('vote_type', None, type=int)
+    vote_type = request.args.get('vote_type', type=int)
     
     if not rack_id:
         return "No rack_id specified", 400

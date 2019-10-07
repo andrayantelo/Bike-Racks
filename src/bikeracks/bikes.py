@@ -84,7 +84,7 @@ def store_rack():
 def get_single_rack():
     # get rack based on rack_id 
    
-    rack_id = request.args.get('rack_id', None, type=int)
+    rack_id = request.args.get('rack_id', type=int)
     
     if not rack_id:
         return "No rack_id specified", 400
@@ -101,7 +101,7 @@ def update_rack_status():
     # update a rack's status (approved, not_approved) based on the upvote_count
     # and downvote_count percentages
    
-    rack_id = request.args.get('rack_id', None, type=int)
+    rack_id = request.args.get('rack_id', type=int)
     
     if not rack_id:
         return "No rack_id specified", 400

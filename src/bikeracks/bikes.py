@@ -31,11 +31,8 @@ def render_file(path):
     return response
 
 
-@bikes.route('/coordinates', methods=('GET', 'POST'))
+@bikes.route('/coordinates', methods=('POST',))
 def coordinates():
-     if request.method != 'POST':
-        return "Bad Request", 400
-        
     # get the coordinates from the request
     lat = request.form.get('lat', 0, type=float)
     lng = request.form.get('lng', 0, type=float)
@@ -44,7 +41,6 @@ def coordinates():
     # First check if these coordinates are valid
     if helper.validate_coordinates((lat, lng)):
         # if valid, save in database
-        print("saving into database")
         try:
             # connect to database to be able to store new coordinates for temporary bikerack
             db = get_db()
@@ -63,9 +59,6 @@ def coordinates():
 # get racks based on status ('not_approved', 'approved')
 @bikes.route('/get_racks/', methods=['GET'])
 def get_racks():
-    if request.method != 'GET':
-        return "Bad Request", 400
-    
     status = request.args.get('status') or None
     user_id = request.args.get('userId') or None
     
@@ -79,8 +72,6 @@ def get_racks():
  
 @bikes.route('/store_rack/', methods=['POST'])
 def store_rack():
-    if request.method != 'POST':
-        return "Bad Request", 400
     # manually insert racks into db   
 
     args = request.json
@@ -92,9 +83,6 @@ def store_rack():
  
 @bikes.route('/get_single_rack', methods=['GET'])
 def get_single_rack():
-    
-    if request.method != 'GET':
-        return "Bad Request", 400
     # get rack based on rack_id 
    
     rack_id = request.args.get('rack_id')
@@ -111,8 +99,6 @@ def get_single_rack():
 def update_rack_status():
     # update a rack's status (approved, not_approved) based on the upvote_count
     # and downvote_count percentages
-    if request.method != 'GET':
-        return "Bad Request", 400
    
     rack_id = request.args.get('rack_id')
     

@@ -134,10 +134,8 @@ def insert_rack(database, rack):
         database.commit()
     except sqlite3.Error as e:
         print("Database error:", e)
-        return "", 500
     except KeyError as key_e:
         print("Error with key: {}".format(key_e))
-        return "", 500
     
     return
   

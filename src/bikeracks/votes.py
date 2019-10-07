@@ -31,16 +31,12 @@ def get_vote_data(rack_id, user_id):
 
 @votes.route('/get_vote_status', methods=['GET'])
 def get_vote_status():
-    if request.method != 'GET':
-        return "Bad Request", 400
-    
     # return true if user with user_id = user_id has voted for 
     # rack with rack_id=rack_id, false otherwise
 
     rack_id = request.args.get('rack_id') or None
     user_id = request.args.get('user_id') or None
     
-    print("looking up vote status for rack_id: {} and user_id: {}".format(rack_id, user_id))
     # make connection the database
     db = get_db()
     
@@ -58,11 +54,6 @@ def get_vote_status():
 def submit_vote():
     # insert a vote into the vote db for rack with rack_id = rack_id, vote by
     # user with user_id = user_id and vote_type=vote_type
-    if request.method != 'POST':
-        return "Bad Request", 400
-    
-    
-    
     try:
         rack_id = request.args.get('rack_id') or None
         user_id = request.args.get('user_id') or None
@@ -118,8 +109,6 @@ def submit_vote():
     
 @votes.route('/unvote', methods=['POST'])
 def unvote():
-    if request.method != 'POST':
-        return "Bad Request", 400
     # remove a vote that the user had previously made
     try:
         rack_id = request.args.get('rack_id') or None

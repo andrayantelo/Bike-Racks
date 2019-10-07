@@ -30,9 +30,6 @@ def dict_from_row(row):
 def validate_coordinates(coordinates):
     # verify that lat and lng are floats
     lat, lng = coordinates
-    # verify they are floats
-    float(lat)
-    float(lng)
     # verify that they fall within their ranges
     if lat < -90 and lat > 90:
         #print("{} not in range.".format(lat))
@@ -205,23 +202,16 @@ def increment_downvote_count(rack_id, database):
 def get_count_percentage(rack_id, database):
     # return the percentage of downvote_count for a rack
 
-    query = "SELECT downvote_count FROM bikeracks WHERE rack_id=?"
-    downvote_count = database.execute(query, (rack_id,)).fetchone()
-    downvote_count = dict_from_row(downvote_count)
+    query = "SELECT downvote_count, upvote_count FROM bikeracks WHERE rack_id=?"
+    counts = database.execute(query, (rack_id,)).fetchone()
+    counts = dict_from_row(counts)
     
-    query = "SElECT upvote_count FROM bikeracks WHERE rack_id=?"
-    upvote_count = database.execute(query, (rack_id,)).fetchone()
-    upvote_count = dict_from_row(upvote_count)
-    
-    
-    upvote_count = upvote_count['upvote_count']
-    downvote_count = downvote_count['downvote_count']
-    total_votes = upvote_count + downvote_count
-    
-    downvote_percentage = floor((downvote_count / total_votes) * 100)
-    upvote_percentage = floor((upvote_count / total_votes)*100)
+    total = counts['upvote_count'] + counts['downvote_count']
+    # Favor upvotes by floor-ing downvote instead
+    downvote = floor(downvote_count / total) * 100
+    upvote = 100 - downvote
 
-    return {'downvote_percentage': downvote_percentage, 'upvote_percentage': upvote_percentage}
+    return {'downvote_percentage': downvote, 'upvote_percentage': upvote}
 
 
 

@@ -595,13 +595,8 @@ BikeMap.prototype.arrowHTML = function(state) {
 BikeMap.prototype.popupContent = function(state) {
     let onlineStatus,
         voterStatus;
-    if (this.auth.currentUser) {
-        onlineStatus = Boolean(this.auth.currentUser);
-    }
-    else {
-        onlineStatus = false;
-    }
-    
+
+    onlineStatus = Boolean(this.auth.currentUser);
     
     /* state : {
      *     address: address (string),

@@ -49,7 +49,9 @@ def get_vote_status():
     
     if result:
         result = h.dict_from_row(result)
-        return jsonify(result)
+        
+    return jsonify(result)
+ 
     
             
 @votes.route('/submit_vote', methods=['POST'])

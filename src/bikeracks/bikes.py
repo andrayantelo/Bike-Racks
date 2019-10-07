@@ -86,6 +86,9 @@ def get_single_rack():
    
     rack_id = request.args.get('rack_id', None, type=int)
     
+    if not rack_id:
+        return "No rack_id specified", 400
+    
     # database connection
     db = get_db()
     
@@ -99,6 +102,9 @@ def update_rack_status():
     # and downvote_count percentages
    
     rack_id = request.args.get('rack_id', None, type=int)
+    
+    if not rack_id:
+        return "No rack_id specified", 400
     
     db = get_db()
     percentages = helper.get_count_percentage(rack_id, db)

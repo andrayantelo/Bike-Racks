@@ -34,8 +34,11 @@ def get_vote_status():
     # return true if user with user_id = user_id has voted for 
     # rack with rack_id=rack_id, false otherwise
 
-    rack_id = request.args.get('rack_id', None)
-    user_id = request.args.get('user_id', None)
+    rack_id = request.args.get('rack_id', None, type=int)
+    user_id = request.args.get('user_id', type=str)
+    
+    if not rack_id:
+        return "No rack_id specified", 400
     
     # make connection the database
     db = get_db()
@@ -57,6 +60,9 @@ def submit_vote():
     rack_id = request.args.get('rack_id', None, type=int)
     user_id = request.args.get('user_id', type=str)
     vote_type = request.args.get('vote_type', None, type=int)
+    
+    if not rack_id:
+        return "No rack_id specified", 400
     
     # connect to db
     db = get_db()
@@ -103,6 +109,9 @@ def unvote():
     rack_id = request.args.get('rack_id', None, type=int)
     user_id = request.args.get('user_id', type=str)
     vote_type = request.args.get('vote_type', None, type=int)
+    
+    if not rack_id:
+        return "No rack_id specified", 400
     
     # connect to db
     db = get_db()

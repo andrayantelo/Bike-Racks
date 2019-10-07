@@ -30,23 +30,17 @@ def dict_from_row(row):
 def validate_coordinates(coordinates):
     # verify that lat and lng are floats
     lat, lng = coordinates
-    try:
-        # verify they are floats
-        float(lat)
-        float(lng)
-        # verify that they fall within their ranges
-        if lat < -90 and lat > 90:
-            #print("{} not in range.".format(lat))
-            raise RangeError(lat, "lat not in range")
-        if lng < -180 and lng > 180:
-            #print("{} not in range.".format(lng))
-            raise RangeError(lng, "long not in range")
-        
-    except ValueError:
-        return False
-    except RangeError as e:
-        print(e.message)
-        
+    # verify they are floats
+    float(lat)
+    float(lng)
+    # verify that they fall within their ranges
+    if lat < -90 and lat > 90:
+        #print("{} not in range.".format(lat))
+        raise RangeError(lat, "lat not in range")
+    if lng < -180 and lng > 180:
+        #print("{} not in range.".format(lng))
+        raise RangeError(lng, "long not in range")
+
     # return true if all tests passed
     return True
 
@@ -68,20 +62,17 @@ def get_racks(database, status, user_id):
     # based on status of rack ('not_approved', 'approved')
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
-    
-    if status is None and user_id is None:
-        print("getting all racks for a user who is logged out")
+
+    if not status and not user_id:
         # get all racks from bikeracks table
         query = "SELECT * FROM bikeracks"
         result = database.execute(query).fetchall()
-    elif status and user_id is None:
+    elif status and not user_id:
         # get all racks with given status from bikeracks table
-        print("fetching all racks of a particular status {} for logged out users".format(status))
         query = "SELECT * FROM bikeracks WHERE status =?"
         result = database.execute(query, (status,)).fetchall()
-    elif status is None and user_id:
+    elif not status and user_id:
         # return all joined rows from bikeracks and votes
-        print("fetching all racks for an logged in user")
         # get all the racks, including voting information for racks that user voted on
         query = """ SELECT 
                         r.*,
@@ -93,8 +84,6 @@ def get_racks(database, status, user_id):
         result = database.execute(query, (user_id,)).fetchall()
         
     elif status and user_id:
-        print("fetching all racks of status {} for logged in user".format(status))
-        
         # get all the racks with status=status, including voting information for racks that user voted on
         query = """ SELECT 
                         r.*,
@@ -122,20 +111,14 @@ def get_single_rack(database, rack_id):
     query = "SELECT * FROM bikeracks WHERE rack_id = ?"
     result = database.execute(query, (rack_id,)).fetchall()
     result = [dict_from_row(row) for row in result]
-    print(result)
     return jsonify(result)
 
 # below function is to easily add racks to db for testing TODO 
 def insert_rack(database, rack):
     # insert into table table_name, the rack (dict)
-    try:
-        query = "INSERT INTO bikeracks (latitude, longitude, status, address) values (?, ?, ?, ?)"
-        database.execute(query, (rack['latitude'], rack['longitude'], rack['status'], rack['address']))
-        database.commit()
-    except sqlite3.Error as e:
-        print("Database error:", e)
-    except KeyError as key_e:
-        print("Error with key: {}".format(key_e))
+    query = "INSERT INTO bikeracks (latitude, longitude, status, address) values (?, ?, ?, ?)"
+    database.execute(query, (rack['latitude'], rack['longitude'], rack['status'], rack['address']))
+    database.commit()
     
     return
   
@@ -149,90 +132,58 @@ def get_vote_status(database, rack_id, user_id):
     
 # decrement from downvote or upvote_count
 def decrement_upvote_count(rack_id, database):
-    try:
-        query = "UPDATE bikeracks SET upvote_count=(SELECT MAX(upvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
-        print(query)
-        database.execute(query, (rack_id,rack_id,))
-        database.commit()
-    except sqlite3.Error as e:
-        print("Database error:", e)
-        return "", 500
-    except KeyError as key_e:
-        print("Error with key: {}".format(key_e))
-        return "", 500
+
+    query = "UPDATE bikeracks SET upvote_count=(SELECT MAX(upvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
+    database.execute(query, (rack_id,rack_id,))
+    database.commit()
     
     return
     
 def decrement_downvote_count(rack_id, database):
-    try:
-        query = "UPDATE bikeracks SET downvote_count=(SELECT MAX(downvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
-        
-        database.execute(query, (rack_id,rack_id,))
-        database.commit()
-    except sqlite3.Error as e:
-        print("Database error:", e)
-        return "", 500
-    except KeyError as key_e:
-        print("Error with key: {}".format(key_e))
-        return "", 500
+    query = "UPDATE bikeracks SET downvote_count=(SELECT MAX(downvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
+    
+    database.execute(query, (rack_id,rack_id,))
+    database.commit()
     
     return
     
 # increment downvote or upvote_count
 def increment_upvote_count(rack_id, database):
-    try:
-        query = "UPDATE bikeracks SET upvote_count = upvote_count + 1 WHERE rack_id=?"
-        database.execute(query, (rack_id,))
-        database.commit()
-    except sqlite3.Error as e:
-        print("Database error:", e)
-        return "", 500
-    except KeyError as key_e:
-        print("Error with key: {}".format(key_e))
-        return "", 500
+    query = "UPDATE bikeracks SET upvote_count = upvote_count + 1 WHERE rack_id=?"
+    database.execute(query, (rack_id,))
+    database.commit()
     
     return
     
 def increment_downvote_count(rack_id, database):
-    try:
-        query = "UPDATE bikeracks SET downvote_count = downvote_count + 1 WHERE rack_id=?"
-        database.execute(query, (rack_id,))
-        database.commit()
-    except sqlite3.Error as e:
-        print("Database error:", e)
-        return "", 500
-    except KeyError as key_e:
-        print("Error with key: {}".format(key_e))
-        return "", 500
-    
+
+    query = "UPDATE bikeracks SET downvote_count = downvote_count + 1 WHERE rack_id=?"
+    database.execute(query, (rack_id,))
+    database.commit()
+
     return
     
 def get_count_percentage(rack_id, database):
     # return the percentage of downvote_count for a rack
-    try:
-        query = "SELECT downvote_count FROM bikeracks WHERE rack_id=?"
-        downvote_count = database.execute(query, (rack_id,)).fetchone()
-        downvote_count = dict_from_row(downvote_count)
-        
-        query = "SElECT upvote_count FROM bikeracks WHERE rack_id=?"
-        upvote_count = database.execute(query, (rack_id,)).fetchone()
-        upvote_count = dict_from_row(upvote_count)
-        
-        
-        upvote_count = upvote_count['upvote_count']
-        downvote_count = downvote_count['downvote_count']
-        total_votes = upvote_count + downvote_count
-        
-        downvote_percentage = floor((downvote_count / total_votes) * 100)
-        upvote_percentage = floor((upvote_count / total_votes)*100)
 
-        return {'downvote_percentage': downvote_percentage, 'upvote_percentage': upvote_percentage}
-    except sqlite3.Error as e:
-        print("Database error:", e)
-        return "", 500
-    except KeyError as key_e:
-        print("Error with key: {}".format(key_e))
-        return "", 500
+    query = "SELECT downvote_count FROM bikeracks WHERE rack_id=?"
+    downvote_count = database.execute(query, (rack_id,)).fetchone()
+    downvote_count = dict_from_row(downvote_count)
+    
+    query = "SElECT upvote_count FROM bikeracks WHERE rack_id=?"
+    upvote_count = database.execute(query, (rack_id,)).fetchone()
+    upvote_count = dict_from_row(upvote_count)
+    
+    
+    upvote_count = upvote_count['upvote_count']
+    downvote_count = downvote_count['downvote_count']
+    total_votes = upvote_count + downvote_count
+    
+    downvote_percentage = floor((downvote_count / total_votes) * 100)
+    upvote_percentage = floor((upvote_count / total_votes)*100)
+
+    return {'downvote_percentage': downvote_percentage, 'upvote_percentage': upvote_percentage}
+
 
 
     

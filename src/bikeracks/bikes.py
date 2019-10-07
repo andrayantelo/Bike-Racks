@@ -39,7 +39,7 @@ def coordinates():
     address = request.form.get('address', '')
     
     if not helper.validate_coordinates((lat, lng)):
-        return "Invalid Coordinates" 500
+        return "Invalid Coordinates", 500
 
     # if valid, save in database
 
@@ -56,14 +56,15 @@ def coordinates():
 # get racks based on status ('not_approved', 'approved')
 @bikes.route('/get_racks/', methods=['GET'])
 def get_racks():
-    status = request.args.get('status') or None
-    user_id = request.args.get('userId') or None
-    
+
+    status = request.args.get('status', "", type=str)
+    user_id = request.args.get('userId', "", type=str)
+
     # make a connection to the database
     db = get_db()
-    
+
     racks = helper.get_racks(db, status, user_id)
-    
+
     return racks
 
  

@@ -9,6 +9,7 @@ from flask import Flask, render_template
 # setup the application needs will happen inside the function, then
 # the application will be returned
 
+    
 def create_app(test_config=None):
     # create and configure the app
     # instance_relative_config tells the app that configuration files

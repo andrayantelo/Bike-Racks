@@ -101,24 +101,24 @@ def update_rack_status():
     
     db = get_db()
     percentages = helper.get_count_percentage(rack_id, db)
-    upvote_ratio = percentages['upvote_percentage']
-    downvote_ratio = percentages['downvote_percentage']
+    
+    should_approve = percentages['upvote_percentage'] >= percentages['downvote_percentage']
     
     current_rack_status = db.execute("SELECT status FROM bikeracks WHERE rack_id=?", (rack_id,)).fetchone()
     current_rack_status = helper.dict_from_row(current_rack_status)
     current_rack_status = current_rack_status['status']
 
     
-    # if the rack has more than 50 % downvotes, and the rack's status is approved,
-    # we change the status to not approved
-    if downvote_ratio > 50 and current_rack_status == 'approved':
+    # if the rack should not be approved (because it has more downvotes than upvotes)
+    # and the status is currently approved, change it to not approved
+    if not should_approve and current_rack_status == 'approved':
         # change status to not approved
         
         db.execute("UPDATE bikeracks SET status = 'not_approved' WHERE rack_id=?", (rack_id,))
         db.commit()
-    # if the rack has more than or equal to 50 % upvotes, and the rack status is currently not approved
+    # if the rack has should be approved, and the rack status is currently not approved
     # we change the status to approved
-    elif upvote_ratio >= 50 and current_rack_status == 'not_approved':
+    elif should_approve and current_rack_status == 'not_approved':
         
         # change status to approved
         db.execute("UPDATE bikeracks SET status = 'approved' WHERE rack_id=?", (rack_id,))

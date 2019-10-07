@@ -95,8 +95,6 @@ def get_racks(database, status, user_id):
                     WHERE r.status=?)
                 """
         result = database.execute(query, (user_id, status,)).fetchall()
-    else:
-        return "", 500
     
     
     result = [dict_from_row(row) for row in result]

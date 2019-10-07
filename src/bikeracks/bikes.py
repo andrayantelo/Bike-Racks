@@ -92,7 +92,6 @@ def get_single_rack():
     
     return rack
 
-# this is a test
 @bikes.route('/update_rack_status', methods=['GET'])
 def update_rack_status():
     # update a rack's status (approved, not_approved) based on the upvote_count

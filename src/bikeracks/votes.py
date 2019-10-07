@@ -55,7 +55,7 @@ def submit_vote():
     # user with user_id = user_id and vote_type=vote_type
 
     rack_id = request.args.get('rack_id', None, type=int)
-    user_id = request.args.get('user_id', "", type=str)
+    user_id = request.args.get('user_id', type=str)
     vote_type = request.args.get('vote_type', None, type=int)
     
     # connect to db
@@ -101,7 +101,7 @@ def unvote():
     # remove a vote that the user had previously made
 
     rack_id = request.args.get('rack_id', None, type=int)
-    user_id = request.args.get('user_id', "", type=str)
+    user_id = request.args.get('user_id', type=str)
     vote_type = request.args.get('vote_type', None, type=int)
     
     # connect to db

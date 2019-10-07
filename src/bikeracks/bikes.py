@@ -58,8 +58,8 @@ def coordinates():
 @bikes.route('/get_racks/', methods=['GET'])
 def get_racks():
 
-    status = request.args.get('status', "", type=str)
-    user_id = request.args.get('userId', "", type=str)
+    status = request.args.get('status', type=str)
+    user_id = request.args.get('userId', type=str)
 
     # make a connection to the database
     db = get_db()

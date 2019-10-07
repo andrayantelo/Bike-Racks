@@ -123,10 +123,6 @@ def update_rack_status():
         # change status to approved
         db.execute("UPDATE bikeracks SET status = 'approved' WHERE rack_id=?", (rack_id,))
         db.commit()
-    after_rack_status = db.execute("SELECT status FROM bikeracks WHERE rack_id=?", (rack_id,)).fetchone()
-    after_rack_status = helper.dict_from_row(after_rack_status)
-    after_rack_status = after_rack_status['status']
-    
-    result = {'before': current_rack_status, 'after': after_rack_status}
-    return jsonify(result)
+
+    return "", 200
     

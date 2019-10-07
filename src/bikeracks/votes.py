@@ -47,8 +47,7 @@ def get_vote_status():
     if result:
         result = h.dict_from_row(result)
         return jsonify(result)
-    else:
-        return jsonify(None)
+    
             
 @votes.route('/submit_vote', methods=['POST'])
 def submit_vote():
@@ -58,7 +57,6 @@ def submit_vote():
     rack_id = request.args.get('rack_id', None, type=int)
     user_id = request.args.get('user_id', "", type=str)
     vote_type = request.args.get('vote_type', None, type=int)
-    vote_type = int(vote_type)
     
     # connect to db
     db = get_db()

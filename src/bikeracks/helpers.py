@@ -115,7 +115,8 @@ def get_single_rack(database, rack_id):
 def insert_rack(database, rack):
     # insert into table table_name, the rack (dict)
     query = "INSERT INTO bikeracks (latitude, longitude, status, address) values (?, ?, ?, ?)"
-    database.execute(query, (rack['latitude'], rack['longitude'], rack['status'], rack['address']))
+    database.execute(query, (rack['latitude'], rack['longitude'], rack['status'],
+        rack['address']))
     database.commit()
     
     return
@@ -131,14 +132,42 @@ def get_vote_status(database, rack_id, user_id):
 # decrement from downvote or upvote_count
 def decrement_upvote_count(rack_id, database):
 
-    query = "UPDATE bikeracks SET upvote_count=(SELECT MAX(upvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
+    query = """
+        UPDATE 
+            bikeracks 
+        SET
+            upvote_count=
+            (
+                SELECT
+                    MAX(upvote_count - 1, 0)
+                FROM
+                    bikeracks
+                WHERE
+                    rack_id=?
+            ) 
+        WHERE
+            rack_id=?"""
     database.execute(query, (rack_id,rack_id,))
     database.commit()
     
     return
     
 def decrement_downvote_count(rack_id, database):
-    query = "UPDATE bikeracks SET downvote_count=(SELECT MAX(downvote_count - 1, 0) FROM bikeracks WHERE rack_id=?) WHERE rack_id=?"
+    query = """
+        UPDATE
+            bikeracks
+        SET
+            downvote_count=
+            (
+                SELECT
+                    MAX(downvote_count - 1, 0)
+                FROM
+                    bikeracks
+                WHERE
+                    rack_id=?
+            )
+        WHERE
+            rack_id=?"""
     
     database.execute(query, (rack_id,rack_id,))
     database.commit()
@@ -147,7 +176,13 @@ def decrement_downvote_count(rack_id, database):
     
 # increment downvote or upvote_count
 def increment_upvote_count(rack_id, database):
-    query = "UPDATE bikeracks SET upvote_count = upvote_count + 1 WHERE rack_id=?"
+    query = """
+        UPDATE
+            bikeracks
+        SET
+            upvote_count = upvote_count + 1
+        WHERE
+            rack_id=?"""
     database.execute(query, (rack_id,))
     database.commit()
     
@@ -155,7 +190,13 @@ def increment_upvote_count(rack_id, database):
     
 def increment_downvote_count(rack_id, database):
 
-    query = "UPDATE bikeracks SET downvote_count = downvote_count + 1 WHERE rack_id=?"
+    query = """
+        UPDATE
+            bikeracks
+        SET
+            downvote_count = downvote_count + 1
+        WHERE
+            rack_id=?"""
     database.execute(query, (rack_id,))
     database.commit()
 

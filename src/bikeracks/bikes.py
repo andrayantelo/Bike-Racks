@@ -45,7 +45,8 @@ def coordinates():
 
     # connect to database to be able to store new coordinates for temporary bikerack
     db = get_db()
-    db.execute('INSERT INTO bikeracks (latitude, longitude, address) VALUES (?, ?, ?);', (lat, lng, address))
+    db.execute('INSERT INTO bikeracks (latitude, longitude, address) VALUES (?, ?, ?);',
+        (lat, lng, address))
     db.commit()
     # return data for the added temporary marker
     bike_rack = helper.get_rack_state(db, lat, lng)
@@ -104,7 +105,8 @@ def update_rack_status():
     
     should_approve = percentages['upvote_percentage'] >= percentages['downvote_percentage']
     
-    current_rack_status = db.execute("SELECT status FROM bikeracks WHERE rack_id=?", (rack_id,)).fetchone()
+    current_rack_status = db.execute("SELECT status FROM bikeracks WHERE rack_id=?",
+        (rack_id,)).fetchone()
     current_rack_status = helper.dict_from_row(current_rack_status)
     current_rack_status = current_rack_status['status']
 
@@ -114,14 +116,16 @@ def update_rack_status():
     if not should_approve and current_rack_status == 'approved':
         # change status to not approved
         
-        db.execute("UPDATE bikeracks SET status = 'not_approved' WHERE rack_id=?", (rack_id,))
+        db.execute("UPDATE bikeracks SET status = 'not_approved' WHERE rack_id=?",
+            (rack_id,))
         db.commit()
     # if the rack has should be approved, and the rack status is currently not approved
     # we change the status to approved
     elif should_approve and current_rack_status == 'not_approved':
         
         # change status to approved
-        db.execute("UPDATE bikeracks SET status = 'approved' WHERE rack_id=?", (rack_id,))
+        db.execute("UPDATE bikeracks SET status = 'approved' WHERE rack_id=?",
+            (rack_id,))
         db.commit()
 
     return "", 200

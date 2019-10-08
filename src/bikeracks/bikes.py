@@ -85,36 +85,4 @@ def get_single_rack():
     
     return rack
 
-@bikes.route('/update_rack_status', methods=['GET'])
-def update_rack_status():
-    # update a rack's status (approved, not_approved) based on the upvote_count
-    # and downvote_count percentages
-   
-    rack_id = request.args.get('rack_id', type=int)
-    
-    if not rack_id:
-        return "No rack_id specified", 400
-    
-    db = get_db()
-    percentages = helper.get_count_percentage(rack_id, db)
-    
-    upvote = percentages['upvote_percentage']
-    downvote = percentages['downvote_percentage']
-    
-    
-    
-    current_rack_status = db.execute(
-        "SELECT rack_id from bikeracks where upvote_count > downvote_count").fetchone()
-    current_rack_status = helper.dict_from_row(current_rack_status)
-    current_rack_status = current_rack_status['status']
-    
-    new_rack_status = "approved" if upvote >= downvote else "not_approved"
-    
-    if new_rack_status != current_rack_status:
-        with db as cursor:
-            cursor.execute('''
-                UPDATE bikeracks SET status=?
-                WHERE rack_id=?''', (new_rack_status, rack_id,))
 
-    return "", 200
-    

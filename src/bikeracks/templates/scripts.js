@@ -609,8 +609,8 @@ BikeMap.prototype.popupContent = function(state) {
      *     address: address (string),
      *     latitude: latitude (string),
      *     longitude: longitude (string),
-     *     rack_id: rack_id (string),
-     *     status: string (is it a temp marker or not, can be determined based on whether this rack has a status or not),
+     *     rack_id: rack_id (string), determine if a marker is a temporary marker
+     * or not by if they have a rack_id or not
      *     user_id: user_id (string, empty? (or undefined) if user is not signed in)
     }*/
     if (state.address === null || state.address === undefined) {
@@ -624,14 +624,14 @@ BikeMap.prototype.popupContent = function(state) {
                <div id="options">`
     
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
-    if (onlineStatus && state.status) {
+    if (onlineStatus && state.rack_id) {
         
         let arrows = this.arrowHTML(state);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }
     // if the user is online and this IS a temporary marker include only the submit button
-    else if (onlineStatus && !state.status && state.address) {
+    else if (onlineStatus && !state.rack_id && state.address) {
         
         content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
     }

@@ -518,10 +518,7 @@ BikeMap.prototype.vote = function(e) {
             if (voteType === 1 && newVoteType === -1 || voteType === -1 && newVoteType === 1) {
                 
                 this.submitVote(rack_id, user_id, newVoteType).done(vote => {
-                    this.updateRackStatus(rack_id).done(status => {
-                        
                         this.loadMap(user_id);
-                    });
                 });
             }
             // if the new vote is the same as the old vote, UNVOTE
@@ -538,10 +535,7 @@ BikeMap.prototype.vote = function(e) {
             voteType = voteType === "upvote"? 1 : -1;
             
             this.submitVote(rack_id, user_id, voteType).done(vote => {
-                this.updateRackStatus(rack_id).done(status => {
-                    
                     this.loadMap(user_id);
-                });
             });
         }
     })

@@ -458,17 +458,6 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
     })
 }
 
-BikeMap.prototype.updateRackStatus = function(rack_id) {
-    let params = $.param({rack_id: rack_id}),
-        path = {{ url_for('bikes.update_rack_status')|tojson }};
-    
-    return $.ajax({
-        method: 'GET',
-        url: path + '?' + params,
-        context: this,
-        })
-}
-
 BikeMap.prototype.unvote = function(voteType, rack_id, user_id) {
     // Remove a vote of voteType for rack with rackId and for user with userId
     

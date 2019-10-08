@@ -244,8 +244,6 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
         // place on the map that was clicked
         
         // submit a location on the map for bike rack location consideration
-        // it will be added to the database with a status of pending
-        // as long as the coordinates are valid
         e.preventDefault();
         $.ajax({
             method: 'POST',

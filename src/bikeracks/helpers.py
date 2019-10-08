@@ -60,7 +60,8 @@ def get_racks(database, status, user_id):
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
     
-    # what status is this rack
+    # what status do we want to get
+    status_req = "r.upvote_count > r.downvote_count" if status == "approved" else "r.downvote_count > r.upvote_count"
 
     if not status and not user_id:
         # get all racks from bikeracks table
@@ -68,7 +69,7 @@ def get_racks(database, status, user_id):
         result = database.execute(query).fetchall()
     elif status and not user_id:
         # get all racks with given status from bikeracks table
-        query = "SELECT * FROM bikeracks WHERE status =?"
+        query = "SELECT * FROM bikeracks as r WHERE {}".format(status_req)
         result = database.execute(query, (status,)).fetchall()
     elif not status and user_id:
         # return all joined rows from bikeracks and votes
@@ -91,8 +92,8 @@ def get_racks(database, status, user_id):
                     LEFT JOIN votes as v
                     ON (r.rack_id=v.rack_id
                     AND v.user_id=?) 
-                    WHERE r.status=?)
-                """
+                    WHERE {})
+                """.format(status_req)
         result = database.execute(query, (user_id, status,)).fetchall()
     
     
@@ -109,16 +110,6 @@ def get_single_rack(database, rack_id):
     result = database.execute(query, (rack_id,)).fetchall()
     result = [dict_from_row(row) for row in result]
     return jsonify(result)
-
-# below function is to easily add racks to db for testing TODO 
-def insert_rack(database, rack):
-    # insert into table table_name, the rack (dict)
-    query = "INSERT INTO bikeracks (latitude, longitude, status, address) values (?, ?, ?, ?)"
-    database.execute(query, (rack['latitude'], rack['longitude'], rack['status'],
-        rack['address']))
-    database.commit()
-    
-    return
   
 # get vote status for server side functions
 def get_vote_status(database, rack_id, user_id):

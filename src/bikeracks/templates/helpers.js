@@ -64,28 +64,7 @@ function getRack(state) {
         
 }
 
-// for testing purposes
-function storeRack(state) {
-    
-    $.ajax({
-        method: 'POST',
-        url: {{ url_for('bikes.store_rack')|tojson }},
-        data: JSON.stringify({
-            latitude: state.latitude,
-            longitude: state.longitude,
-            status: state.status,
-            address: state.address,
-            upvote_count: state.vote.upvote,
-            downvote_count: state.vote.downvote
-        }, null, '\t'),
-        dataType: 'json',
-        contentType: 'application/json;charset=UTF-8',
-        context: this
-    }).done((data) => {
-        console.log("printing data:");
-        console.log(data);
-    })
-}
+
 
 
 

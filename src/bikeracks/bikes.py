@@ -69,17 +69,6 @@ def get_racks():
     return racks
 
  
-@bikes.route('/store_rack/', methods=['POST'])
-def store_rack():
-    # manually insert racks into db   
-
-    args = request.json
-    db = get_db()
-    
-    helper.insert_rack(db, args)
-    return Response(status=200)
-
- 
 @bikes.route('/get_single_rack', methods=['GET'])
 def get_single_rack():
     # get rack based on rack_id 

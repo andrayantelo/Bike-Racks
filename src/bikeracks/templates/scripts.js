@@ -91,22 +91,8 @@ BikeMap.prototype.initBikeMap = function () {
     this.searchControl = new GeoSearch.GeoSearchControl({
       provider: this.provider, 
       style: 'bar',                              
-      showMarker: true,                                   
+      showMarker: false,                                   
       showPopup: false, 
-      marker: {                                           
-        icon: buildMarkerIcon(tempMarkerColor),
-        draggable: false,
-      },
-      popupFormat: ({ query, result }) => this.popupContent({
-            latitude: result.y,
-            longitude: result.x,
-            address: result.label,
-            status: undefined,
-            rackId: "",
-            upvoteCount: undefined,
-            downvoteCount: undefined,
-            userId: ""
-        }),   
       maxMarkers: 1,                                      
       retainZoomLevel: false,                             
       animateZoom: true,                                  
@@ -121,7 +107,6 @@ BikeMap.prototype.initBikeMap = function () {
     this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
     //this.searchControl.getContainer().onclick =(e) => e.stopPropagation();
 
-    
     // Initialize Firebase
     this.initFirebase();
     

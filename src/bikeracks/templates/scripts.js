@@ -89,11 +89,20 @@ BikeMap.prototype.initBikeMap = function () {
     this.provider = new GeoSearch.OpenStreetMapProvider();
     
     this.searchControl = new GeoSearch.GeoSearchControl({
-        provider: this.provider,
-        style: 'bar',
-        autoComplete: true,
-        autoCompleteDelay: 250,
-        retainZoomLevel: true
+      provider: this.provider, 
+      style: 'bar',                              
+      showMarker: true, 
+      marker: {                                           	
+        icon: new L.Icon.Default(),	
+        draggable: false,	
+      },	
+      showPopup: false, 
+      maxMarkers: 1,                                      
+      retainZoomLevel: false,                             
+      animateZoom: true,                                  
+      autoClose: true,                                   
+      searchLabel: 'Enter address',                       
+      keepResult: true                                 
     }).addTo(this.mymap);
     
     // this should use .getContainer() instead of elements.container but
@@ -101,17 +110,7 @@ BikeMap.prototype.initBikeMap = function () {
     // https://github.com/smeijer/leaflet-geosearch/issues/169
     this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
     //this.searchControl.getContainer().onclick =(e) => e.stopPropagation();
-    
-    // when someone searches an address and presses enter or clicks on the 
-    // address in the search bar, add a temporary (gray) marker at that location
-    this.mymap.on('geosearch/showlocation', (e) => {
-        let lat = e.location.y,
-            lng = e.location.x,
-            address = e.location.label;
-            
-        this.addTempMarker(lat, lng, address);
-    })
-    
+
     // Initialize Firebase
     this.initFirebase();
     
@@ -281,7 +280,7 @@ BikeMap.prototype.onMapClick = function (e) {
         userId = this.auth.currentUser.uid
     }
     
-    let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng, userId),
+    let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng),
         target = document.getElementById('address'),
         spinner = new Spinner(opts).spin(target);
     
@@ -313,10 +312,12 @@ BikeMap.prototype.findAddress = function(lat, lng) {
     });
 };
 
-BikeMap.prototype.addTempMarker = function(lat, lng, userId, address) {
+BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
     
+    let userId = this.auth.currentUser ? this.auth.currentUser.uid : "";
+
     let markerIcon = buildMarkerIcon(tempMarkerColor),
         markerState = {
             latitude: lat,

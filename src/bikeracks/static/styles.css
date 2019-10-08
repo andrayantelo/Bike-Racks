@@ -5,6 +5,11 @@
 .navbar-light {
   background-color: #e3f2fd;
 }
+
+.checkboxes {
+  margin: 0px 5px 0px 5px;
+}
+
 .popup {
   display: flex;
   flex-wrap: wrap;

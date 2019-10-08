@@ -314,14 +314,8 @@ BikeMap.prototype.findAddress = function(lat, lng) {
 BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker, that is removed as soon as you click away
     //build icon
-    let userId;
     
-    if (this.auth.currentUser) {
-        userId = this.auth.currentUser.uid;
-    }
-    else {
-        userId = ""
-    }
+    let userId = this.auth.currentUser ? this.auth.currentUser.uid : "";
 
     let markerIcon = buildMarkerIcon(tempMarkerColor),
         markerState = {

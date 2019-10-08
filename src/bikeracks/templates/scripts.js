@@ -91,14 +91,18 @@ BikeMap.prototype.initBikeMap = function () {
     this.searchControl = new GeoSearch.GeoSearchControl({
       provider: this.provider, 
       style: 'bar',                              
-      showMarker: false,                                   
+      showMarker: true, 
+      marker: {                                           	
+        icon: new L.Icon.Default(),	
+        draggable: false,	
+      },	
       showPopup: false, 
       maxMarkers: 1,                                      
       retainZoomLevel: false,                             
       animateZoom: true,                                  
       autoClose: true,                                   
       searchLabel: 'Enter address',                       
-      keepResult: true                                  
+      keepResult: true                                 
     }).addTo(this.mymap);
     
     // this should use .getContainer() instead of elements.container but

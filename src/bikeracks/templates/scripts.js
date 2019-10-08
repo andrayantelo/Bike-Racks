@@ -142,9 +142,7 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         // hide sign in button
         this.$signInButton.attr('hidden', true);
         
-        // TODO load map with UI for online users (buttons available for
-        // submitting and voting)
-        
+
         // first things first, reload the map TODO
         this.loadMap(user.uid); 
         
@@ -290,7 +288,6 @@ BikeMap.prototype.onMapClick = function (e) {
             longitude: e.latlng.lng,
             address: address,
             rackId: "",
-            status: undefined,
             upvoteCount: undefined,
             downvoteCount: undefined,
             userId: userId,
@@ -323,7 +320,6 @@ BikeMap.prototype.addTempMarker = function(lat, lng, address) {
             latitude: lat,
             longitude: lng,
             address: address,
-            status: undefined,
             rackId: "",
             upvoteCount: undefined,
             downvoteCount: undefined,
@@ -366,13 +362,14 @@ BikeMap.prototype.createMarker = function(state) {
     else {
         // we didn't find a marker, make a new one
         marker = L.marker([state.latitude, state.longitude], {uniqueId: state.rack_id}); 
-        
+        // Figure out marker's status
+        let status = state.upvote_count > state.downvote_count;
         // add marker to allRacks feature group and its feature group based on status
         this.allRacks.addLayer(marker);
-        if (state.status === "approved") {
+        if (status) {
             this.allApproved.addLayer(marker);
         }
-        else if (state.status === "not_approved") {
+        else if (!status) {
             this.allNotApproved.addLayer(marker);
         }
         

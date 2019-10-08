@@ -112,8 +112,10 @@ def update_rack_status():
     upvote = percentages['upvote_percentage']
     downvote = percentages['downvote_percentage']
     
-    current_rack_status = db.execute("SELECT status FROM bikeracks WHERE rack_id=?",
-        (rack_id,)).fetchone()
+    
+    
+    current_rack_status = db.execute(
+        "SELECT rack_id from bikeracks where upvote_count > downvote_count").fetchone()
     current_rack_status = helper.dict_from_row(current_rack_status)
     current_rack_status = current_rack_status['status']
     

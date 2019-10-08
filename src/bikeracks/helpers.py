@@ -59,6 +59,8 @@ def get_racks(database, status, user_id):
     # based on status of rack ('not_approved', 'approved')
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
+    
+    # what status is this rack
 
     if not status and not user_id:
         # get all racks from bikeracks table

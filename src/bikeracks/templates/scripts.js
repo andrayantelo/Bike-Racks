@@ -181,10 +181,7 @@ BikeMap.prototype.loadMap = function(userId) {
     // display on map
     
     this.getRacks(userId).done((data) => {
-        console.log("data received from db on load:");
-        console.log(data);
 
-        
         return this.buildRacks(data, userId);
     });
     
@@ -474,6 +471,20 @@ BikeMap.prototype.updateRackStatus = function(rack_id) {
         })
 }
 
+BikeMap.prototype.unvote = function(voteType, rack_id, user_id) {
+    // Remove a vote of voteType for rack with rackId and for user with userId
+    
+    let params = $.param({rack_id: rack_id, vote_type: voteType, user_id: user_id}),
+        path = {{ url_for('votes.unvote')|tojson }};
+        
+    return $.ajax({
+        method: 'POST',
+        url: path + '?' + params,
+        context: this,
+    })
+    
+}
+
 
 BikeMap.prototype.vote = function(e) {
     console.log('voting');
@@ -494,8 +505,12 @@ BikeMap.prototype.vote = function(e) {
     // that happen even if they didn't already make a vote still happen
     voteStatusP.then(voteStatus => {
         if (voteStatus) {
-            console.log('rack already has a vote, updating vote');
             // user already submitted a vote for this rack
+            
+            // IF the vote type of the arrow that the user clicked matches
+            // the vote that they have given this rack - UNVOTE
+            // remove their vote from the db, remove .voted class from the arrow
+            // that was clicked on
             let voteType = voteStatus.vote_type,
                 newVote = e.target.dataset.votetype;
                 
@@ -511,12 +526,16 @@ BikeMap.prototype.vote = function(e) {
                     });
                 });
             }
-            // if the new vote is the same as the old vote, nothing happens
+            // if the new vote is the same as the old vote, UNVOTE
+            else {
+                this.unvote(newVoteType, rack_id, user_id).done(resp => {
+                    this.loadMap(user_id);
+                });
+            }
 
         }
         else {
             // user is voting for rack for the first time
-            console.log('voting for this rack for the first time');
             let voteType = e.target.dataset.votetype;
             voteType = voteType === "upvote"? 1 : -1;
             
@@ -535,9 +554,9 @@ BikeMap.prototype.vote = function(e) {
     
 };
 
-BikeMap.prototype.arrowHTML = function(state, currentUserId) { 
+BikeMap.prototype.arrowHTML = function(state) { 
     let containerId = "rack_" + state.rack_id;
-    
+   
     let upvoteArrowClass = "fas fa-arrow-circle-up fa-2x arrow ",
         downvoteArrowClass = "fas fa-arrow-circle-down fa-2x arrow ",
         upvotePercentage = Math.floor((state.upvote_count/(state.upvote_count + state.downvote_count))*100),
@@ -558,12 +577,11 @@ BikeMap.prototype.arrowHTML = function(state, currentUserId) {
         downvoteArrowClass += "arrowHover arrowClick";
     }
     else if (state.vote_type === 1) {
-       console.log('adding voted class');
-       upvoteArrowClass += "voted";
+       upvoteArrowClass += "voted arrowClick";
        downvoteArrowClass += "arrowHover arrowClick";
     }
    else if (state.vote_type === -1) {
-        downvoteArrowClass += "voted";
+        downvoteArrowClass += "voted arrowClick";
         upvoteArrowClass += "arrowHover arrowClick";
     }
     // if the state's user id does NOT match the current user, then the user has not voted on this rack yet
@@ -584,13 +602,10 @@ BikeMap.prototype.arrowHTML = function(state, currentUserId) {
 
 
 BikeMap.prototype.popupContent = function(state) {
-    let onlineStatus;
-    if (this.auth.currentUser) {
-        onlineStatus = this.auth.currentUser.uid;
-    }
-    else {
-        onlineStatus = false
-    }
+    let onlineStatus,
+        voterStatus;
+
+    onlineStatus = Boolean(this.auth.currentUser);
     
     /* state : {
      *     address: address (string),
@@ -613,7 +628,7 @@ BikeMap.prototype.popupContent = function(state) {
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
     if (onlineStatus && state.status) {
         
-        let arrows = this.arrowHTML(state, onlineStatus);
+        let arrows = this.arrowHTML(state);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }

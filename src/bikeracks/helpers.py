@@ -60,43 +60,24 @@ def get_racks(database, status, user_id):
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
     
-    # what status do we want to get
-    status_req = "r.upvote_count > r.downvote_count" if status == "approved" else "r.downvote_count > r.upvote_count"
-
-    if not status and not user_id:
-        # get all racks from bikeracks table
-        query = "SELECT * FROM bikeracks"
-        result = database.execute(query).fetchall()
-    elif status and not user_id:
-        # get all racks with given status from bikeracks table
-        query = "SELECT * FROM bikeracks as r WHERE {}".format(status_req)
-        result = database.execute(query, (status,)).fetchall()
-    elif not status and user_id:
-        # return all joined rows from bikeracks and votes
-        # get all the racks, including voting information for racks that user voted on
-        query = """ SELECT 
-                        r.*,
-                        v.vote_type
-                    FROM bikeracks as r
-                    LEFT JOIN votes as v
-                    ON (r.rack_id=v.rack_id AND v.user_id=?)
-                """
-        result = database.execute(query, (user_id,)).fetchall()
+    query = []
+    args = []
+    # Limit to a single user_id if we have it
+    if user_id:
+        query.append(""" SELECT r.*, v.vote_type
+                         FROM bikeracks as r
+                         LEFT JOIN votes as v
+                         ON (r.rack_id = v.rack_id and v.user_id = ?)""")
+        args.append(user_id)
+    else:
+        query.append("SELECT * FROM bikeracks as r")
         
-    elif status and user_id:
-        # get all the racks with status=status, including voting information for racks that user voted on
-        query = """ SELECT 
-                        r.*,
-                        v.vote_type
-                    FROM bikeracks as r
-                    LEFT JOIN votes as v
-                    ON (r.rack_id=v.rack_id
-                    AND v.user_id=?) 
-                    WHERE {})
-                """.format(status_req)
-        result = database.execute(query, (user_id, status,)).fetchall()
-    
-    
+    # Limit to some status if we know it
+    if status:
+        op = ">" if status == "approved" else "<"
+        query.append("WHERE r.upvote_count {} r.downvote_count".format(op))
+        
+    result = database.execute(' '.join(query), tuple(args)).fetchall()
     result = [dict_from_row(row) for row in result]
 
     return jsonify(result)

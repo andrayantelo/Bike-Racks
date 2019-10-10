@@ -18,14 +18,9 @@ class BikeRack {
         // based on upvote and downvote count
         let markerColor,
             status = this.state.upvote_count > this.state.downvote_count;
-        
-        if (status) {
-            markerColor = approvedMarkerColor;
-        }
-        else if (!status) {
-            markerColor = notApprovedMarkerColor;
-        }
-        
+            
+        markerColor = status? approvedMarkerColor : notApprovedMarkerColor;
+       
         this.state.markerColor = markerColor;
         
         return markerColor;

@@ -518,7 +518,7 @@ BikeMap.prototype.vote = function(e) {
         else {
             // user is voting for rack for the first time
             let voteType = e.target.dataset.votetype;
-            voteType = voteType === "upvote"? 1 : -1;
+            voteType = voteType === "upvote" ? 1 : -1;
             
             this.submitVote(rack_id, user_id, voteType).done(vote => {
                     this.loadMap(user_id);

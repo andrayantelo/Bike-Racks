@@ -360,15 +360,13 @@ BikeMap.prototype.createMarker = function(state) {
     else {
         // we didn't find a marker, make a new one
         marker = L.marker([state.latitude, state.longitude], {uniqueId: state.rack_id}); 
-        // Figure out marker's status
-        let status = state.upvote_count > state.downvote_count;
         // add marker to allRacks feature group and its feature group based on status
         this.allRacks.addLayer(marker);
         // true implies that this rack is approved
-        if (status) {
+        if (isApproved(state)) {
             this.allApproved.addLayer(marker);
         }
-        else (!status) {
+        else (!isApproved(state)) {
             this.allNotApproved.addLayer(marker);
         }
         

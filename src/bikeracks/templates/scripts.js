@@ -590,7 +590,7 @@ BikeMap.prototype.popupContent = function(state) {
      *     latitude: latitude (string),
      *     longitude: longitude (string),
      *     rack_id: rack_id (string), determine if a marker is a temporary marker
-     * or not by if they have a rack_id or not
+     *         or not by if they have a rack_id or not
      *     user_id: user_id (string, empty? (or undefined) if user is not signed in)
     }*/
     if (state.address === null || state.address === undefined) {

@@ -45,6 +45,15 @@ function isApproved(state) {
     return state.upvote_count > state.downvote_count;
 }
 
+function isTemporary(state) {
+    // returns true if a rack is a temporary rack (does not have a rack_id)
+    return !state.rack_id;
+}
+
+function isLoggedIn(bikemap) {
+    return Boolean(bikemap.auth.currentUser);
+}
+
 
 // -------------------------------@-------------------------------------
 // for testing purposes

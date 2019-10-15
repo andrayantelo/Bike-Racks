@@ -366,7 +366,7 @@ BikeMap.prototype.createMarker = function(state) {
         if (isApproved(state)) {
             this.allApproved.addLayer(marker);
         }
-        else (!isApproved(state)) {
+        else {
             this.allNotApproved.addLayer(marker);
         }
         

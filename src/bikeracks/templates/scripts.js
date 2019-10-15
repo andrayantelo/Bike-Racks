@@ -364,6 +364,7 @@ BikeMap.prototype.createMarker = function(state) {
         let status = state.upvote_count > state.downvote_count;
         // add marker to allRacks feature group and its feature group based on status
         this.allRacks.addLayer(marker);
+        // true implies that this rack is approved
         if (status) {
             this.allApproved.addLayer(marker);
         }

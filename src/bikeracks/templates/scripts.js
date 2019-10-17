@@ -142,10 +142,8 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         // hide sign in button
         this.$signInButton.attr('hidden', true);
         
-        // TODO load map with UI for online users (buttons available for
-        // submitting and voting)
-        
-        // first things first, reload the map TODO
+
+        // first things first, reload the map
         this.loadMap(user.uid); 
         
         
@@ -156,7 +154,6 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         // show sign in button
         this.$signInButton.removeAttr('hidden');
         
-        // TODO disable add bike rack and voting buttons
         // reload the map again, so that popup buttons can be updated
         this.loadMap();
     }
@@ -246,8 +243,6 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
         // place on the map that was clicked
         
         // submit a location on the map for bike rack location consideration
-        // it will be added to the database with a status of pending
-        // as long as the coordinates are valid
         e.preventDefault();
         $.ajax({
             method: 'POST',
@@ -290,7 +285,6 @@ BikeMap.prototype.onMapClick = function (e) {
             longitude: e.latlng.lng,
             address: address,
             rackId: "",
-            status: undefined,
             upvoteCount: undefined,
             downvoteCount: undefined,
             userId: userId,
@@ -323,7 +317,6 @@ BikeMap.prototype.addTempMarker = function(lat, lng, address) {
             latitude: lat,
             longitude: lng,
             address: address,
-            status: undefined,
             rackId: "",
             upvoteCount: undefined,
             downvoteCount: undefined,
@@ -366,13 +359,13 @@ BikeMap.prototype.createMarker = function(state) {
     else {
         // we didn't find a marker, make a new one
         marker = L.marker([state.latitude, state.longitude], {uniqueId: state.rack_id}); 
-        
         // add marker to allRacks feature group and its feature group based on status
         this.allRacks.addLayer(marker);
-        if (state.status === "approved") {
+        // true implies that this rack is approved
+        if (isApproved(state)) {
             this.allApproved.addLayer(marker);
         }
-        else if (state.status === "not_approved") {
+        else {
             this.allNotApproved.addLayer(marker);
         }
         
@@ -461,17 +454,6 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
     })
 }
 
-BikeMap.prototype.updateRackStatus = function(rack_id) {
-    let params = $.param({rack_id: rack_id}),
-        path = {{ url_for('bikes.update_rack_status')|tojson }};
-    
-    return $.ajax({
-        method: 'GET',
-        url: path + '?' + params,
-        context: this,
-        })
-}
-
 BikeMap.prototype.unvote = function(voteType, rack_id, user_id) {
     // Remove a vote of voteType for rack with rackId and for user with userId
     
@@ -521,10 +503,7 @@ BikeMap.prototype.vote = function(e) {
             if (voteType === 1 && newVoteType === -1 || voteType === -1 && newVoteType === 1) {
                 
                 this.submitVote(rack_id, user_id, newVoteType).done(vote => {
-                    this.updateRackStatus(rack_id).done(status => {
-                        
                         this.loadMap(user_id);
-                    });
                 });
             }
             // if the new vote is the same as the old vote, UNVOTE
@@ -538,13 +517,10 @@ BikeMap.prototype.vote = function(e) {
         else {
             // user is voting for rack for the first time
             let voteType = e.target.dataset.votetype;
-            voteType = voteType === "upvote"? 1 : -1;
+            voteType = voteType === "upvote" ? 1 : -1;
             
             this.submitVote(rack_id, user_id, voteType).done(vote => {
-                this.updateRackStatus(rack_id).done(status => {
-                    
                     this.loadMap(user_id);
-                });
             });
         }
     })
@@ -605,16 +581,14 @@ BikeMap.prototype.arrowHTML = function(state) {
 BikeMap.prototype.popupContent = function(state) {
     let onlineStatus,
         voterStatus;
-
-    onlineStatus = Boolean(this.auth.currentUser);
     
     /* state : {
      *     address: address (string),
      *     latitude: latitude (string),
      *     longitude: longitude (string),
-     *     rack_id: rack_id (string),
-     *     status: string (is it a temp marker or not, can be determined based on whether this rack has a status or not),
-     *     user_id: user_id (string, empty? (or undefined) if user is not signed in)
+     *     rack_id: rack_id (string), determine if a marker is a temporary marker
+     *         or not by if they have a rack_id or not
+     *     user_id: user_id (string, empty string if user is not signed in)
     }*/
     if (state.address === null || state.address === undefined) {
         state.address = ""
@@ -627,14 +601,14 @@ BikeMap.prototype.popupContent = function(state) {
                <div id="options">`
     
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
-    if (onlineStatus && state.status) {
+    if (isLoggedIn(this) && isTemporary(state)) {
         
         let arrows = this.arrowHTML(state);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }
     // if the user is online and this IS a temporary marker include only the submit button
-    else if (onlineStatus && !state.status && state.address) {
+    else if (isLoggedIn(this) && !isTemporary(state) && state.address) {
         
         content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
     }

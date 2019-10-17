@@ -59,41 +59,25 @@ def get_racks(database, status, user_id):
     # based on status of rack ('not_approved', 'approved')
     # return a response object with the application/json mimetype, the content
     # is an array of dictionary objects that contain the states of each rack
-
-    if not status and not user_id:
-        # get all racks from bikeracks table
-        query = "SELECT * FROM bikeracks"
-        result = database.execute(query).fetchall()
-    elif status and not user_id:
-        # get all racks with given status from bikeracks table
-        query = "SELECT * FROM bikeracks WHERE status =?"
-        result = database.execute(query, (status,)).fetchall()
-    elif not status and user_id:
-        # return all joined rows from bikeracks and votes
-        # get all the racks, including voting information for racks that user voted on
-        query = """ SELECT 
-                        r.*,
-                        v.vote_type
-                    FROM bikeracks as r
-                    LEFT JOIN votes as v
-                    ON (r.rack_id=v.rack_id AND v.user_id=?)
-                """
-        result = database.execute(query, (user_id,)).fetchall()
+    
+    query = []
+    args = []
+    # Limit to a single user_id if we have it
+    if user_id:
+        query.append(""" SELECT r.*, v.vote_type
+                         FROM bikeracks as r
+                         LEFT JOIN votes as v
+                         ON (r.rack_id = v.rack_id and v.user_id = ?)""")
+        args.append(user_id)
+    else:
+        query.append("SELECT * FROM bikeracks as r")
         
-    elif status and user_id:
-        # get all the racks with status=status, including voting information for racks that user voted on
-        query = """ SELECT 
-                        r.*,
-                        v.vote_type
-                    FROM bikeracks as r
-                    LEFT JOIN votes as v
-                    ON (r.rack_id=v.rack_id
-                    AND v.user_id=?) 
-                    WHERE r.status=?)
-                """
-        result = database.execute(query, (user_id, status,)).fetchall()
-    
-    
+    # Limit to some status if we know it
+    if status:
+        op = ">" if status == "approved" else "<"
+        query.append("WHERE r.upvote_count {} r.downvote_count".format(op))
+        
+    result = database.execute(' '.join(query), tuple(args)).fetchall()
     result = [dict_from_row(row) for row in result]
 
     return jsonify(result)
@@ -107,16 +91,6 @@ def get_single_rack(database, rack_id):
     result = database.execute(query, (rack_id,)).fetchall()
     result = [dict_from_row(row) for row in result]
     return jsonify(result)
-
-# below function is to easily add racks to db for testing TODO 
-def insert_rack(database, rack):
-    # insert into table table_name, the rack (dict)
-    query = "INSERT INTO bikeracks (latitude, longitude, status, address) values (?, ?, ?, ?)"
-    database.execute(query, (rack['latitude'], rack['longitude'], rack['status'],
-        rack['address']))
-    database.commit()
-    
-    return
   
 # get vote status for server side functions
 def get_vote_status(database, rack_id, user_id):

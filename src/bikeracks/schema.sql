@@ -1,6 +1,7 @@
 /* The sqlite database schema */
 /* Why is 'status' blue 
 There are actually 2 states a bikerack can be in: "approved" or "not_approved"
+which will be calculated by using downvote_count and upvote_count
 separate table for votes, has foreign key on bike rack id
 and this separate table has the data for voting: type of vote (1 ("upvote") or -1 ("downvote")),
 user_id, index on the bikerack id (or user_id)
@@ -20,14 +21,12 @@ DROP TABLE IF EXISTS votes_history;
 
 CREATE TABLE bikeracks (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    status TEXT DEFAULT "not_approved",
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
     address TEXT,
     upvote_count INTEGER NOT NULL DEFAULT 0,
     downvote_count INTEGER NOT NULL DEFAULT 0,
-    CONSTRAINT coordinates UNIQUE(latitude, longitude),
-    CHECK (status in ("approved", "not_approved"))
+    CONSTRAINT coordinates UNIQUE(latitude, longitude)
     
 );
 
@@ -61,12 +60,10 @@ that way we can link old votes back to their bikerack */
 
 CREATE TABLE bikeracks_history (
     rack_id INTEGER PRIMARY KEY,
-    status TEXT DEFAULT "not_approved",
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
     address TEXT,
-    CONSTRAINT coordinates UNIQUE(latitude, longitude),
-    CHECK (status in ("approved", "not_approved"))
+    CONSTRAINT coordinates UNIQUE(latitude, longitude)
 );
 
 /* 
@@ -90,13 +87,5 @@ CREATE TABLE votes_history (
 /*want to be able to look up votes from a certain period in time */
 CREATE UNIQUE INDEX old_votes ON votes_history (vote_timestamp);
 
-/* TODO Things to check:
-- check that the foreign key on the regular tables bikeracks and votes works 
-- add all bikeracks to the bikeracks_history 
-- then you can have foreign key on it in votes_history
-
-TODO this weekend:
-- ask about users table, and foreign key idea
-*/
 
 

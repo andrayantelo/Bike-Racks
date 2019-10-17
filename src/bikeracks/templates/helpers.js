@@ -16,16 +16,10 @@ class BikeRack {
 
     setMarkerColor() {
         // based on upvote and downvote count
-        let markerColor,
-            status = this.state.status;
-        
-        if (status === "approved") {
-            markerColor = approvedMarkerColor;
-        }
-        else if (status === "not_approved") {
-            markerColor = notApprovedMarkerColor;
-        }
-        
+        let markerColor;
+            
+        markerColor = isApproved(this.state) ? approvedMarkerColor : notApprovedMarkerColor;
+       
         this.state.markerColor = markerColor;
         
         return markerColor;
@@ -46,6 +40,20 @@ function buildMarkerIcon(markerColor) {
     });
 };
 
+function isApproved(state) {
+    // returns true if a rack is approved (more upvotes than downvotes)
+    return state.upvote_count > state.downvote_count;
+}
+
+function isTemporary(state) {
+    // returns true if a rack is a temporary rack (does not have a rack_id)
+    return !state.rack_id;
+}
+
+function isLoggedIn(bikemap) {
+    return Boolean(bikemap.auth.currentUser);
+}
+
 
 // -------------------------------@-------------------------------------
 // for testing purposes
@@ -64,28 +72,7 @@ function getRack(state) {
         
 }
 
-// for testing purposes
-function storeRack(state) {
-    
-    $.ajax({
-        method: 'POST',
-        url: {{ url_for('bikes.store_rack')|tojson }},
-        data: JSON.stringify({
-            latitude: state.latitude,
-            longitude: state.longitude,
-            status: state.status,
-            address: state.address,
-            upvote_count: state.vote.upvote,
-            downvote_count: state.vote.downvote
-        }, null, '\t'),
-        dataType: 'json',
-        contentType: 'application/json;charset=UTF-8',
-        context: this
-    }).done((data) => {
-        console.log("printing data:");
-        console.log(data);
-    })
-}
+
 
 
 

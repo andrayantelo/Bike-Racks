@@ -143,7 +143,7 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         this.$signInButton.attr('hidden', true);
         
 
-        // first things first, reload the map TODO
+        // first things first, reload the map
         this.loadMap(user.uid); 
         
         
@@ -154,7 +154,6 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         // show sign in button
         this.$signInButton.removeAttr('hidden');
         
-        // TODO disable add bike rack and voting buttons
         // reload the map again, so that popup buttons can be updated
         this.loadMap();
     }
@@ -589,7 +588,7 @@ BikeMap.prototype.popupContent = function(state) {
      *     longitude: longitude (string),
      *     rack_id: rack_id (string), determine if a marker is a temporary marker
      *         or not by if they have a rack_id or not
-     *     user_id: user_id (string, empty? (or undefined) if user is not signed in)
+     *     user_id: user_id (string, empty string if user is not signed in)
     }*/
     if (state.address === null || state.address === undefined) {
         state.address = ""

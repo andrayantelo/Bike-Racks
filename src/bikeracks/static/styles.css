@@ -1,5 +1,8 @@
 #mapid { 
-  height: 100vmax;
+  height: 90vmin;
+}
+.container {
+  margin-top: 10px;
 }
 
 .navbar-light {
@@ -68,7 +71,9 @@
 and (max-width: 320) {
     .leaflet-control-geosearch.bar {
       width: 20%;
-      
+    }
+    #mapid {
+      height: 80vmax;
     }
 }
 
@@ -77,7 +82,9 @@ and (max-width : 345px)  {
 
     .leaflet-control-geosearch.bar {
       width: 65%;
-      
+    }
+    #mapid {
+      height: 80vmax;
     }
 }
 
@@ -86,7 +93,17 @@ and (min-width : 345px)
 and (max-width : 515px) {
     .leaflet-control-geosearch.bar {
       width: 75%;
-      
+    }
+    #mapid {
+      height: 90vmax;
+    }
+}
+
+@media only screen
+and (min-width : 768)
+and (max-width : 1366) {
+    #mapid {
+      height: 100vmax;
     }
 }
 

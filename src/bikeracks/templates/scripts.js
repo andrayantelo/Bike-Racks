@@ -436,6 +436,8 @@ BikeMap.prototype.getVoteStatus = function(rack_id, user_id) {
 }
 
 BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
+    // maybe one of the arguments can be a boolean (Boolean(remove) then 
+    // the method is DELETE, otherwise it is POST?
     // submit a vote to the database
     // rack_id: integer
     // user_id: string

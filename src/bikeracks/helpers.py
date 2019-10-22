@@ -100,6 +100,33 @@ def get_vote_status(database, rack_id, user_id):
     result = database.execute(query, (rack_id, user_id)).fetchone()
     return result
     
+def update_vote_count(database, rack_id, up_delta, down_delta):
+    query = """ UPDATE
+                    bikeracks
+                SET
+                    upvote_count=
+                    (
+                        SELECT
+                            MAX(upvote_count + ?, 0)
+                        FROM
+                            bikeracks
+                        WHERE
+                            rack_id=?
+                    ),
+                    downvote_count=
+                    (
+                        SELECT
+                            MAX(downvote_count + ?, 0)
+                        FROM
+                            bikeracks
+                        WHERE rack_id=?
+                    )
+                WHERE
+                    rack_id=?"""
+    database.execute(query, (up_delta, rack_id, down_delta, rack_id, rack_id))
+    database.commit()
+    return
+    
 # decrement from downvote or upvote_count
 def decrement_upvote_count(rack_id, database):
 

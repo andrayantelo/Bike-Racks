@@ -68,7 +68,7 @@ def submit_vote():
     
     # connect to db
     db = get_db()
-                
+    
     vote_status = h.get_vote_status(db, rack_id, user_id)
     if vote_status:
         # updating an existing vote

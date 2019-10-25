@@ -72,7 +72,7 @@ def submit_vote():
     query = """ INSERT INTO votes (rack_id, user_id, vote_type)
                 VALUES (?, ?, ?)
                 ON CONFLICT(rack_id, user_id) DO UPDATE SET vote_type=?"""
-    db.execute(query, (rack_id, user_id, vote_type))
+    db.execute(query, (rack_id, user_id, vote_type, vote_type))
     db.commit()
     
     # if the vote is an upvote then delta_up is 1 and delta_down is -1

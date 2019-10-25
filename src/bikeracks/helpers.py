@@ -104,26 +104,14 @@ def update_vote_count(database, rack_id, up_delta, down_delta):
     query = """ UPDATE
                     bikeracks
                 SET
-                    upvote_count=
-                    (
-                        SELECT
-                            MAX(upvote_count + ?, 0)
-                        FROM
-                            bikeracks
-                        WHERE
-                            rack_id=?
-                    ),
-                    downvote_count=
-                    (
-                        SELECT
-                            MAX(downvote_count + ?, 0)
-                        FROM
-                            bikeracks
-                        WHERE rack_id=?
-                    )
+                    (upvote_count, downvote_count)
+                =
+                    (MAX(upvote_count + ?, 0), MAX(downvote_count + ?, 0))
                 WHERE
-                    rack_id=?"""
-    database.execute(query, (up_delta, rack_id, down_delta, rack_id, rack_id))
+                    rack_id = ?
+            """
+    
+    database.execute(query, (up_delta, down_delta, rack_id))
     database.commit()
     return
     

@@ -102,7 +102,7 @@ def get_vote_status(database, rack_id, user_id):
     
 def update_vote_count(database, rack_id, up_delta, down_delta):
     query = """ UPDATE
-                    bikeracks
+                   bikeracks
                 SET
                     (upvote_count, downvote_count)
                 =
@@ -110,7 +110,6 @@ def update_vote_count(database, rack_id, up_delta, down_delta):
                 WHERE
                     rack_id = ?
             """
-    
     database.execute(query, (up_delta, down_delta, rack_id))
     database.commit()
     return

@@ -90,55 +90,12 @@ def submit_vote():
         h.update_vote_count(db, rack_id, 1, 0)
     elif vote_type == -1:
         h.update_vote_count(db, rack_id, 0, 1)
+    elif vote_type == 1 and vote_status.vote_type == 1:
+        # unvote the previous upvote
+        h.update_vote_count(db, rack_id, -1, 0)
+    elif vote_type == -1 and vote_status.vote_type == -1:
+        # unvote the previous downvote
+        h.update_vote_count(db, rack_id, 0, -1)
     
     resp = get_vote_data(rack_id, user_id)
     return jsonify(resp)
-    
-@votes.route('/unvote', methods=['POST'])
-def unvote():
-    # remove a vote that the user had previously made
-
-    rack_id = request.args.get('rack_id', type=int)
-    user_id = request.args.get('user_id', type=str)
-    vote_type = request.args.get('vote_type', type=int)
-    
-    if not rack_id:
-        return "No rack_id specified", 400
-    
-    # connect to db
-    db = get_db()
-    
-    # remove user's vote for this rack from votes table and update bikeracks vote count
-    
-    #remove user's vote 
-    query = """
-            DELETE FROM
-                votes
-            WHERE
-                user_id=? AND
-                vote_type=? AND
-                rack_id=?
-            """
-    db.execute(query, (user_id, vote_type, rack_id))
-    
-    # decrement the vote count in the bikeracks row for this rack
-    if int(vote_type) == 1:
-         count_column_name= "upvote_count"
-    else:
-        count_column_name = "downvote_count"
-    
-    query = """
-                UPDATE
-                    bikeracks
-                SET
-                    {}={} - 1
-                WHERE
-                    rack_id=?
-            """.format(count_column_name, count_column_name)
-    
-    db.execute(query, (rack_id,))
-    
-    db.commit()
-    return "OK", 200
- 
-

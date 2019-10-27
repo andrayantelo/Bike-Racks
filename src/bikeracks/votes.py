@@ -61,7 +61,7 @@ def submit_vote():
 
     rack_id = request.args.get('rack_id', type=int)
     user_id = request.args.get('user_id', type=str)
-    vote_type = request.args.get('vote_type', type=int)
+    new_vote = request.args.get('vote_type', type=int)
     
     if not rack_id:
         return "No rack_id specified", 400
@@ -69,86 +69,35 @@ def submit_vote():
     # connect to db
     db = get_db()
     
-    vote_status = h.get_vote_status(db, rack_id, user_id)
-    if vote_status:
-        # updating an existing vote
-        
-        query = "UPDATE votes SET vote_type = ? WHERE rack_id = ? AND user_id = ?"
-        db.execute(query, (vote_type, rack_id, user_id))
-        db.commit()
-        # also update the vote count in bikeracks table
-        if vote_type == 1:
-            # update the downvote_count in bikeracks for this rack, decrement by 1
-            h.decrement_downvote_count(rack_id, db)
-            
-        # if the user downvoted
-        elif vote_type == -1:
-            # update the upvote_count in bikeracks for this rack, decrement by 1
-            h.decrement_upvote_count(rack_id, db)
-        
+    # check if user has voted on this rack before
+    row = h.get_vote_status(db, rack_id, user_id)
+    old_vote = row[0] if row else 0
+    # vote_status is an object, {vote_type: -1} for example or None
+    if new_vote == 0:
+        query = """
+                   DELETE FROM
+                              votes
+                          WHERE
+                              rack_id = ? AND user_id = ?
+                """
+        db.execute(query, (rack_id, user_id))
     else:
-        # voting for the first time
-        
-        query = "INSERT INTO votes (rack_id, user_id, vote_type) VALUES (?, ?, ?)"
-        db.execute(query, (rack_id, user_id, vote_type))
-        db.commit()
-        
-    # increment the upvote or downvote count
-    if vote_type == 1:
-        # update the upvote_count in bikeracks for this rack, increment by 1
-        h.increment_upvote_count(rack_id, db)
-    elif vote_type == -1:
-        # update the downvote_count in bikeracks for this rack, increment by 1
-        h.increment_downvote_count(rack_id, db)
+        query = """ INSERT INTO votes (rack_id, user_id, vote_type)
+                VALUES (?, ?, ?)
+                ON CONFLICT(rack_id, user_id) DO UPDATE SET vote_type=?"""
+        db.execute(query, (rack_id, user_id, new_vote, new_vote))
+    db.commit()
+    
+    if new_vote  > old_vote:
+    # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (0, -1)
+        delta_up = new_vote
+        delta_down = old_vote
+    if new_vote < old_vote:
+    # This is a new downvote (0, 1) or change from up to down (-1, 1) or change from up to no vote (-1, 0)
+        delta_up = -old_vote
+        delta_down = -new_vote
+    
+    h.update_vote_count(db, rack_id, delta_up, delta_down)
     
     resp = get_vote_data(rack_id, user_id)
     return jsonify(resp)
-    
-@votes.route('/unvote', methods=['POST'])
-def unvote():
-    # remove a vote that the user had previously made
-
-    rack_id = request.args.get('rack_id', type=int)
-    user_id = request.args.get('user_id', type=str)
-    vote_type = request.args.get('vote_type', type=int)
-    
-    if not rack_id:
-        return "No rack_id specified", 400
-    
-    # connect to db
-    db = get_db()
-    
-    # remove user's vote for this rack from votes table and update bikeracks vote count
-    
-    #remove user's vote 
-    query = """
-            DELETE FROM
-                votes
-            WHERE
-                user_id=? AND
-                vote_type=? AND
-                rack_id=?
-            """
-    db.execute(query, (user_id, vote_type, rack_id))
-    
-    # decrement the vote count in the bikeracks row for this rack
-    if int(vote_type) == 1:
-         count_column_name= "upvote_count"
-    else:
-        count_column_name = "downvote_count"
-    
-    query = """
-                UPDATE
-                    bikeracks
-                SET
-                    {}={} - 1
-                WHERE
-                    rack_id=?
-            """.format(count_column_name, count_column_name)
-    
-    db.execute(query, (rack_id,))
-    
-    db.commit()
-    return "OK", 200
- 
-

@@ -19,8 +19,7 @@ class BikeMap {
         this.allRacks.on('click', (e) => {
             this.mymap.removeLayer(this.tempMarker);
             this.marker = e.sourceTarget;
-            console.log('clicked on: ');
-            console.log(this.marker);
+            
             e.target.openPopup();
         });
         
@@ -177,7 +176,6 @@ BikeMap.prototype.loadMap = function(userId) {
     // display on map
     
     this.getRacks(userId).done((data) => {
-
         return this.buildRacks(data, userId);
     });
     
@@ -454,23 +452,8 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
     })
 }
 
-BikeMap.prototype.unvote = function(voteType, rack_id, user_id) {
-    // Remove a vote of voteType for rack with rackId and for user with userId
-    
-    let params = $.param({rack_id: rack_id, vote_type: voteType, user_id: user_id}),
-        path = {{ url_for('votes.unvote')|tojson }};
-        
-    return $.ajax({
-        method: 'POST',
-        url: path + '?' + params,
-        context: this,
-    })
-    
-}
-
 
 BikeMap.prototype.vote = function(e) {
-    console.log('voting');
     if (!this.auth.currentUser) {
         // redirect user to sign in
         bikemap.signIn()
@@ -482,53 +465,30 @@ BikeMap.prototype.vote = function(e) {
         user_id = this.auth.currentUser.uid,
         voteStatusP = this.getVoteStatus(rack_id, user_id),
         arrowDiv = e.target.id;
-    
+
     // if the user already voted on this rack,
     // need to update their vote in the database, and the UI changes
     // that happen even if they didn't already make a vote still happen
     voteStatusP.then(voteStatus => {
-        if (voteStatus) {
-            // user already submitted a vote for this rack
-            
-            // IF the vote type of the arrow that the user clicked matches
-            // the vote that they have given this rack - UNVOTE
-            // remove their vote from the db, remove .voted class from the arrow
-            // that was clicked on
-            let voteType = voteStatus.vote_type,
-                newVote = e.target.dataset.votetype;
+
+            let oldVoteType = voteStatus ? voteStatus.vote_type : 0,
+                newVote = e.target.dataset.votetype,
+                voteToSubmit;
                 
             let newVoteType = newVote === "upvote"? 1: -1;
-            
-            // if the new vote is different from the old vote, submit the vote (update it)
-            if (voteType === 1 && newVoteType === -1 || voteType === -1 && newVoteType === 1) {
-                
-                this.submitVote(rack_id, user_id, newVoteType).done(vote => {
-                        this.loadMap(user_id);
-                });
+             
+             // if the new vote is the same as the old vote, unvote
+            if (newVoteType === oldVoteType) {
+                voteToSubmit = 0;
             }
-            // if the new vote is the same as the old vote, UNVOTE
             else {
-                this.unvote(newVoteType, rack_id, user_id).done(resp => {
-                    this.loadMap(user_id);
-                });
+            // just vote
+                voteToSubmit = newVoteType
             }
-
-        }
-        else {
-            // user is voting for rack for the first time
-            let voteType = e.target.dataset.votetype;
-            voteType = voteType === "upvote" ? 1 : -1;
+                
+            this.submitVote(rack_id, user_id, voteToSubmit);
             
-            this.submitVote(rack_id, user_id, voteType).done(vote => {
-                    this.loadMap(user_id);
-            });
-        }
     })
-
-    
-    
-    
-    
 };
 
 BikeMap.prototype.arrowHTML = function(state) { 
@@ -581,7 +541,6 @@ BikeMap.prototype.arrowHTML = function(state) {
 BikeMap.prototype.popupContent = function(state) {
     let onlineStatus,
         voterStatus;
-    
     /* state : {
      *     address: address (string),
      *     latitude: latitude (string),

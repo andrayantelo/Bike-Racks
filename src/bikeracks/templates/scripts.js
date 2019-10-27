@@ -8,6 +8,8 @@ class BikeMap {
             zoomControl: false,
             gestureHandling: true
         }).locate({setView:true, maxZoom: 16});
+        
+        L.control.locate().addTo(this.mymap);
         // set map to display user's current location
         //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         

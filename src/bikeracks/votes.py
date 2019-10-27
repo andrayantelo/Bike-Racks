@@ -84,7 +84,7 @@ def submit_vote():
     # update_vote_count(database, rack_id, up_delta, down_delta)
     if vote_type == 1 and vote_status:
         h.update_vote_count(db, rack_id, 1, -1)
-    elif vote_type == - 1 and vote_status:
+    elif vote_type == -1 and vote_status:
         h.update_vote_count(db, rack_id, -1, 1)
     elif vote_type == 1:
         h.update_vote_count(db, rack_id, 1, 0)

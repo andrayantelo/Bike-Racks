@@ -71,7 +71,8 @@ def submit_vote():
     
     # check if user has voted on this rack before
     vote_status = h.get_vote_status(db, rack_id, user_id)
-    
+    vote_status =  h.dict_from_row(vote_status) if vote_status else None
+    # vote_status is an object, {vote_type: -1} for example or None
     query = """ INSERT INTO votes (rack_id, user_id, vote_type)
                 VALUES (?, ?, ?)
                 ON CONFLICT(rack_id, user_id) DO UPDATE SET vote_type=?"""
@@ -80,15 +81,15 @@ def submit_vote():
     
     # if the vote is an upvote and the user has voted before
     # then delta_up is 1 and delta_down is -1
-    
-    if vote_type == 1 and voteStatus:
+    # update_vote_count(database, rack_id, up_delta, down_delta)
+    if vote_type == 1 and vote_status:
         h.update_vote_count(db, rack_id, 1, -1)
-    elif vote_type == - 1 and voteStatus:
+    elif vote_type == - 1 and vote_status:
         h.update_vote_count(db, rack_id, -1, 1)
     elif vote_type == 1:
         h.update_vote_count(db, rack_id, 1, 0)
     elif vote_type == -1:
-        h.update_vote_count(db, rack_id, 0, -1)
+        h.update_vote_count(db, rack_id, 0, 1)
     
     resp = get_vote_data(rack_id, user_id)
     return jsonify(resp)

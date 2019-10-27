@@ -101,6 +101,8 @@ def get_vote_status(database, rack_id, user_id):
     return result
     
 def update_vote_count(database, rack_id, up_delta, down_delta):
+    print("updating upvote count by: {}".format(up_delta))
+    print("updating downvote count by: {}".format(down_delta))
     query = """ UPDATE
                    bikeracks
                 SET

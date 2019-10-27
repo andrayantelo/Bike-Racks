@@ -71,8 +71,9 @@ def submit_vote():
     
     # check if user has voted on this rack before
     vote_status = h.get_vote_status(db, rack_id, user_id)
-    vote_status =  h.dict_from_row(vote_status) if vote_status else None
+    vote_status =  h.dict_from_row(vote_status) if vote_status else {'vote_type': 0}
     # vote_status is an object, {vote_type: -1} for example or None
+    print(vote_status)
     query = """ INSERT INTO votes (rack_id, user_id, vote_type)
                 VALUES (?, ?, ?)
                 ON CONFLICT(rack_id, user_id) DO UPDATE SET vote_type=?"""
@@ -82,20 +83,16 @@ def submit_vote():
     # if the vote is an upvote and the user has voted before
     # then delta_up is 1 and delta_down is -1
     # update_vote_count(database, rack_id, up_delta, down_delta)
-    if vote_type == 1 and vote_status:
-        h.update_vote_count(db, rack_id, 1, -1)
-    elif vote_type == -1 and vote_status:
-        h.update_vote_count(db, rack_id, -1, 1)
-    elif vote_type == 1:
-        h.update_vote_count(db, rack_id, 1, 0)
-    elif vote_type == -1:
-        h.update_vote_count(db, rack_id, 0, 1)
-    elif vote_type == 1 and vote_status.vote_type == 1:
-        # unvote the previous upvote
-        h.update_vote_count(db, rack_id, -1, 0)
-    elif vote_type == -1 and vote_status.vote_type == -1:
-        # unvote the previous downvote
-        h.update_vote_count(db, rack_id, 0, -1)
+    if vote_type  > vote_status['vote_type']:
+    # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (-1, 0)
+        delta_up = vote_type
+        delta_down = vote_status['vote_type']
+    if vote_type < vote_status['vote_type']:
+    # This is a new downvote (0, 1) or change from up to down (-1, 1) or change from up to no vote (-1, 0)
+        delta_up = vote_status['vote_type']
+        delta_down = -vote_type
+    
+    h.update_vote_count(db, rack_id, delta_up, delta_down)
     
     resp = get_vote_data(rack_id, user_id)
     return jsonify(resp)

@@ -449,7 +449,6 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
         context: this,
     }).done(data => {
         // reload the map
-        console.log(data);
         this.loadMap(user_id);
     })
 }
@@ -467,21 +466,30 @@ BikeMap.prototype.vote = function(e) {
         user_id = this.auth.currentUser.uid,
         voteStatusP = this.getVoteStatus(rack_id, user_id),
         arrowDiv = e.target.id;
-    
+
     // if the user already voted on this rack,
     // need to update their vote in the database, and the UI changes
     // that happen even if they didn't already make a vote still happen
-    // user already submitted a vote for this rack
+    voteStatusP.then(voteStatus => {
 
-    let newVote = e.target.dataset.votetype;
-        
-    let newVoteType = newVote === "upvote"? 1: -1;
-    
-        
-    this.submitVote(rack_id, user_id, newVoteType).done(vote => {
-                this.loadMap(user_id);
-    });
-    
+            let oldVoteType = voteStatus ? voteStatus.vote_type : 0,
+                newVote = e.target.dataset.votetype,
+                voteToSubmit;
+                
+            let newVoteType = newVote === "upvote"? 1: -1;
+             
+             // if the new vote is the same as the old vote, unvote
+            if (newVoteType === oldVoteType) {
+                voteToSubmit = 0;
+            }
+            else {
+            // just vote
+                voteToSubmit = newVoteType
+            }
+                
+            this.submitVote(rack_id, user_id, voteToSubmit);
+            
+    })
 };
 
 BikeMap.prototype.arrowHTML = function(state) { 

@@ -61,7 +61,7 @@ def submit_vote():
 
     rack_id = request.args.get('rack_id', type=int)
     user_id = request.args.get('user_id', type=str)
-    vote_type = request.args.get('vote_type', type=int)
+    new_vote = request.args.get('vote_type', type=int)
     
     if not rack_id:
         return "No rack_id specified", 400
@@ -73,24 +73,30 @@ def submit_vote():
     old_vote = h.get_vote_status(db, rack_id, user_id)
     old_vote =  h.dict_from_row(old_vote) if old_vote else {'vote_type': 0}
     # vote_status is an object, {vote_type: -1} for example or None
-    print(old_vote)
-    query = """ INSERT INTO votes (rack_id, user_id, vote_type)
+    if new_vote == 0:
+        query = """
+                   DELETE FROM
+                              votes
+                          WHERE
+                              rack_id = ? AND user_id = ?
+                """
+        db.execute(query, (rack_id, user_id))
+    else:
+        query = """ INSERT INTO votes (rack_id, user_id, vote_type)
                 VALUES (?, ?, ?)
                 ON CONFLICT(rack_id, user_id) DO UPDATE SET vote_type=?"""
-    db.execute(query, (rack_id, user_id, vote_type, vote_type))
+        db.execute(query, (rack_id, user_id, new_vote, new_vote))
     db.commit()
     
-    # if the vote is an upvote and the user has voted before
-    # then delta_up is 1 and delta_down is -1
-    # update_vote_count(database, rack_id, up_delta, down_delta)
-    if vote_type  > old_vote['vote_type']:
-    # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (-1, 0)
-        delta_up = vote_type
+    print("new_vote: {} old_vote: {}".format(new_vote, old_vote))
+    if new_vote  > old_vote['vote_type']:
+    # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (0, -1)
+        delta_up = new_vote
         delta_down = old_vote['vote_type']
-    if vote_type < old_vote['vote_type']:
+    if new_vote < old_vote['vote_type']:
     # This is a new downvote (0, 1) or change from up to down (-1, 1) or change from up to no vote (-1, 0)
         delta_up = old_vote['vote_type']
-        delta_down = -vote_type
+        delta_down = -new_vote
     
     h.update_vote_count(db, rack_id, delta_up, delta_down)
     

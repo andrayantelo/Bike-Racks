@@ -19,8 +19,7 @@ class BikeMap {
         this.allRacks.on('click', (e) => {
             this.mymap.removeLayer(this.tempMarker);
             this.marker = e.sourceTarget;
-            console.log('clicked on: ');
-            console.log(this.marker);
+            
             e.target.openPopup();
         });
         

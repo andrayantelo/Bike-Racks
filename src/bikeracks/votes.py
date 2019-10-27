@@ -88,14 +88,13 @@ def submit_vote():
         db.execute(query, (rack_id, user_id, new_vote, new_vote))
     db.commit()
     
-    print("new_vote: {} old_vote: {}".format(new_vote, old_vote))
     if new_vote  > old_vote['vote_type']:
     # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (0, -1)
         delta_up = new_vote
         delta_down = old_vote['vote_type']
     if new_vote < old_vote['vote_type']:
     # This is a new downvote (0, 1) or change from up to down (-1, 1) or change from up to no vote (-1, 0)
-        delta_up = old_vote['vote_type']
+        delta_up = -old_vote['vote_type']
         delta_down = -new_vote
     
     h.update_vote_count(db, rack_id, delta_up, delta_down)

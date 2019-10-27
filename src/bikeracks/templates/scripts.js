@@ -601,14 +601,14 @@ BikeMap.prototype.popupContent = function(state) {
                <div id="options">`
     
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
-    if (isLoggedIn(this) && isTemporary(state)) {
+    if (isLoggedIn(this) && !isTemporary(state)) {
         
         let arrows = this.arrowHTML(state);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
     }
     // if the user is online and this IS a temporary marker include only the submit button
-    else if (isLoggedIn(this) && !isTemporary(state) && state.address) {
+    else if (isLoggedIn(this) && isTemporary(state) && state.address) {
         
         content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
     }

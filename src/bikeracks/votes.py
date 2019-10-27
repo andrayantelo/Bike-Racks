@@ -70,8 +70,8 @@ def submit_vote():
     db = get_db()
     
     # check if user has voted on this rack before
-    old_vote = h.get_vote_status(db, rack_id, user_id)
-    old_vote =  h.dict_from_row(old_vote) if old_vote else {'vote_type': 0}
+    row = h.get_vote_status(db, rack_id, user_id)
+    old_vote = row[0] if row else 0
     # vote_status is an object, {vote_type: -1} for example or None
     if new_vote == 0:
         query = """
@@ -88,13 +88,13 @@ def submit_vote():
         db.execute(query, (rack_id, user_id, new_vote, new_vote))
     db.commit()
     
-    if new_vote  > old_vote['vote_type']:
+    if new_vote  > old_vote:
     # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (0, -1)
         delta_up = new_vote
-        delta_down = old_vote['vote_type']
-    if new_vote < old_vote['vote_type']:
+        delta_down = old_vote
+    if new_vote < old_vote:
     # This is a new downvote (0, 1) or change from up to down (-1, 1) or change from up to no vote (-1, 0)
-        delta_up = -old_vote['vote_type']
+        delta_up = -old_vote
         delta_down = -new_vote
     
     h.update_vote_count(db, rack_id, delta_up, delta_down)

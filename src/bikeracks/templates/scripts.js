@@ -177,7 +177,6 @@ BikeMap.prototype.loadMap = function(userId) {
     // display on map
     
     this.getRacks(userId).done((data) => {
-
         return this.buildRacks(data, userId);
     });
     
@@ -581,7 +580,6 @@ BikeMap.prototype.arrowHTML = function(state) {
 BikeMap.prototype.popupContent = function(state) {
     let onlineStatus,
         voterStatus;
-    
     /* state : {
      *     address: address (string),
      *     latitude: latitude (string),

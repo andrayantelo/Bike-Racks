@@ -102,7 +102,7 @@ def submit_vote():
         resp = get_vote_data(rack_id, user_id)
         return jsonify(resp)
     except Exception as e:
-        with open('/home/andrayantelo/bikerack.log', 'a') as f:
+        with open('/tmp/bikerack.log', 'a') as f:
             f.write(str(e))
         return 200, str(e)
     

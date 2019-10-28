@@ -102,5 +102,5 @@ def submit_vote():
         resp = get_vote_data(rack_id, user_id)
         return jsonify(resp)
     except Exception as e:
-        return 500, str(e)
+        return 200, str(e)
     

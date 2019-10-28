@@ -33,6 +33,9 @@ def get_vote_data(rack_id, user_id):
 def get_vote_status():
     # return true if user with user_id = user_id has voted for 
     # rack with rack_id=rack_id, false otherwise
+    
+    with open('/tmp/bikerack.log', 'a') as f:
+        f.write('hello world')
 
     rack_id = request.args.get('rack_id', type=int)
     user_id = request.args.get('user_id', type=str)

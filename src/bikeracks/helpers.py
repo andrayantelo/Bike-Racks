@@ -1,5 +1,4 @@
 from flask import jsonify
-import sqlite3
 from math import floor
 
 # Helper functions

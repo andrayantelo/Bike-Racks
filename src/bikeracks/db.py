@@ -1,6 +1,9 @@
 # Python comes with built-in support for sqlite in sqlite3 module
 # sqlite does not require setting up a separate database server
-from pysqlite3 import dbapi2 as sqlite3
+try:
+    import sqlite3
+except ImportError:
+    from pysqlite3 import dbapi2 as sqlite3
 
 import click
 from flask import current_app, g

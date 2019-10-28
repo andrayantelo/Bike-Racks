@@ -16,7 +16,6 @@ from flask import (
 )
 from . import helpers as h
 from bikeracks.db import get_db
-import sqlite3
 
 votes = Blueprint('votes', __name__)
 
@@ -62,6 +61,8 @@ def submit_vote():
         rack_id = request.args.get('rack_id', type=int)
         user_id = request.args.get('user_id', type=str)
         new_vote = request.args.get('vote_type', type=int)
+        delta_up = 0
+        delta_down = 0
         
         if not rack_id:
             return "No rack_id specified", 400
@@ -92,12 +93,13 @@ def submit_vote():
         # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (0, -1)
             delta_up = new_vote
             delta_down = old_vote
-        if new_vote < old_vote:
+        elif new_vote < old_vote:
         # This is a new downvote (0, 1) or change from up to down (-1, 1) or change from up to no vote (-1, 0)
             delta_up = -old_vote
             delta_down = -new_vote
         
-        h.update_vote_count(db, rack_id, delta_up, delta_down)
+        if delta_up or delta_down:
+          h.update_vote_count(db, rack_id, delta_up, delta_down)
         
         resp = get_vote_data(rack_id, user_id)
         return jsonify(resp)

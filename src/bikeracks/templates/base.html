@@ -92,7 +92,7 @@
                           <button class="btn btn-secondary dropdown-toggle" type="button"
                                   id="dropdownMenuButton" data-toggle="dropdown"
                                   aria-haspopup="true" aria-expanded="false">
-                                  Show Racks
+                                  Filter
                           </button>
                             <ul class="dropdown-menu">
                                   <li>
@@ -115,10 +115,35 @@
                       </div>
                       
                   </li>
+                  <li class="nav-item">
+                      <a href=# data-toggle="modal" data-target="#feedbackModal">Contact</a>
+                  </li>
                 
               </ul> 
           </div> <!-- /.navbar-collapse -->
       </nav> 
+      
+      <!-- feedback modal -->
+      <div id="feedbackModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Contact Us</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeJ9w7CSIw-0ZSq1Va6_GKSYD1jCxlzHbVBEXN7YbGmZBzLGQ/viewform?embedded=true"
+                width="400" height="235" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+          </div>
+        </div>
 
       <div class="container"> 
           <div id="mapid"></div>

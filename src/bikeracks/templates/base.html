@@ -116,7 +116,7 @@
                       
                   </li>
                   <li class="nav-item">
-                      <a href=# data-toggle="modal" data-target="#feedbackModal">Contact</a>
+                      <button class="btn btn-secondary" data-toggle="modal" data-target="#feedbackModal">Contact</button>
                   </li>
                 
               </ul> 
@@ -128,19 +128,23 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Contact Us</h5>
+              
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
-              <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeJ9w7CSIw-0ZSq1Va6_GKSYD1jCxlzHbVBEXN7YbGmZBzLGQ/viewform?embedded=true"
-                width="400" height="235" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+              
+              <form action="/submitFeedback" method="post">
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea1">Please leave comments or suggestions.</label>
+                  <textarea id="feedback" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+              
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary">Save changes</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
+            
             </div>
           </div>
         </div>

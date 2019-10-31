@@ -1,7 +1,7 @@
 # __init__ file contains the application factory and tells
 # Python that bikeracks should be treated as a package
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 # Instead of creating a Flask instance globally, the app
 # will be created inside of a function which is known as the 
@@ -54,8 +54,28 @@ def create_app(test_config=None):
     @app.route('/')
     def home(name=None):
         # update map with approved markers
-        # render_template invokes the jinja template engine
         return render_template('base.html', name=name)
+        
+    import csv
+    from time import time
+        
+    @app.route('/submitFeedback', methods=('POST',))
+    def submitFeedback():
+        if request.method == 'POST':
+            print('Feedback sent')
+            csv_file = os.path.join(app.instance_path, "feedback.csv")
+            with open(csv_file, 'a') as f:
+                timestamp = int(time())
+                feedback = request.form.get('feedback', '', type=str)
+                row = [timestamp, feedback]
+                # creating a csv writer object 
+                csvwriter = csv.writer(f) 
+                # writing the data rows 
+                csvwriter.writerow(row)
+                
+            return render_template('base.html')
+        else:
+            return render_template('base.html')
         
     @app.route('/favicon.ico')
     def favicon():

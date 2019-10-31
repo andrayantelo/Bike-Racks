@@ -62,20 +62,21 @@ def create_app(test_config=None):
     @app.route('/submitFeedback', methods=('POST',))
     def submitFeedback():
         if request.method == 'POST':
-            print('Feedback sent')
             csv_file = os.path.join(app.instance_path, "feedback.csv")
-            with open(csv_file, 'a') as f:
-                timestamp = int(time())
-                feedback = request.form.get('feedback', '', type=str)
-                row = [timestamp, feedback]
-                # creating a csv writer object 
-                csvwriter = csv.writer(f) 
-                # writing the data rows 
-                csvwriter.writerow(row)
-                
-            return render_template('base.html')
-        else:
-            return render_template('base.html')
+            try:
+                with open(csv_file, 'a') as f:
+                    timestamp = int(time())
+                    feedback = request.form.get('feedback', '', type=str)
+                    row = [timestamp, feedback]
+                    # creating a csv writer object 
+                    csvwriter = csv.writer(f) 
+                    # writing the data rows 
+                    csvwriter.writerow(row)
+                    return render_template('base.html')
+            except Exception as e:
+                return (e, 500)
+        return render_template('base.html')
+            
         
     @app.route('/favicon.ico')
     def favicon():

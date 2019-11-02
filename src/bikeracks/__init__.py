@@ -64,7 +64,7 @@ def create_app(test_config=None):
     def submitFeedback():
         csv_file = os.path.join(app.instance_path, "feedback.csv")
         timestamp = int(time())
-        feedback = request.form.get('feedback', '', type=str)
+        feedback = request.form.get('feedback', type=str)
         row = [timestamp, feedback]
         try:
             with open(csv_file, 'a') as f:

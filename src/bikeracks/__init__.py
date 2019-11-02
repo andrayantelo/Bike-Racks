@@ -2,6 +2,8 @@
 # Python that bikeracks should be treated as a package
 import os
 from flask import Flask, render_template, request
+import csv
+from time import time
 
 # Instead of creating a Flask instance globally, the app
 # will be created inside of a function which is known as the 
@@ -56,26 +58,21 @@ def create_app(test_config=None):
         # update map with approved markers
         return render_template('base.html', name=name)
         
-    import csv
-    from time import time
-        
     @app.route('/submitFeedback', methods=('POST',))
     def submitFeedback():
-        if request.method == 'POST':
-            csv_file = os.path.join(app.instance_path, "feedback.csv")
-            try:
-                with open(csv_file, 'a') as f:
-                    timestamp = int(time())
-                    feedback = request.form.get('feedback', '', type=str)
-                    row = [timestamp, feedback]
-                    # creating a csv writer object 
-                    csvwriter = csv.writer(f) 
-                    # writing the data rows 
-                    csvwriter.writerow(row)
-                    return render_template('base.html')
-            except Exception as e:
-                return (e, 500)
-        return render_template('base.html')
+        csv_file = os.path.join(app.instance_path, "feedback.csv")
+        try:
+            with open(csv_file, 'a') as f:
+                timestamp = int(time())
+                feedback = request.form.get('feedback', '', type=str)
+                row = [timestamp, feedback]
+                # creating a csv writer object 
+                csvwriter = csv.writer(f) 
+                # writing the data rows 
+                csvwriter.writerow(row)
+                return ('OK', 200)
+        except Exception as e:
+            return (e, 500)
             
         
     @app.route('/favicon.ico')

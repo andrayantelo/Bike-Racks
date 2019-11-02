@@ -30,13 +30,14 @@ const inBetweenMarkerColor = 'orange';
 
 let bikemap;
 
-function subForm (){
+function subForm (e){
+    e.preventDefault();
     $.ajax({
         url:'/submitFeedback',
         type:'POST',
         data:$('#feedbackForm').serialize(),
         success:function(){
-            console.log("form submitted");
+            $('#closeModal').trigger('click');
         }
     });
 }

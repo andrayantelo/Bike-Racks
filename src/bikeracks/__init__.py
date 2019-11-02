@@ -4,6 +4,9 @@ import os
 from flask import Flask, render_template, request
 import csv
 from time import time
+from . import db
+from . import bikes
+from . import votes
 
 # Instead of creating a Flask instance globally, the app
 # will be created inside of a function which is known as the 
@@ -44,12 +47,9 @@ def create_app(test_config=None):
         pass
         
     # register close_db and init_db_command with the app
-    from . import db
     db.init_app(app)
     
     # import and register the blueprint from the factory
-    from . import bikes
-    from . import votes
     app.register_blueprint(bikes.bikes)
     app.register_blueprint(votes.votes)
         

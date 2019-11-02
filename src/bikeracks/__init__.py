@@ -1,9 +1,11 @@
 # __init__ file contains the application factory and tells
 # Python that bikeracks should be treated as a package
 import os
-from flask import Flask, render_template, request
 import csv
 from time import time
+
+from flask import Flask, render_template, request
+
 from . import db
 from . import bikes
 from . import votes

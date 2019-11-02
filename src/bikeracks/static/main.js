@@ -37,6 +37,8 @@ function subForm (e){
         type:'POST',
         data:$('#feedbackForm').serialize(),
         success:function(){
+            // clear the form
+            $('#feedback').val("");
             $('#closeModal').trigger('click');
         }
     });

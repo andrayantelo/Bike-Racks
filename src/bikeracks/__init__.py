@@ -67,7 +67,7 @@ def create_app(test_config=None):
         feedback = request.form.get('feedback', type=str)
         row = [timestamp, feedback]
         try:
-            with open(csv_file, 'a', 'utf-8') as f:
+            with open(csv_file, 'a', encoding='utf-8') as f:
                 # creating a csv writer object 
                 csvwriter = csv.writer(f) 
                 # writing the data rows 

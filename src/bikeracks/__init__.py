@@ -66,7 +66,7 @@ def create_app(test_config=None):
         timestamp = int(time())
         feedback = request.form.get('feedback', type=str)
         if len(feedback) > 280:
-            return ('Exceeded 280 character limit', 500)
+            return ('Exceeded 280 character limit', 413)
         row = [timestamp, feedback]
         try:
             with open(csv_file, 'a', encoding='utf-8') as f:

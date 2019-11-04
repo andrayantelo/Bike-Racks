@@ -65,6 +65,8 @@ def create_app(test_config=None):
         csv_file = os.path.join(app.instance_path, "feedback.csv")
         timestamp = int(time())
         feedback = request.form.get('feedback', type=str)
+        if len(feedback) > 280:
+            return ('', 500)
         row = [timestamp, feedback]
         try:
             with open(csv_file, 'a', encoding='utf-8') as f:

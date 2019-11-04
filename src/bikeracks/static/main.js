@@ -40,6 +40,9 @@ function subForm (e){
             // clear the form
             $('#feedback').val("");
             $('#closeModal').trigger('click');
+        },
+        error: function() {
+            $('#feedback').addClass('is-invalid');
         }
     });
 }

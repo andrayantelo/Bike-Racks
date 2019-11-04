@@ -5,8 +5,7 @@ class BikeMap {
     constructor(mymap) {
         // show mountain view for now
         this.mymap = L.map('mapid', { 
-            zoomControl: false,
-            gestureHandling: true
+            zoomControl: false
         }).locate({setView:true, maxZoom: 16});
         
         L.control.locate().addTo(this.mymap);

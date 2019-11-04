@@ -406,17 +406,19 @@ BikeMap.prototype.removeMarkers = function(markerGroup) {
 
 BikeMap.prototype.toggleMarkers = function(status, selector, group) {
     
-    let racksP = this.getRacks(status);
+    let markerGroup = status === "approved"? this.allApproved : this.allNotApproved;
+    //let racksP = this.getRacks(status);
     // if the map is showing markers of status=status, remove them from map
-    if (selector.hasClass('onmap')) {
-        racksP.done((racks) => this.removeMarkers(group));
-        // remove class onmap
-        selector.removeClass('onmap');
+    if (selector.attr('checked')) {
+       this.removeMarkers(markerGroup);
+       // and uncheck
+       selector.removeAttr('checked')
     }
-    // if the map is now showing markers of status=status, add them to map
+    // if the map is not showing markers of status=status, add them to map
     else {
-        racksP.done((racks) => this.showMarkers(group));
-        selector.addClass('onmap');
+        this.showMarkers(markerGroup);
+        // and add the checked attribute
+        selector.attr('checked', true);
     }
 };
 

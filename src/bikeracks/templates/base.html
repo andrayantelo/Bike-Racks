@@ -92,7 +92,7 @@
                           <button class="btn btn-secondary dropdown-toggle" type="button"
                                   id="dropdownMenuButton" data-toggle="dropdown"
                                   aria-haspopup="true" aria-expanded="false">
-                                  Show Racks
+                                  Filter
                           </button>
                             <ul class="dropdown-menu">
                                   <li>
@@ -115,10 +115,42 @@
                       </div>
                       
                   </li>
+                  <li class="nav-item">
+                      <button class="btn btn-secondary" data-toggle="modal" data-target="#feedbackModal">Contact</button>
+                  </li>
                 
               </ul> 
           </div> <!-- /.navbar-collapse -->
       </nav> 
+      
+      <!-- feedback modal -->
+      <div id="feedbackModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <p>Please leave comments or suggestions.</p>
+              <button id="closeModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              
+              <form id="feedbackForm">
+                <div class="form-group">
+                  <label for="feedback"></label>
+                  <textarea name="feedback" maxlength="280" class="form-control" id="feedback" rows="3"></textarea>
+                  <div class="invalid-feedback">
+                     Feedback limited to 280 characters.
+                </div>
+                </div>
+                <button id="submitFeedback" class="btn btn-primary">Submit</button>
+              </form>
+              
+            </div>
+            
+            </div>
+          </div>
+        </div>
 
       <div class="container"> 
           <div id="mapid"></div>

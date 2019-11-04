@@ -1,7 +1,14 @@
 # __init__ file contains the application factory and tells
 # Python that bikeracks should be treated as a package
 import os
-from flask import Flask, render_template
+import csv
+from time import time
+
+from flask import Flask, render_template, request
+
+from . import db
+from . import bikes
+from . import votes
 
 # Instead of creating a Flask instance globally, the app
 # will be created inside of a function which is known as the 
@@ -42,20 +49,35 @@ def create_app(test_config=None):
         pass
         
     # register close_db and init_db_command with the app
-    from . import db
     db.init_app(app)
     
     # import and register the blueprint from the factory
-    from . import bikes
-    from . import votes
     app.register_blueprint(bikes.bikes)
     app.register_blueprint(votes.votes)
         
     @app.route('/')
     def home(name=None):
         # update map with approved markers
-        # render_template invokes the jinja template engine
         return render_template('base.html', name=name)
+        
+    @app.route('/submitFeedback', methods=('POST',))
+    def submitFeedback():
+        csv_file = os.path.join(app.instance_path, "feedback.csv")
+        timestamp = int(time())
+        feedback = request.form.get('feedback', type=str)
+        if len(feedback) > 280:
+            return ('Exceeded 280 character limit', 413)
+        row = [timestamp, feedback]
+        try:
+            with open(csv_file, 'a', encoding='utf-8') as f:
+                # creating a csv writer object 
+                csvwriter = csv.writer(f) 
+                # writing the data rows 
+                csvwriter.writerow(row)
+        except Exception as e:
+            return (e, 500)
+        return ('OK', 200)
+            
         
     @app.route('/favicon.ico')
     def favicon():

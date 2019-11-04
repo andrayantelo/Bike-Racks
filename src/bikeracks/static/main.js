@@ -30,7 +30,25 @@ const inBetweenMarkerColor = 'orange';
 
 let bikemap;
 
+function subForm (e){
+    e.preventDefault();
+    $.ajax({
+        url:'/submitFeedback',
+        type:'POST',
+        data:$('#feedbackForm').serialize(),
+        success:function(){
+            // clear the form
+            $('#feedback').val("");
+            $('#closeModal').trigger('click');
+        },
+        error: function() {
+            $('#feedback').addClass('is-invalid');
+        }
+    });
+}
+
 $(document).ready(function() {
+    $('#submitFeedback').on('click', subForm);
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 

@@ -412,7 +412,7 @@ BikeMap.prototype.removeMarkers = function(markerGroup) {
 
 BikeMap.prototype.toggleMarkers = function(status, selector, group) {
     
-    let markerGroup = status === "approved"? this.allApproved : this.allNotApproved;
+    let markerGroup = status === "approved" ? this.allApproved : this.allNotApproved;
     //let racksP = this.getRacks(status);
     // if the map is showing markers of status=status, remove them from map
     if (selector.attr('checked')) {

@@ -394,8 +394,6 @@ BikeMap.prototype.showMarkers = function(markerGroup) {
     markerGroup.eachLayer(function(layer) {
         // add the marker to the cluster group
         this.markers.addLayer(layer);
-        // add the marker to map
-        this.mymap.addLayer(layer);
     }.bind(this))
 }
 
@@ -404,8 +402,6 @@ BikeMap.prototype.removeMarkers = function(markerGroup) {
     markerGroup.eachLayer(function(layer) {
         // remove the marker from the cluster group
         this.markers.removeLayer(layer)
-        // remove the marker from the map
-        this.mymap.removeLayer(layer);
     }.bind(this));
 }
 

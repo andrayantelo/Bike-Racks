@@ -15,8 +15,8 @@
 .popup {
   display: flex;
   flex-wrap: wrap;
-  min-width: 200px;
-  align-items: stretch;
+  min-width: 250px;
+  align-items: center;
 }
 
 #lat, #lng, #coordinateComma {
@@ -38,6 +38,7 @@
   flex-grow: 0.5;
   height: 50%;
   justify-content: space-between;
+  align-items: center;
 }
 
 #submitButton {

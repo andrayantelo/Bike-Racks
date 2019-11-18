@@ -49,6 +49,9 @@ function subForm (e){
 
 $(document).ready(function() {
     $('#submitFeedback').on('click', subForm);
+    
+    
+    
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 

@@ -69,6 +69,7 @@
 
 .edit-option:hover {
   color: #bfbfbf;
+  cursor: pointer;
 }
 
 #trashIcon {

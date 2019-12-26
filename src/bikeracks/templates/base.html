@@ -162,29 +162,6 @@
           </div>
         </div>
 
-      <!-- suggest an edit modal -->
-      <div id="editModal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Suggest an edit</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <ul class="list-group">
-                <li id="removeRackSuggestion" class="list-group-item edit-option class"
-                data-toggle="modal" data-target="#removalModal" data-dismiss="modal">
-                  <i id="trashIcon" class="fas fa-trash-alt"></i>
-                  Remove this bikerack
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- suggest removal modal-->
 
       <div class="modal fade" id="removalModal" tabindex="-1" role="dialog" aria-labelledby="removalModal" aria-hidden="true">
@@ -199,10 +176,10 @@
               <div class="modal-body">
                   <div class="dropdown">
                       
-                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <button class="btn btn-secondary dropdown-toggle removal-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           Reason for removal
                         </button>
-                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <div id="removal-dropdown" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         
                         <a class="dropdown-item" href="#">Duplicate</a>
                         <a class="dropdown-item" href="#">Doesn't exist</a>

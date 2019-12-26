@@ -37,8 +37,17 @@
   flex-direction: row;
   flex-grow: 0.5;
   height: 50%;
+  min-width:230px;
   justify-content: space-between;
   align-items: center;
+}
+
+#edit {
+  align-self: flex-end;
+}
+
+#edit:hover {
+  cursor: pointer; 
 }
 
 #submitButton {
@@ -67,6 +76,7 @@
  margin: 8px;
 }
 
+
 .edit-option:hover {
   color: #bfbfbf;
   cursor: pointer;
@@ -74,6 +84,7 @@
 
 #trashIcon {
   margin-right: 5px;
+  color: black;
 }
 
 @media only screen

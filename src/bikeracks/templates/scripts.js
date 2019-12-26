@@ -574,8 +574,8 @@ BikeMap.prototype.popupContent = function(state) {
             `<div id="edit">
                 <button type="button"
                  class="btn btn-outline-secondary"
-                 data-toggle="modal" data-target="#editModal">
-                 Suggest an edit
+                 data-toggle="modal" data-target="#removalModal">
+                 <i id="trashIcon" class="fas fa-trash-alt"></i>
                  </button>
             </div></div><!-- /#options -->`
         let arrows = this.arrowHTML(state);

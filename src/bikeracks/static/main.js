@@ -59,7 +59,7 @@ $(document).ready(function() {
     
     // return the dropdown main button text after clicking out of the modal
     $('#removalModal').on('hidden.bs.modal', function () {
-        $(".removal-btn:first-child").text("Reason for removal");
+        $(".removal-btn:first-child").text("Duplicate");
     })
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();

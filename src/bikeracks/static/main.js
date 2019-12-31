@@ -49,6 +49,18 @@ function subForm (e){
 
 $(document).ready(function() {
     $('#submitFeedback').on('click', subForm);
+
+    // UI for 'suggest an edit' dropdown
+    // reason for removal text should appear in dropdown button text area when clicked
+    $('#removal-dropdown a').click(function() {
+        $(".removal-btn:first-child").text($(this).text());
+      $(".removal-btn:first-child").val($(this).text());
+    })
+    
+    // return the dropdown main button text after clicking out of the modal
+    $('#removalModal').on('hidden.bs.modal', function () {
+        $(".removal-btn:first-child").text("Duplicate");
+    })
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 

@@ -533,13 +533,16 @@ BikeMap.prototype.arrowHTML = function(state) {
     }
     
 
-    return `<div class="arrowsContainer" id=${containerId}>
-                     <div><i id=${"u-" + state.rack_id} data-votetype="upvote" class="${upvoteArrowClass}"></i>
-                      <span id=${"upvoteCount_" + state.rack_id}>${upvotePercentage}%</span><div>
-                      <div><i id=${"d-" + state.rack_id} data-votetype="downvote" class="${downvoteArrowClass}"></i>
-                      <span id=${"downvoteCount_" + state.rack_id}>${downvotePercentage}%</span></div>
-                      </div>
-                     </div> <!-- /#options -->`
+    return `<div id="options">
+        <div class="arrowsContainer" id=${containerId}>         
+            <div><i id=${"u-" + state.rack_id} data-votetype="upvote" class="${upvoteArrowClass}"></i>
+              <span id=${"upvoteCount_" + state.rack_id}>${upvotePercentage}%</span>
+            </div>
+            <div><i id=${"d-" + state.rack_id} data-votetype="downvote" class="${downvoteArrowClass}"></i>
+              <span id=${"downvoteCount_" + state.rack_id}>${downvotePercentage}%</span>
+            </div>
+        </div> <!-- /.arrowsContainer -->
+   `
 };
 
 
@@ -562,19 +565,29 @@ BikeMap.prototype.popupContent = function(state) {
                  <span id="coordinateComma">,</span>
                  </span> <span id="lng">${state.longitude}</span>
                </div>
-               <div id="options">`
+               `
     
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
     if (isLoggedIn(this) && !isTemporary(state)) {
-        
+        // include the "suggest an edit" button
+        const editButton = 
+            `<div id="edit">
+                <button type="button"
+                 class="btn btn-link"
+                 data-toggle="modal" data-target="#removalModal">
+                 <i id="trashIcon" class="fas fa-trash-alt"></i>
+                 </button>
+            </div></div><!-- /#options -->`
         let arrows = this.arrowHTML(state);
         //content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
         content += arrows;
+        content += editButton;
+        
     }
     // if the user is online and this IS a temporary marker include only the submit button
     else if (isLoggedIn(this) && isTemporary(state) && state.address) {
         
-        content += `<button id="submitButton" type="submit">Add Bike Rack</button>`
+        content += `<div id="options"><button id="submitButton" type="submit">Add Bike Rack</button></div>`
     }
     // if the user is not online then don't include any buttons (doesn't matter if temp marker or not)
     else {

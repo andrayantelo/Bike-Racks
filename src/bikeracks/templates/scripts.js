@@ -101,7 +101,7 @@ BikeMap.prototype.initBikeMap = function () {
       retainZoomLevel: false,                             
       animateZoom: true,                                  
       autoClose: true,                                   
-      searchLabel: 'Enter address',                       
+      searchLabel: 'Enter address to find a bike rack',                       
       keepResult: true                                 
     }).addTo(this.mymap);
     

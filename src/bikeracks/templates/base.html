@@ -119,12 +119,60 @@
                       
                   </li>
                   <li class="nav-item">
+                    <button class="btn btn-secondary" data-toggle="modal" data-target="#guideModal">Guide</button>
+                  </li>
+                  <li class="nav-item">
                       <button class="btn btn-secondary" data-toggle="modal" data-target="#feedbackModal">Contact</button>
                   </li>
                 
               </ul> 
           </div> <!-- /.navbar-collapse -->
       </nav> 
+
+      <!-- Guide Modal -->
+
+      <div id="guideModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <p>How to Use</p>
+              <button id="closeModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <h6>Everyone can:</h6>
+              <ol>
+                <li>
+                  Enter an address in the search bar to find bike racks near them.
+                </li>
+                <li>
+                  Double click anywhere on the map to add a temporary marker.
+                </li>
+                <li>
+                  Submit feedback.
+                </li>
+              </ol>
+              <h6>Logged in users can:</h6>
+              <ol>
+                <li>
+                  Submit the location at a temporary marker as a bike rack location.
+                </li>
+                <li>
+                  Upvote or downvote bike racks based on quality and existance. 
+                </li>
+                <li>
+                  Submit a suggestion to remove a bike rack.
+                </li>
+              </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            
+            </div>
+          </div>
+        </div>
       
       <!-- feedback modal -->
       <div id="feedbackModal" class="modal" tabindex="-1" role="dialog">

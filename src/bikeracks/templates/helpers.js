@@ -1,6 +1,5 @@
 "use strict"
 
-
 // BikeRack class
 class BikeRack {
     constructor(state) {
@@ -33,9 +32,16 @@ class BikeRack {
 
 // BikeMap class helper functions
 function buildMarkerIcon(markerColor) {
+    let icon;
+    if (markerColor === notApprovedMarkerColor) {
+        icon = 'exclamation'
+    }
+    else {
+        icon = 'bicycle'
+    }
     return L.AwesomeMarkers.icon({
         prefix: 'fa',
-        icon: 'bicycle',
+        icon: icon,
         markerColor: markerColor
     });
 };

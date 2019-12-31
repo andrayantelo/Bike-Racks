@@ -7,6 +7,8 @@ class BikeMap {
         this.mymap = L.map('mapid', { 
             zoomControl: false
         }).locate({setView:true, maxZoom: 16});
+
+        this.mymap.doubleClickZoom.disable(); 
         
         L.control.locate().addTo(this.mymap);
         // set map to display user's current location
@@ -41,7 +43,10 @@ class BikeMap {
         this.$signOutButton.click(this.signOut.bind(this));
         this.$signInButton.click(this.signIn.bind(this));
         
-        this.mymap.on('click', this.onMapClick.bind(this));
+        this.mymap.on('dblclick', this.onMapClick.bind(this));
+        this.mymap.on('click', function(e) {
+            this.tempMarker.remove();
+        }.bind(this));
         
         
         this.$myMap.on('click', '#submitButton', function(e) {

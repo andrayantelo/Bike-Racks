@@ -44,7 +44,7 @@ const errorOptions = {
     icon: 'glyphicon glyphicon-warning-sign',
     message: "Unable to send suggestion at this time."
 };
-const errorSettings = { type: "danger"};
+const errorSettings = {type: "danger"};
 
 const successOptions = {
     icon: 'glyphicon glyphicon-ok',

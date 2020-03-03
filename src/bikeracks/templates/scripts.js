@@ -52,6 +52,12 @@ class BikeMap {
         this.$suggestRemoval.on('click', function(e) {
             this.suggestRemoval(e);
         }.bind(this));
+
+        //Modal click handler
+        $('#removalModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget),
+                rack_id = button.data('rack_id');
+        })
         
         
         this.$myMap.on('click', '#submitButton', function(e) {
@@ -585,8 +591,10 @@ BikeMap.prototype.popupContent = function(state) {
             `<div id="edit">
                 <button type="button"
                  class="btn btn-link"
-                 data-toggle="modal" data-target="#removalModal">
-                 <i id="trashIcon" class="fas fa-trash-alt" data-rack_id=${state.rack_id}></i>
+                 data-toggle="modal"
+                 data-rack_id=${state.rack_id}
+                 data-target="#removalModal">
+                 <i id="trashIcon" class="fas fa-trash-alt"></i>
                  </button>
             </div></div><!-- /#options -->`
         let arrows = this.arrowHTML(state);

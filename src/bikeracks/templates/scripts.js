@@ -580,6 +580,7 @@ BikeMap.prototype.popupContent = function(state) {
         const editButton = 
             `<div id="edit">
                 <button type="button"
+                 id="suggestButton"
                  class="btn btn-link"
                  data-toggle="modal"
                  data-rack_id=${state.rack_id}

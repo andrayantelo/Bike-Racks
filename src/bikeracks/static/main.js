@@ -29,41 +29,78 @@ const notApprovedMarkerColor = 'red';
 
 let bikemap;
 
+// Relevant DOM elements
+const $sendSuggestionButton = $('#sendSuggestionButton');
+const $submitFeedback = $('#submitFeedback');
+const $suggestButton = $('#suggestButton');
+const $removalReason = $('#removalReason');
+const $feedbackForm = $('#feedbackForm');
+const $feedback = $('#feedback');
+const $closeFeedbackModal = $('#closeFeedbackModal');
+const $closeRemovalModal = $('#closeRemovalModal');
+
+// Options and settings for alerts
+const errorOptions = {
+    icon: 'glyphicon glyphicon-warning-sign',
+    message: "Unable to send suggestion at this time."
+};
+const errorSettings = { type: "danger"};
+
+const successOptions = {
+    icon: 'glyphicon glyphicon-ok',
+    message: "Suggestion sent. Thank you."
+}
+
+const successSettings = {type: "success"};
+
 function subForm (e){
     e.preventDefault();
     $.ajax({
         url:'/submitFeedback',
         type:'POST',
-        data:$('#feedbackForm').serialize(),
+        data:$feedbackForm.serialize(),
         success:function(){
             // clear the form
-            $('#feedback').val("");
-            $('#closeModal').trigger('click');
+            $feedback.val("");
+            $closeFeedbackModal.trigger('click');
         },
         error: function() {
-            $('#feedback').addClass('is-invalid');
+            $feedback.addClass('is-invalid');
         }
     });
 }
-
-// Relevant DOM elements
-const $sendSuggestionButton = $('#sendSuggestionButton');
-const $submitFeedback = $('#submitFeedback');
-const $suggestButton = $('#suggestButton');
 
 
 function submitRemovalForm(e) {
     console.log("submitting removal form");
     e.preventDefault();
-    const button = $(e.target),
-        rack_id = $suggestButton.data("rack_id");
-    console.log(e);
-    console.log("rack_id: ", rack_id);
+    const rack_id = $suggestButton.data("rack_id"),
+          removalReason = $removalReason.children("option:selected").val();
     // need to send rack id and removal reason
-
+    $.ajax({
+        url:'/submitRemovalSuggestion',
+        type:'POST',
+        data: {
+            rack_id: rack_id,
+            removal_reason: removalReason
+        },
+        success:function(){
+            // clear the form
+            $closeRemovalModal.trigger('click');
+            $.notify(successOptions, successSettings);
+        },
+        error: function() {
+            $closeRemovalModal.trigger('click');
+            $.notify(errorOptions, errorSettings);
+        }
+    });
 }
 
 $(document).ready(function() {
+    /*
+    bind .click() inside of $(document).ready() to be certain that the element to which the
+    .click() event is bound has been created when the function executes.
+    */
    $submitFeedback.on('click', subForm);
    $sendSuggestionButton.on('click', submitRemovalForm);
 

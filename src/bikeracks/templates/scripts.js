@@ -51,7 +51,7 @@ class BikeMap {
         // suggest removal click handler
         this.$suggestRemoval.on('click', function(e) {
             this.suggestRemoval(e);
-        })
+        }.bind(this));
         
         
         this.$myMap.on('click', '#submitButton', function(e) {

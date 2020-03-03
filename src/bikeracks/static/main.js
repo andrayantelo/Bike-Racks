@@ -46,8 +46,20 @@ function subForm (e){
     });
 }
 
+const $suggestRemoval = $('#suggestRemoval');
+const $submitFeedback = $('#submitFeedback');
+
+function submitRemovalForm(e) {
+    e.preventDefault();
+    const button = $(e.target),
+    rack_id = button.data('rack_id');
+    console.log(e);
+    console.log(rack_id);
+}
+
 $(document).ready(function() {
-    $('#submitFeedback').on('click', subForm);
+   $submitFeedback.on('click', subForm);
+   $suggestRemoval.on('click', submitRemovalForm);
 
     // UI for 'suggest an edit' dropdown
     // reason for removal text should appear in dropdown button text area when clicked
@@ -60,6 +72,19 @@ $(document).ready(function() {
     $('#removalModal').on('hidden.bs.modal', function () {
         $(".removal-btn:first-child").text("Duplicate");
     })
+
+    //Removal suggestion Modal click handler
+
+    /* TODO probably rewrite below function entirely or get rid of it
+    $('#removalModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget),
+            rack_id = button.data('rack_id');
+        // add the rack_id as an attribute on send button in the modal so that
+        // if user clicks on send, the rack_id is sent in the request
+        $('#suggestRemoval').attr('data-rack_id', rack_id);
+    })
+    */
+   
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 

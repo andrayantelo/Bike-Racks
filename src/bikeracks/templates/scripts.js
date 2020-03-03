@@ -39,6 +39,7 @@ class BikeMap {
         this.$signOutButton = $('#sign-out');
         this.$signInButton = $('#sign-in');
         
+        
         // click bindings
         this.$signOutButton.click(this.signOut.bind(this));
         this.$signInButton.click(this.signIn.bind(this));
@@ -47,7 +48,7 @@ class BikeMap {
         this.mymap.on('click', function(e) {
             this.tempMarker.remove();
         }.bind(this));
-        
+
         
         this.$myMap.on('click', '#submitButton', function(e) {
             
@@ -554,6 +555,7 @@ BikeMap.prototype.arrowHTML = function(state) {
 BikeMap.prototype.popupContent = function(state) {
     let onlineStatus,
         voterStatus;
+
     /* state : {
      *     address: address (string),
      *     latitude: latitude (string),
@@ -579,7 +581,9 @@ BikeMap.prototype.popupContent = function(state) {
             `<div id="edit">
                 <button type="button"
                  class="btn btn-link"
-                 data-toggle="modal" data-target="#removalModal">
+                 data-toggle="modal"
+                 data-rack_id=${state.rack_id}
+                 data-target="#removalModal">
                  <i id="trashIcon" class="fas fa-trash-alt"></i>
                  </button>
             </div></div><!-- /#options -->`

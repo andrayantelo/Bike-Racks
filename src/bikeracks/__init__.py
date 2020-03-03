@@ -11,6 +11,7 @@ from flask import (
 from . import db
 from . import bikes
 from . import votes
+from bikeracks.db import get_db
 
 # Instead of creating a Flask instance globally, the app
 # will be created inside of a function which is known as the 
@@ -77,14 +78,33 @@ def create_app(test_config=None):
                 # writing the data rows 
                 csvwriter.writerow(row)
         except Exception as e:
-            return (e, 500)
+            return (str(e), 500)
         return ('OK', 200)
 
     # Function for processing "suggest removal" request
     @app.route('/submitRemovalSuggestion', methods=('POST',))
     def submitSuggestion():
-        print(request.form)
-        return('Ok', 200)
+        rack_id = request.form.get("rack_id", type=float)
+        removal_reason = request.form.get("removal_reason", type=str)
+        user_id = request.form.get("user_id", type=str)
+
+        # connect to database
+        db = get_db()
+
+        try:
+        #rack_id, user_id, removal_reason, time_stamp
+            query = """
+                INSERT INTO 
+                    suggested_removals
+                        (rack_id, user_id, removal_reason, time_stamp)
+                    VALUES 
+                        (?, ?, ?, datetime('now'))"""
+            db.execute(query, (rack_id, user_id, removal_reason))
+            db.commit()
+        except Exception as e:
+            return(str(e), 500)
+        return ('OK', 200)
+        
             
         
     @app.route('/favicon.ico')

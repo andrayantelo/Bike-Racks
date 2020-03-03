@@ -72,7 +72,6 @@ function subForm (e){
 
 
 function submitRemovalForm(e) {
-    console.log("submitting removal form");
     e.preventDefault();
     const rack_id = $suggestButton.data("rack_id"),
           removalReason = $removalReason.children("option:selected").val();

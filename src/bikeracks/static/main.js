@@ -46,8 +46,10 @@ function subForm (e){
     });
 }
 
-function removeForm(e) {
+function deleteForm(e) {
+    e.preventDefault();
     
+
 }
 
 $(document).ready(function() {

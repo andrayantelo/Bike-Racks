@@ -48,12 +48,13 @@ class BikeMap {
         this.mymap.on('click', function(e) {
             this.tempMarker.remove();
         }.bind(this));
-        
+
         // suggest removal click handler
         this.$suggestRemoval.on('click', function(e) {
-            const button = $(event.target),
+            const button = $(e.target),
                   rack_id = button.data('rack_id');
-            this.suggestRemoval(event, rack_id);
+            console.log($('#removalReason').value());
+            this.suggestRemoval(e, rack_id);
         }.bind(this));
         
         

@@ -32,7 +32,6 @@ let bikemap;
 // Relevant DOM elements
 const $sendSuggestionButton = $('#sendSuggestionButton');
 const $submitFeedback = $('#submitFeedback');
-const $suggestButton = $('#suggestButton');
 const $removalReason = $('#removalReason');
 const $feedbackForm = $('#feedbackForm');
 const $feedback = $('#feedback');
@@ -73,14 +72,14 @@ function subForm (e){
 
 function submitRemovalForm(e) {
     e.preventDefault();
-    const rack_id = $suggestButton.data("rack_id"),
+    const rackId = $('#suggestButton').data("rack_id"),
           removalReason = $removalReason.children("option:selected").val();
     // need to send rack id and removal reason
     $.ajax({
         url:'/submitRemovalSuggestion',
         type:'POST',
         data: {
-            rack_id: rack_id,
+            rack_id: rackId,
             removal_reason: removalReason
         },
         success:function(){

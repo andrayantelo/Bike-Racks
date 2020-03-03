@@ -46,14 +46,20 @@ function subForm (e){
     });
 }
 
-function deleteForm(e) {
-    e.preventDefault();
-    
+const $suggestRemoval = $('#suggestRemoval');
+const $submitFeedback = $('#submitFeedback');
 
+function submitRemovalForm(e) {
+    e.preventDefault();
+    const button = $(e.target),
+    rack_id = button.data('rack_id');
+    console.log(e);
+    console.log(rack_id);
 }
 
 $(document).ready(function() {
-    $('#submitFeedback').on('click', subForm);
+   $submitFeedback.on('click', subForm);
+   $suggestRemoval.on('click', submitRemovalForm);
 
     // UI for 'suggest an edit' dropdown
     // reason for removal text should appear in dropdown button text area when clicked

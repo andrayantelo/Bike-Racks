@@ -38,7 +38,7 @@ class BikeMap {
         this.$showNotApproved = $('#showNotApproved');
         this.$signOutButton = $('#sign-out');
         this.$signInButton = $('#sign-in');
-        this.$suggestRemoval = $('#suggestRemoval');
+        
         
         // click bindings
         this.$signOutButton.click(this.signOut.bind(this));
@@ -49,14 +49,6 @@ class BikeMap {
             this.tempMarker.remove();
         }.bind(this));
 
-        // suggest removal click handler
-        this.$suggestRemoval.on('click', function(e) {
-            const button = $(e.target),
-                  rack_id = button.data('rack_id');
-            console.log($('#removalReason').value());
-            this.suggestRemoval(e, rack_id);
-        }.bind(this));
-        
         
         this.$myMap.on('click', '#submitButton', function(e) {
             
@@ -614,14 +606,5 @@ BikeMap.prototype.popupContent = function(state) {
     
     return `<div class="popup"> ${content} </div>`
    
-};
-
-
-/*
-Suggest removal of a bike rack
-*/
-BikeMap.prototype.suggestRemoval = function(e, rack_id) {
-    console.log(e);
-    console.log(rack_id);
 };
 

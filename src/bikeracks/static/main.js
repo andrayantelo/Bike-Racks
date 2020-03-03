@@ -46,6 +46,10 @@ function subForm (e){
     });
 }
 
+function removeForm(e) {
+    
+}
+
 $(document).ready(function() {
     $('#submitFeedback').on('click', subForm);
 
@@ -59,6 +63,15 @@ $(document).ready(function() {
     // return the dropdown main button text after clicking out of the modal
     $('#removalModal').on('hidden.bs.modal', function () {
         $(".removal-btn:first-child").text("Duplicate");
+    })
+
+    //Removal suggestion Modal click handler
+    $('#removalModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget),
+            rack_id = button.data('rack_id');
+        // add the rack_id as an attribute on send button in the modal so that
+        // if user clicks on send, the rack_id is sent in the request
+        $('#suggestRemoval').attr('data-rack_id', rack_id);
     })
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();

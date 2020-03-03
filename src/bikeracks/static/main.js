@@ -29,62 +29,80 @@ const notApprovedMarkerColor = 'red';
 
 let bikemap;
 
+// Relevant DOM elements
+const $sendSuggestionButton = $('#sendSuggestionButton');
+const $submitFeedback = $('#submitFeedback');
+const $suggestButton = $('#suggestButton');
+const $removalReason = $('#removalReason');
+const $feedbackForm = $('#feedbackForm');
+const $feedback = $('#feedback');
+const $closeFeedbackModal = $('#closeFeedbackModal');
+const $closeRemovalModal = $('#closeRemovalModal');
+
+// Options and settings for alerts
+const errorOptions = {
+    icon: 'glyphicon glyphicon-warning-sign',
+    message: "Unable to send suggestion at this time."
+};
+const errorSettings = {type: "danger"};
+
+const successOptions = {
+    icon: 'glyphicon glyphicon-ok',
+    message: "Suggestion sent. Thank you."
+}
+
+const successSettings = {type: "success"};
+
 function subForm (e){
     e.preventDefault();
     $.ajax({
         url:'/submitFeedback',
         type:'POST',
-        data:$('#feedbackForm').serialize(),
+        data:$feedbackForm.serialize(),
         success:function(){
             // clear the form
-            $('#feedback').val("");
-            $('#closeModal').trigger('click');
+            $feedback.val("");
+            $closeFeedbackModal.trigger('click');
         },
         error: function() {
-            $('#feedback').addClass('is-invalid');
+            $feedback.addClass('is-invalid');
         }
     });
 }
 
-const $suggestRemoval = $('#suggestRemoval');
-const $submitFeedback = $('#submitFeedback');
 
 function submitRemovalForm(e) {
     e.preventDefault();
-    const button = $(e.target),
-    rack_id = button.data('rack_id');
-    console.log(e);
-    console.log(rack_id);
+    const rack_id = $suggestButton.data("rack_id"),
+          removalReason = $removalReason.children("option:selected").val();
+    // need to send rack id and removal reason
+    $.ajax({
+        url:'/submitRemovalSuggestion',
+        type:'POST',
+        data: {
+            rack_id: rack_id,
+            removal_reason: removalReason
+        },
+        success:function(){
+            // clear the form
+            $closeRemovalModal.trigger('click');
+            $.notify(successOptions, successSettings);
+        },
+        error: function() {
+            $closeRemovalModal.trigger('click');
+            $.notify(errorOptions, errorSettings);
+        }
+    });
 }
 
 $(document).ready(function() {
-   $submitFeedback.on('click', subForm);
-   $suggestRemoval.on('click', submitRemovalForm);
-
-    // UI for 'suggest an edit' dropdown
-    // reason for removal text should appear in dropdown button text area when clicked
-    $('#removal-dropdown a').click(function() {
-        $(".removal-btn:first-child").text($(this).text());
-      $(".removal-btn:first-child").val($(this).text());
-    })
-    
-    // return the dropdown main button text after clicking out of the modal
-    $('#removalModal').on('hidden.bs.modal', function () {
-        $(".removal-btn:first-child").text("Duplicate");
-    })
-
-    //Removal suggestion Modal click handler
-
-    /* TODO probably rewrite below function entirely or get rid of it
-    $('#removalModal').on('show.bs.modal', function (event) {
-        const button = $(event.relatedTarget),
-            rack_id = button.data('rack_id');
-        // add the rack_id as an attribute on send button in the modal so that
-        // if user clicks on send, the rack_id is sent in the request
-        $('#suggestRemoval').attr('data-rack_id', rack_id);
-    })
+    /*
+    bind .click() inside of $(document).ready() to be certain that the element to which the
+    .click() event is bound has been created when the function executes.
     */
-   
+   $submitFeedback.on('click', subForm);
+   $sendSuggestionButton.on('click', submitRemovalForm);
+
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 

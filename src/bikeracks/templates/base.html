@@ -136,7 +136,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h3>How to Use</h3>
-              <button id="closeModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button id="closeGuideModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -184,7 +184,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <p>Please leave comments or suggestions.</p>
-              <button id="closeModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button id="closeFeedbackModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -221,7 +221,7 @@
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title" id="removalModalTitle">Suggest removal</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button id="closeRemovalModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -235,7 +235,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button id="suggestRemoval" type="button" class="btn btn-primary">Send</button>
+                <button id="sendSuggestionButton" type="button" class="btn btn-primary">Send</button>
               </div>
             </div>
           </div>
@@ -290,7 +290,8 @@
   <!-- leaflet locate JS -->
   <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
 
-  
+  <!-- Bootstrap-notify JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.1.7/bootstrap-notify.min.js"></script>
   
   <!-- Awesome Markers JS -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">

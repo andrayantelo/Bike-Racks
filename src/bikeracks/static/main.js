@@ -46,46 +46,27 @@ function subForm (e){
     });
 }
 
+// Relevant DOM elements
 const $sendSuggestionButton = $('#sendSuggestionButton');
 const $submitFeedback = $('#submitFeedback');
+const $suggestButton = $('#suggestButton');
+
 
 function submitRemovalForm(e) {
     console.log("submitting removal form");
     e.preventDefault();
     const button = $(e.target),
-    rack_id = button.data('rack_id');
+        rack_id = $suggestButton.data("rack_id");
     console.log(e);
-    console.log(rack_id);
+    console.log("rack_id: ", rack_id);
+    // need to send rack id and removal reason
+
 }
 
 $(document).ready(function() {
    $submitFeedback.on('click', subForm);
    $sendSuggestionButton.on('click', submitRemovalForm);
 
-    // UI for 'suggest an edit' dropdown
-    // reason for removal text should appear in dropdown button text area when clicked
-    $('#removal-dropdown a').click(function() {
-        $(".removal-btn:first-child").text($(this).text());
-      $(".removal-btn:first-child").val($(this).text());
-    })
-    
-    // return the dropdown main button text after clicking out of the modal
-    $('#removalModal').on('hidden.bs.modal', function () {
-        $(".removal-btn:first-child").text("Duplicate");
-    })
-
-    //Removal suggestion Modal click handler
-
-    /* TODO probably rewrite below function entirely or get rid of it
-    $('#removalModal').on('show.bs.modal', function (event) {
-        const button = $(event.relatedTarget),
-            rack_id = button.data('rack_id');
-        // add the rack_id as an attribute on send button in the modal so that
-        // if user clicks on send, the rack_id is sent in the request
-        $('#suggestRemoval').attr('data-rack_id', rack_id);
-    })
-    */
-   
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 

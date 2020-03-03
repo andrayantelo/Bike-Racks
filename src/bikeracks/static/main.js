@@ -74,6 +74,8 @@ $(document).ready(function() {
     })
 
     //Removal suggestion Modal click handler
+
+    /* TODO probably rewrite below function entirely or get rid of it
     $('#removalModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget),
             rack_id = button.data('rack_id');
@@ -81,6 +83,8 @@ $(document).ready(function() {
         // if user clicks on send, the rack_id is sent in the request
         $('#suggestRemoval').attr('data-rack_id', rack_id);
     })
+    */
+   
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 

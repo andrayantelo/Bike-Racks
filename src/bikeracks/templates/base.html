@@ -119,12 +119,64 @@
                       
                   </li>
                   <li class="nav-item">
+                    <button class="btn btn-secondary" data-toggle="modal" data-target="#guideModal">Guide</button>
+                  </li>
+                  <li class="nav-item">
                       <button class="btn btn-secondary" data-toggle="modal" data-target="#feedbackModal">Contact</button>
                   </li>
                 
               </ul> 
           </div> <!-- /.navbar-collapse -->
       </nav> 
+
+      <!-- Guide Modal -->
+
+      <div id="guideModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>How to Use</h3>
+              <button id="closeModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <ul class="list-group">
+                <li class="list-group-item">
+                  You can log in using your Google account in the upper right.
+                </li>
+                <li class="list-group-item">
+                  Enter an address in the search bar to find bike racks in your area.
+                </li>
+                <li class="list-group-item">
+                  Double click anywhere on the map to add a temporary marker.
+                </li>
+                <li class="list-group-item">
+                  Click on a marker to open its popup.
+                </li>
+                <li class="list-group-item">
+                  If the marker is a temporary marker, click on the submit button to
+                  add the marker as a bike rack location.
+                </li>
+                <li class="list-group-item">
+                  If the marker is already a bike rack location click on the arrows
+                  to upvote or downvote the bike rack based on its quality.
+                </li>
+                <li class="list-group-item">
+                  Click on the trash can icon in a bike rack's popup to suggest removal.
+                </li>
+                <li class="list-group-item">
+                  Click on the Contact button in the navbar to leave feedback.
+                </li>
+              </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            
+            </div>
+          </div>
+        </div>
       
       <!-- feedback modal -->
       <div id="feedbackModal" class="modal" tabindex="-1" role="dialog">

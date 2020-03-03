@@ -4,7 +4,9 @@ import os
 import csv
 from time import time
 
-from flask import Flask, render_template, request
+from flask import (
+    Flask, render_template, request, session, jsonify, Response
+)
 
 from . import db
 from . import bikes
@@ -77,6 +79,12 @@ def create_app(test_config=None):
         except Exception as e:
             return (e, 500)
         return ('OK', 200)
+
+    # Function for processing "suggest removal" request
+    @app.route('/submitRemovalSuggestion', methods=('POST',))
+    def submitSuggestion():
+        print(request.form)
+        return('Ok', 200)
             
         
     @app.route('/favicon.ico')

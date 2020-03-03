@@ -38,6 +38,7 @@ class BikeMap {
         this.$showNotApproved = $('#showNotApproved');
         this.$signOutButton = $('#sign-out');
         this.$signInButton = $('#sign-in');
+        this.$suggestRemoval = $('#suggestRemoval');
         
         // click bindings
         this.$signOutButton.click(this.signOut.bind(this));
@@ -47,6 +48,10 @@ class BikeMap {
         this.mymap.on('click', function(e) {
             this.tempMarker.remove();
         }.bind(this));
+        // suggest removal click handler
+        this.$suggestRemoval.on('click', function(e) {
+            this.suggestRemoval(e);
+        })
         
         
         this.$myMap.on('click', '#submitButton', function(e) {

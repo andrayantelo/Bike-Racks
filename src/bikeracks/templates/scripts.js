@@ -559,6 +559,7 @@ BikeMap.prototype.arrowHTML = function(state) {
 BikeMap.prototype.popupContent = function(state) {
     let onlineStatus,
         voterStatus;
+
     /* state : {
      *     address: address (string),
      *     latitude: latitude (string),
@@ -585,7 +586,7 @@ BikeMap.prototype.popupContent = function(state) {
                 <button type="button"
                  class="btn btn-link"
                  data-toggle="modal" data-target="#removalModal">
-                 <i id="trashIcon" class="fas fa-trash-alt"></i>
+                 <i id="trashIcon" class="fas fa-trash-alt" data-rack_id=${state.rack_id}></i>
                  </button>
             </div></div><!-- /#options -->`
         let arrows = this.arrowHTML(state);

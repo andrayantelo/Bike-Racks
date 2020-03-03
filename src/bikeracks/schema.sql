@@ -61,13 +61,14 @@ CREATE UNIQUE INDEX rack_vote ON votes (user_id, rack_id);
 
 /*
 Table that holds the bike racks that people have suggested for removal
-id, bike rack id, (removal reason), user id, timestamp (in Unix Time)
+id, bike rack id, removal reason, user id, timestamp (in Unix Time)
 */
 CREATE TABLE suggested_removals (
     removal_id INTEGER PRIMARY KEY AUTOINCREMENT,
     rack_id INTEGER NOT NULL,
     user_id TEXT,
-    time_stamp INTEGER
+    time_stamp INTEGER,
+    reason TEXT
 )
 
 

@@ -62,6 +62,9 @@ CREATE UNIQUE INDEX rack_vote ON votes (user_id, rack_id);
 /*
 Table that holds the bike racks that people have suggested for removal
 id, bike rack id, removal reason, user id, timestamp (in Unix Time)
+LEGEND for REMOVAL REASON:
+    A value of 1 means Duplicate
+    A value of 2 means Doesn't Exist (as in the bike rack doesn't)
 */
 CREATE TABLE suggested_removals (
     removal_id INTEGER PRIMARY KEY AUTOINCREMENT,

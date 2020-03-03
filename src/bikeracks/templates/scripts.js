@@ -604,3 +604,11 @@ BikeMap.prototype.popupContent = function(state) {
    
 };
 
+
+/*
+Suggest removal of a bike rack
+*/
+BikeMap.prototype.suggestRemoval = function(event) {
+console.log(event);
+};
+

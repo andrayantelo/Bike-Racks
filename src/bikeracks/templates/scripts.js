@@ -48,16 +48,13 @@ class BikeMap {
         this.mymap.on('click', function(e) {
             this.tempMarker.remove();
         }.bind(this));
+        
         // suggest removal click handler
         this.$suggestRemoval.on('click', function(e) {
-            this.suggestRemoval(e);
+            const button = $(event.target),
+                  rack_id = button.data('rack_id');
+            this.suggestRemoval(event, rack_id);
         }.bind(this));
-
-        //Modal click handler
-        $('#removalModal').on('show.bs.modal', function (event) {
-            const button = $(event.relatedTarget),
-                rack_id = button.data('rack_id');
-        })
         
         
         this.$myMap.on('click', '#submitButton', function(e) {
@@ -622,7 +619,8 @@ BikeMap.prototype.popupContent = function(state) {
 /*
 Suggest removal of a bike rack
 */
-BikeMap.prototype.suggestRemoval = function(event) {
-console.log(event);
+BikeMap.prototype.suggestRemoval = function(e, rack_id) {
+    console.log(e);
+    console.log(rack_id);
 };
 

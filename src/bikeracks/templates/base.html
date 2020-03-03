@@ -227,16 +227,11 @@
               </div>
               <div class="modal-body">
                   <div class="dropdown">
-                      
-                      <button class="btn btn-secondary dropdown-toggle removal-btn" type="button" id="removalReason" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Duplicate
-                        </button>
-                      <div id="removal-dropdown" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        
-                        <a class="dropdown-item" href="#">Duplicate</a>
-                        <a class="dropdown-item" href="#">Doesn't exist</a>
-                      </div>
-                    </div>
+                      <select class="bootstrap-select" id="removalReason">
+                          <option value="1" selected="selected">Duplicate</option>
+                          <option value="2">Doesn't exist</option>
+                        </select>
+                  </div>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

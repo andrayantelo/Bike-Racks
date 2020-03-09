@@ -1,8 +1,8 @@
-#mapid { 
-  height: 90vmin;
+.map-container {
+  height: 100vh;
 }
-.container {
-  margin-top: 10px;
+#mapid {
+  height: 92%;
 }
 .navbar-light {
   background-color: #e3f2fd;
@@ -84,6 +84,7 @@
 #trashIcon {
   margin-right: 5px;
   color: black;
+}
 
 .leaflet-container a.leaflet-popup-close-button {
   font-size: 24px;
@@ -91,46 +92,10 @@
   height: 26px;
 }
 
-@media only screen
-and (max-width: 320) {
+@media (max-width: 768px) {
     .leaflet-control-geosearch.bar {
-      width: 20%;
-    }
-    #mapid {
-      height: 80vmax;
+        width: 65%;
     }
 }
-
-@media only screen
-and (max-width : 345px)  {
-
-    .leaflet-control-geosearch.bar {
-      width: 65%;
-    }
-    #mapid {
-      height: 80vmax;
-    }
-}
-
-@media only screen
-and (min-width : 345px)
-and (max-width : 515px) {
-    .leaflet-control-geosearch.bar {
-      width: 75%;
-    }
-    #mapid {
-      height: 90vmax;
-    }
-}
-
-@media only screen
-and (min-width : 768)
-and (max-width : 1366) {
-    #mapid {
-      height: 100vmax;
-    }
-}
-
-
 
 

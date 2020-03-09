@@ -9,3 +9,5 @@ env
 # Vim files
 *.swp
 
+# Vscode files
+.vscode

@@ -1,9 +1,11 @@
 .map-container {
   height: 100vh;
 }
+
 #mapid {
   height: 92%;
 }
+
 .navbar-light {
   background-color: #e3f2fd;
 }

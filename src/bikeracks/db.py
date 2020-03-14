@@ -34,6 +34,8 @@ def get_db():
             # out "integer"
             detect_types=sqlite3.PARSE_DECLTYPES
         )
+        # Enable foreign key constraints
+        g.db.execute("PRAGMA foreign_keys = ON")
         # Row supports mapping access by column name and index, iteration
         # representation, equality testing, and len()
         g.db.row_factory = sqlite3.Row

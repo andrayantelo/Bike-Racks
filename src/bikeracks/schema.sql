@@ -14,11 +14,15 @@ consraint is applied.
 The rack_id in bikeracks is the parent key, the rack_id column in
 votes is called the child key.*/
 
+/* Enables foreign key constraints */
+PRAGMA foreign_keys = ON;
+
 DROP TABLE IF EXISTS bikeracks;
 DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS suggested_removals;
 DROP TABLE IF EXISTS bikeracks_history;
 DROP TABLE IF EXISTS votes_history;
+DROP TABLE IF EXISTS removal_reasons;
 
 CREATE TABLE bikeracks (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,9 +67,6 @@ CREATE UNIQUE INDEX rack_vote ON votes (user_id, rack_id);
 /*
 Table that holds the bike racks that people have suggested for removal
 id, bike rack id, removal reason, user id, timestamp (in Unix Time)
-LEGEND for REMOVAL REASON:
-    A value of 1 means Duplicate
-    A value of 2 means Doesn't Exist (as in the bike rack doesn't)
 */
 
 CREATE TABLE suggested_removals (
@@ -73,11 +74,21 @@ CREATE TABLE suggested_removals (
     rack_id INTEGER NOT NULL,
     user_id TEXT,
     time_stamp INTEGER,
-    reason INTEGER
-)
+    reason_id INTEGER,
+    FOREIGN KEY(reason_id) REFERENCES removal_reasons(reason_id)
+);
 
+/* Maps reason integer from suggested_removals table to a language
+and reason */
+CREATE TABLE removal_reasons (
+    reason_id INTEGER PRIMARY KEY,
+    lang TEXT DEFAULT "en" NOT NULL,
+    reason TEXT NOT NULL
+);
 
-
+INSERT INTO removal_reasons VALUES                                              
+   (1, "en", "Duplicate"),                                                     
+   (2, "en", "Doesn't Exist");
 
 
 

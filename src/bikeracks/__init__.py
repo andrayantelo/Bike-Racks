@@ -86,21 +86,20 @@ def create_app(test_config=None):
     @app.route('/submitRemovalSuggestion', methods=('POST',))
     def submitSuggestion():
         rack_id = request.form.get("rack_id", type=float)
-        removal_reason = request.form.get("removal_reason", type=int)
+        reason_id = request.form.get("reason_id", type=int)
         user_id = request.form.get("user_id", type=str)
 
         # connect to database
         db = get_db()
-        
+
         try:
-        #rack_id, user_id, removal_reason, time_stamp
             query = """
                 INSERT INTO 
                     suggested_removals
-                        (rack_id, user_id, removal_reason, time_stamp)
+                        (rack_id, user_id, reason_id, time_stamp)
                     VALUES 
                         (?, ?, ?, datetime('now'))"""
-            db.execute(query, (rack_id, user_id, removal_reason))
+            db.execute(query, (rack_id, user_id, reason_id))
             db.commit()
         except Exception as e:
             print(e)

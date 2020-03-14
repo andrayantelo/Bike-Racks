@@ -74,7 +74,8 @@ CREATE TABLE suggested_removals (
     rack_id INTEGER NOT NULL,
     user_id TEXT,
     time_stamp INTEGER,
-    reason_id INTEGER
+    reason_id INTEGER,
+    CHECK (reason_id in (1, 2))
 )
 
 /* Maps reason integer from suggested_removals table to a language

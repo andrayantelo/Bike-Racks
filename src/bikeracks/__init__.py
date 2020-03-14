@@ -79,19 +79,19 @@ def create_app(test_config=None):
                 csvwriter.writerow(row)
         except Exception as e:
             print(e)
-            raise
+            raise e
         return ('OK', 200)
 
     # Function for processing "suggest removal" request
     @app.route('/submitRemovalSuggestion', methods=('POST',))
     def submitSuggestion():
         rack_id = request.form.get("rack_id", type=float)
-        removal_reason = request.form.get("removal_reason", type=str)
+        removal_reason = request.form.get("removal_reason", type=int)
         user_id = request.form.get("user_id", type=str)
 
         # connect to database
         db = get_db()
-
+        
         try:
         #rack_id, user_id, removal_reason, time_stamp
             query = """
@@ -104,7 +104,7 @@ def create_app(test_config=None):
             db.commit()
         except Exception as e:
             print(e)
-            raise
+            raise e
         return ('OK', 200)
         
             

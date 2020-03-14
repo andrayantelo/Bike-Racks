@@ -76,7 +76,7 @@ CREATE TABLE suggested_removals (
     time_stamp INTEGER,
     reason_id INTEGER,
     FOREIGN KEY(reason_id) REFERENCES removal_reasons(reason_id)
-)
+);
 
 /* Maps reason integer from suggested_removals table to a language
 and reason */
@@ -84,7 +84,7 @@ CREATE TABLE removal_reasons (
     reason_id INTEGER PRIMARY KEY AUTOINCREMENT,
     lang TEXT DEFAULT "en",
     reason TEXT
-)
+);
 
 
 

@@ -78,7 +78,8 @@ def create_app(test_config=None):
                 # writing the data rows 
                 csvwriter.writerow(row)
         except Exception as e:
-            return (str(e), 500)
+            print(e)
+            raise
         return ('OK', 200)
 
     # Function for processing "suggest removal" request
@@ -102,7 +103,8 @@ def create_app(test_config=None):
             db.execute(query, (rack_id, user_id, removal_reason))
             db.commit()
         except Exception as e:
-            return(str(e), 500)
+            print(e)
+            raise
         return ('OK', 200)
         
             

@@ -14,6 +14,9 @@ consraint is applied.
 The rack_id in bikeracks is the parent key, the rack_id column in
 votes is called the child key.*/
 
+/* Enables foreign key constraints */
+PRAGMA foreign_keys = ON;
+
 DROP TABLE IF EXISTS bikeracks;
 DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS suggested_removals;

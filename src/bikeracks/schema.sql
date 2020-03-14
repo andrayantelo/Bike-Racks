@@ -75,7 +75,7 @@ CREATE TABLE suggested_removals (
     user_id TEXT,
     time_stamp INTEGER,
     reason_id INTEGER,
-    CHECK (reason_id in (1, 2))
+    FOREIGN KEY(reason_id) REFERENCES removal_reasons(reason_id)
 )
 
 /* Maps reason integer from suggested_removals table to a language
@@ -83,8 +83,7 @@ and reason */
 CREATE TABLE removal_reasons (
     reason_id INTEGER PRIMARY KEY AUTOINCREMENT,
     lang TEXT DEFAULT "en",
-    reason TEXT,
-    FOREIGN KEY(reason_id) REFERENCES suggested_removals(reason_id)
+    reason TEXT
 )
 
 

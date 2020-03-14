@@ -81,9 +81,9 @@ CREATE TABLE suggested_removals (
 /* Maps reason integer from suggested_removals table to a language
 and reason */
 CREATE TABLE removal_reasons (
-    reason_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    lang TEXT DEFAULT "en",
-    reason TEXT
+    reason_id INTEGER PRIMARY KEY,
+    lang TEXT DEFAULT "en" NOT NULL,
+    reason TEXT NOT NULL
 );
 
 INSERT INTO removal_reasons VALUES                                              

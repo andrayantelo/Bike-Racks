@@ -93,7 +93,6 @@ def create_app(test_config=None):
         db = get_db()
 
         try:
-        #rack_id, user_id, reason_id, time_stamp
             query = """
                 INSERT INTO 
                     suggested_removals

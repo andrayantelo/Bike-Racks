@@ -16,6 +16,7 @@ votes is called the child key.*/
 
 DROP TABLE IF EXISTS bikeracks;
 DROP TABLE IF EXISTS votes;
+DROP TABLE IF EXISTS suggested_removals;
 DROP TABLE IF EXISTS bikeracks_history;
 DROP TABLE IF EXISTS votes_history;
 
@@ -66,12 +67,13 @@ LEGEND for REMOVAL REASON:
     A value of 1 means Duplicate
     A value of 2 means Doesn't Exist (as in the bike rack doesn't)
 */
+
 CREATE TABLE suggested_removals (
     removal_id INTEGER PRIMARY KEY AUTOINCREMENT,
     rack_id INTEGER NOT NULL,
     user_id TEXT,
     time_stamp INTEGER,
-    reason TEXT
+    reason INTEGER
 )
 
 

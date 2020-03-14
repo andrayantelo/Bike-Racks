@@ -19,6 +19,7 @@ DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS suggested_removals;
 DROP TABLE IF EXISTS bikeracks_history;
 DROP TABLE IF EXISTS votes_history;
+DROP TABLE IF EXISTS removal_reasons;
 
 CREATE TABLE bikeracks (
     rack_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,6 +75,14 @@ CREATE TABLE suggested_removals (
     user_id TEXT,
     time_stamp INTEGER,
     reason INTEGER
+)
+
+/* Maps reason integer from suggested_removals table to a language
+and reason */
+CREATE TABLE removal_reasons (
+    reason_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lang TEXT DEFAULT "en",
+    reason TEXT
 )
 
 

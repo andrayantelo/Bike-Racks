@@ -11,8 +11,8 @@
 
       gtag('config', 'UA-91404440-2');
     </script>
-    <meta charset="utf-8"/>
-    <meta content="initial-scale=1, width=device-width" name="viewport"/>
+
+    <meta content="initial-scale=1, width=device-width" name="viewport" charset="utf-8" />
     <title>BikeRacks</title>
     
     <!-- Leaflet CSS -->
@@ -26,34 +26,19 @@
     <!-- Leaflet GeoSearch CSS -->
     <link href="https://unpkg.com/leaflet-geosearch@2.6.0/assets/css/leaflet.css" rel="stylesheet"/> 
     
-    <!-- App's own CSS -->
-    <link href="static/styles.css" rel="stylesheet"/>
-    
     <!-- Leaflet Marker cluster CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" type="text/css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" type="text/css">
-    
-    <!-- JQuery -->
-    <script src="https://code.jquery.com/jquery-3.3.1.js"
-            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-            crossorigin="anonymous"></script>
-            
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
-            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
-            crossorigin=""></script>
-            
-    
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.js"></script>
-    
+
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
-    
+
     <!-- Leaflet locate CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
 
-    
+     <!-- App's own CSS -->
+    <link href="static/styles.css" rel="stylesheet"/>
+
   </head>
   
   <body>
@@ -240,11 +225,11 @@
             </div>
           </div>
         </div>
-
-      <div class="container"> 
-          <div id="mapid"></div>
-        
-      </div> <!-- /.container -->
+      
+      <div class="map-container">
+        <div id="mapid">
+        </div>
+      </div>
       
       <!-- TODO: Add SDKs for Firebase products that you want to use
            https://firebase.google.com/docs/web/setup#config-web-app -->
@@ -280,6 +265,20 @@
       
       
   </body>
+
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.3.1.js"
+      integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+      crossorigin="anonymous"></script>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+      integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+      crossorigin="">
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.bundle.js"></script>
   
   <!-- Leaflet marker cluster -->
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>

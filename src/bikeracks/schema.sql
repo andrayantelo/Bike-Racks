@@ -73,7 +73,7 @@ CREATE TABLE suggested_removals (
     rack_id INTEGER NOT NULL,
     user_id TEXT,
     time_stamp INTEGER,
-    reason TEXT
+    reason INTEGER
 )
 
 

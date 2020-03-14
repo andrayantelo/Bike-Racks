@@ -72,9 +72,9 @@ id, bike rack id, removal reason, user id, timestamp (in Unix Time)
 CREATE TABLE suggested_removals (
     removal_id INTEGER PRIMARY KEY AUTOINCREMENT,
     rack_id INTEGER NOT NULL,
-    user_id TEXT,
-    time_stamp INTEGER,
-    reason_id INTEGER,
+    user_id TEXT NOT NULL,
+    time_stamp INTEGER NOT NULL,
+    reason_id INTEGER NOT NULL,
     FOREIGN KEY(reason_id) REFERENCES removal_reasons(reason_id)
 );
 

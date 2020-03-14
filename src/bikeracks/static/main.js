@@ -73,15 +73,16 @@ function subForm (e){
 function submitRemovalForm(e) {
     e.preventDefault();
     const rackId = $('#trashButton').data("rack_id"),
-          removalId = $removalReason.children("option:selected").val(),
+          reasonId = $removalReason.children("option:selected").val(),
           userId = bikemap.auth.currentUser.uid;
     // need to send rack id and removal reason
+
     $.ajax({
         url:'/submitRemovalSuggestion',
         type:'POST',
         data: {
             rack_id: rackId,
-            removal_id: removalId,
+            reason_id: reasonId,
             user_id: userId
         },
         success:function(){

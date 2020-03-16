@@ -93,7 +93,6 @@ def create_app(test_config=None):
                 # writing the data rows 
                 csvwriter.writerow(row)
         except Exception as e:
-            print(e)
             raise e
         return ('OK', 200)
 
@@ -117,7 +116,6 @@ def create_app(test_config=None):
             db.execute(query, (rack_id, user_id, reason_id))
             db.commit()
         except Exception as e:
-            print(e)
             raise e
         return ('OK', 200)
         

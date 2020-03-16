@@ -43,7 +43,7 @@ class BikeMap {
         this.$signInButton.click(this.signIn.bind(this));
         
         // placing temporary marker on map event listeners
-        this.mymap.on('contextmenu', this.onMapClick.bind(this));
+        this.mymap.on('contextmenu', this.onRightClick.bind(this));
         
         this.$myMap.on('click', '#submitButton', function(e) {
             
@@ -263,7 +263,7 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
 
 
     
-BikeMap.prototype.onMapClick = function (e) {
+BikeMap.prototype.onRightClick = function (e) {
 
     // add the temporary  marker at coordinates
     // when the user clicks on the map, add a temporary marker there

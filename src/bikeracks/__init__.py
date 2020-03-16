@@ -8,6 +8,8 @@ from flask import (
     Flask, render_template, request, session, jsonify, Response
 )
 
+import logging
+from logging.handlers import RotatingFileHandler
 from . import db
 from . import bikes
 from . import votes
@@ -49,7 +51,21 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-        
+    
+    # Create error logging file
+    if not app.debug:
+        if not os.path.exists('instance/logs'):
+            os.mkdir('instance/logs')
+        file_handler = RotatingFileHandler('instance/logs/errors.log', maxBytes=10240,
+            backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        # write a line to log each time server starts
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('Bikeracks startup')
     # register close_db and init_db_command with the app
     db.init_app(app)
     

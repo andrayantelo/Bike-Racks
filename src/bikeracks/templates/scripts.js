@@ -7,8 +7,6 @@ class BikeMap {
         this.mymap = L.map('mapid', { 
             zoomControl: false
         }).locate({setView:true, maxZoom: 16});
-
-        this.mymap.doubleClickZoom.disable(); 
         
         L.control.locate().addTo(this.mymap);
         // set map to display user's current location
@@ -44,11 +42,12 @@ class BikeMap {
         this.$signOutButton.click(this.signOut.bind(this));
         this.$signInButton.click(this.signIn.bind(this));
         
-        this.mymap.on('dblclick', this.onMapClick.bind(this));
-        this.mymap.on('click', function(e) {
-            this.tempMarker.remove();
-        }.bind(this));
-
+        // placing temporary marker on map event listeners
+        this.mymap.on('contextmenu', this.onRightClick.bind(this));
+        // remove temporary marker when clicking on map
+        this.mymap.on('click', function() {
+            this.mymap.removeLayer(this.tempMarker);
+        }.bind(this))
         
         this.$myMap.on('click', '#submitButton', function(e) {
             
@@ -268,7 +267,7 @@ BikeMap.prototype.submitBikeRack = function(e, callback) {
 
 
     
-BikeMap.prototype.onMapClick = function (e) {
+BikeMap.prototype.onRightClick = function (e) {
 
     // add the temporary  marker at coordinates
     // when the user clicks on the map, add a temporary marker there
@@ -312,8 +311,7 @@ BikeMap.prototype.findAddress = function(lat, lng) {
 };
 
 BikeMap.prototype.addTempMarker = function(lat, lng, address) {
-    // add a temporary marker, that is removed as soon as you click away
-    //build icon
+    // add a temporary marker to the map
     
     let userId = this.auth.currentUser ? this.auth.currentUser.uid : "";
 

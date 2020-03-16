@@ -29,7 +29,6 @@ def create_app(test_config=None):
     # DATABASE is the path where the SQLite db file will be saved
     # it's in the instance dir
     app.config.from_mapping(
-        SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'bikeracks.sqlite'),
     )
     # overrides the default configuration with values taken from

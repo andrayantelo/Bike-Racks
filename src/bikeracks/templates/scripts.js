@@ -44,6 +44,10 @@ class BikeMap {
         
         // placing temporary marker on map event listeners
         this.mymap.on('contextmenu', this.onRightClick.bind(this));
+        // remove temporary marker when clicking on map
+        this.mymap.on('click', function() {
+            this.mymap.removeLayer(this.tempMarker);
+        }.bind(this))
         
         this.$myMap.on('click', '#submitButton', function(e) {
             

@@ -39,17 +39,20 @@ const $closeFeedbackModal = $('#closeFeedbackModal');
 const $closeRemovalModal = $('#closeRemovalModal');
 
 // Options and settings for alerts
-const errorOptions = {
-    icon: 'glyphicon glyphicon-warning-sign',
-    message: "Unable to send suggestion at this time."
-};
-const errorSettings = {type: "danger"};
+const suggestionErrorMessage = "Sorry, unable to send suggestion at this time.";
+const suggestionSuccessMessage = "Suggestion sent. Thank you.";
+const feedbackErrorMessage = "Sorry, unable to send feedback at this time.";
+const feedbackSuccessMessage = "Thank you for your feedback.";
+const errorIcon = 'glyphicon glyphicon-warning-sign';
+const successIcon = 'glyphicon glyphicon-ok';
 
-const successOptions = {
-    icon: 'glyphicon glyphicon-ok',
-    message: "Suggestion sent. Thank you."
+const renderMessage = (icon, message) => {
+    return {
+        icon,
+        message
+    }
 }
-
+const errorSettings = {type: "danger"};
 const successSettings = {type: "success"};
 
 function subForm (e){
@@ -62,9 +65,11 @@ function subForm (e){
             // clear the form
             $feedback.val("");
             $closeFeedbackModal.trigger('click');
+            $.notify(renderMessage(successIcon, feedbackSuccessMessage), successSettings);
         },
         error: function() {
-            $feedback.addClass('is-invalid');
+            $closeFeedbackModal.trigger('click');
+            $.notify(renderMessage(errorIcon, feedbackErrorMessage), errorSettings);
         }
     });
 }
@@ -88,11 +93,11 @@ function submitRemovalForm(e) {
         success:function(){
             // clear the form
             $closeRemovalModal.trigger('click');
-            $.notify(successOptions, successSettings);
+            $.notify(renderMessage(successIcon, suggestionSuccessMessage), successSettings);
         },
         error: function() {
             $closeRemovalModal.trigger('click');
-            $.notify(errorOptions, errorSettings);
+            $.notify(renderMessage(errorIcon, suggestionErrorMessage), errorSettings);
         }
     });
 }

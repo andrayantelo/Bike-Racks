@@ -53,10 +53,12 @@ def create_app(test_config=None):
         pass
     
     # Create error logging file
+    log_path = os.path.join(app.instance_path, 'logs')
+    log_file = os.path.join(app.instance_path, 'logs/errors.log')
     if not app.debug:
-        if not os.path.exists('instance/logs'):
-            os.mkdir('instance/logs')
-        file_handler = RotatingFileHandler('instance/logs/errors.log', maxBytes=512000,
+        if not os.path.exists(log_path):
+            os.mkdir(log_path)
+        file_handler = RotatingFileHandler(log_file, maxBytes=524288,
             backupCount=5)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'

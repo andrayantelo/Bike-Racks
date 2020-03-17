@@ -57,53 +57,48 @@ def get_vote_status():
 def submit_vote():
     # insert a vote into the vote db for rack with rack_id = rack_id, vote by
     # user with user_id = user_id and vote_type=vote_type
-    try:
-        rack_id = request.args.get('rack_id', type=int)
-        user_id = request.args.get('user_id', type=str)
-        new_vote = request.args.get('vote_type', type=int)
-        delta_up = 0
-        delta_down = 0
-        
-        if not rack_id:
-            return "No rack_id specified", 400
-        
-        # connect to db
-        db = get_db()
-        
-        # check if user has voted on this rack before
-        row = h.get_vote_status(db, rack_id, user_id)
-        old_vote = row[0] if row else 0
-        # vote_status is an object, {vote_type: -1} for example or None
-        if new_vote == 0:
-            query = """
-                       DELETE FROM
-                                  votes
-                              WHERE
-                                  rack_id = ? AND user_id = ?
-                    """
-            db.execute(query, (rack_id, user_id))
-        else:
-            query = """ INSERT INTO votes (rack_id, user_id, vote_type)
-                    VALUES (?, ?, ?)
-                    ON CONFLICT(rack_id, user_id) DO UPDATE SET vote_type=?"""
-            db.execute(query, (rack_id, user_id, new_vote, new_vote))
-        db.commit()
-        
-        if new_vote  > old_vote:
-        # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (0, -1)
-            delta_up = new_vote
-            delta_down = old_vote
-        elif new_vote < old_vote:
-        # This is a new downvote (0, 1) or change from up to down (-1, 1) or change from up to no vote (-1, 0)
-            delta_up = -old_vote
-            delta_down = -new_vote
-        
-        if delta_up or delta_down:
-          h.update_vote_count(db, rack_id, delta_up, delta_down)
-        
-        resp = get_vote_data(rack_id, user_id)
-        return jsonify(resp)
-    except Exception as e:
-        raise(e)
-        return 200, str(e)
+    rack_id = request.args.get('rack_id', type=int)
+    user_id = request.args.get('user_id', type=str)
+    new_vote = request.args.get('vote_type', type=int)
+    delta_up = 0
+    delta_down = 0
+    
+    if not rack_id:
+        return "No rack_id specified", 400
+    
+    # connect to db
+    db = get_db()
+    
+    # check if user has voted on this rack before
+    row = h.get_vote_status(db, rack_id, user_id)
+    old_vote = row[0] if row else 0
+    # vote_status is an object, {vote_type: -1} for example or None
+    if new_vote == 0:
+        query = """
+                    DELETE FROM
+                                votes
+                            WHERE
+                                rack_id = ? AND user_id = ?
+                """
+        db.execute(query, (rack_id, user_id))
+    else:
+        query = """ INSERT INTO votes (rack_id, user_id, vote_type)
+                VALUES (?, ?, ?)
+                ON CONFLICT(rack_id, user_id) DO UPDATE SET vote_type=?"""
+        db.execute(query, (rack_id, user_id, new_vote, new_vote))
+    db.commit()
+    
+    if new_vote  > old_vote:
+    # This is a new upvote (1, 0) or change from down to up (1, -1) or change from down to no vote (0, -1)
+        delta_up = new_vote
+        delta_down = old_vote
+    elif new_vote < old_vote:
+    # This is a new downvote (0, 1) or change from up to down (-1, 1) or change from up to no vote (-1, 0)
+        delta_up = -old_vote
+        delta_down = -new_vote
+    
+    if delta_up or delta_down:
+        h.update_vote_count(db, rack_id, delta_up, delta_down)
+    
+    return 200, str(e)
     

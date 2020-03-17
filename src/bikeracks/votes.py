@@ -100,5 +100,5 @@ def submit_vote():
     if delta_up or delta_down:
         h.update_vote_count(db, rack_id, delta_up, delta_down)
     
-    return 200, str(e)
+    return ('OK', 200)
     

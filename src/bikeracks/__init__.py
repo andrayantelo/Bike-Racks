@@ -54,7 +54,7 @@ def create_app(test_config=None):
     
     # Create error logging file
     log_dir_path = os.path.join(app.instance_path, 'logs')
-    error_log_file = os.path.join(app.instance_path, 'logs/errors.log')
+    error_log_file = os.path.join(app.instance_path, 'logs', 'errors.log')
     if not app.debug:
         if not os.path.exists(log_dir_path):
             os.mkdir(log_dir_path)

@@ -11,8 +11,8 @@ from flask import (
 import logging
 from logging.handlers import RotatingFileHandler
 from . import db
-from . import bikes
-from . import votes
+from .blueprints import bikes
+from .blueprints import votes
 from bikeracks.db import get_db
 
 # Instead of creating a Flask instance globally, the app

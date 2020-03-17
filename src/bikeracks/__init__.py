@@ -56,8 +56,8 @@ def create_app(test_config=None):
     if not app.debug:
         if not os.path.exists('instance/logs'):
             os.mkdir('instance/logs')
-        file_handler = RotatingFileHandler('instance/logs/errors.log', maxBytes=10240,
-            backupCount=10)
+        file_handler = RotatingFileHandler('instance/logs/errors.log', maxBytes=512000,
+            backupCount=5)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
         ))

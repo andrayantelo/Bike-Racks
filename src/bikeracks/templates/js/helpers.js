@@ -93,9 +93,6 @@ const getUserId = (auth) => {
     if (auth.currentUser) {
         userId = auth.currentUser.uid;
     }
-    else {
-        userId = "";
-    }
     return userId;
 }
 

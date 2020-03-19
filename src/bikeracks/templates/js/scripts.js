@@ -8,23 +8,28 @@ class BikeMap {
             zoomControl: false
         }).locate({setView:true, maxZoom: 16});
         
+        // Include button to locate user's location on the map
         L.control.locate().addTo(this.mymap);
-        // set map to display user's current location
-        //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         
         this.marker;
-        // markers clustergroup
+        // markers clustergroup, to cluster markers together
+        // on the map, does not include temporary marker
         this.markers = L.markerClusterGroup();
-   
+        
+        // allRacks feature group does not include temporary marker,
+        // adds functionality to markers as a group
         this.allRacks = L.featureGroup([]);
         this.allRacks.on('click', (e) => {
+            // remove temporary marker when clicking on a marker
             this.mymap.removeLayer(this.tempMarker);
             this.marker = e.sourceTarget;
-            
+            // open the clicked on marker's popup
             e.target.openPopup();
         });
         
+        // Contains all approved markers (upvotes > 50%)
         this.allApproved = L.featureGroup([]);
+        // Contains all unapproved markers (downvotes <= 50%)
         this.allNotApproved = L.featureGroup([]);
    
         // temporary marker for when person clicks on random spot on map
@@ -39,6 +44,7 @@ class BikeMap {
         
         
         // click bindings
+        // Click handlers for sign in and sign out buttons
         this.$signOutButton.click(this.signOut.bind(this));
         this.$signInButton.click(this.signIn.bind(this));
         
@@ -49,10 +55,9 @@ class BikeMap {
             this.mymap.removeLayer(this.tempMarker);
         }.bind(this))
         
+        // submit bike rack click handler
         this.$myMap.on('click', '#submitButton', function(e) {
-            
             this.submitBikeRack(e, this.buildRacks.bind(this));
-            
         }.bind(this));
         
         // arrow click binding
@@ -60,6 +65,7 @@ class BikeMap {
             this.vote(e)
         }.bind(this));
         
+        // 'Filter' dropdown click handlers
         this.$showApproved.on('click', function(e) {
             this.toggleMarkers("approved", this.$showApproved, this.allApproved);
         }.bind(this));

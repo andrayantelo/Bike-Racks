@@ -1,5 +1,10 @@
 "use strict"
 
+// Colors for different types of markers
+const tempMarkerColor = 'gray';
+const approvedMarkerColor = 'green';
+const notApprovedMarkerColor = 'red';
+
 // BikeRack class
 class BikeRack {
     constructor(state) {

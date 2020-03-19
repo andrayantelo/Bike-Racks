@@ -38,7 +38,7 @@ const $feedback = $('#feedback');
 const $closeFeedbackModal = $('#closeFeedbackModal');
 const $closeRemovalModal = $('#closeRemovalModal');
 
-// Options and settings for alerts
+/* // Options and settings for alerts
 const suggestionErrorMessage = "Sorry, unable to send suggestion at this time.";
 const suggestionSuccessMessage = "Suggestion sent. Thank you.";
 const feedbackErrorMessage = "Sorry, unable to send feedback at this time.";
@@ -54,7 +54,7 @@ const renderMessage = (icon, message) => {
 }
 const errorSettings = {type: "danger"};
 const successSettings = {type: "success"};
-
+*/
 function subForm (e){
     e.preventDefault();
     $.ajax({

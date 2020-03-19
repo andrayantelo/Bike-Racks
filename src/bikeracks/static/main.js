@@ -1,6 +1,4 @@
 "use strict"
-let bikemap;
-
 // Relevant DOM elements
 const $sendSuggestionButton = $('#sendSuggestionButton');
 const $submitFeedback = $('#submitFeedback');
@@ -10,6 +8,7 @@ const $feedback = $('#feedback');
 const $closeFeedbackModal = $('#closeFeedbackModal');
 const $closeRemovalModal = $('#closeRemovalModal');
 
+// subForm handles the request to submit feedback
 function subForm (e){
     e.preventDefault();
     $.ajax({
@@ -29,13 +28,13 @@ function subForm (e){
     });
 }
 
-
+// Handles POST request to submit a suggestion to remove a bike rack
 function submitRemovalForm(e) {
     e.preventDefault();
+    // Gather data to be sent with request
     const rackId = $('#trashButton').data("rack_id"),
           reasonId = $removalReason.children("option:selected").val(),
           userId = bikemap.auth.currentUser.uid;
-    // need to send rack id and removal reason
 
     $.ajax({
         url:'/submitRemovalSuggestion',
@@ -62,12 +61,14 @@ $(document).ready(function() {
     bind .click() inside of $(document).ready() to be certain that the element to which the
     .click() event is bound has been created when the function executes.
     */
-   $submitFeedback.on('click', subForm);
-   $sendSuggestionButton.on('click', submitRemovalForm);
-
+    $submitFeedback.on('click', subForm);
+    $sendSuggestionButton.on('click', submitRemovalForm);
+    
+    let bikemap;
     // When the website loads, need to have an instance of BikeMap made right away
     bikemap = new BikeMap();
     // Initialize map 
     bikemap.initBikeMap();
+    console.log(bikemap.allRacks);
     
 });

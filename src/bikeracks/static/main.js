@@ -22,10 +22,6 @@ var opts = {
   position: 'absolute' // Element positioning
 };
 
-// Colors for different types of markers
-const tempMarkerColor = 'gray';
-const approvedMarkerColor = 'green';
-const notApprovedMarkerColor = 'red';
 
 let bikemap;
 
@@ -38,23 +34,6 @@ const $feedback = $('#feedback');
 const $closeFeedbackModal = $('#closeFeedbackModal');
 const $closeRemovalModal = $('#closeRemovalModal');
 
-/* // Options and settings for alerts
-const suggestionErrorMessage = "Sorry, unable to send suggestion at this time.";
-const suggestionSuccessMessage = "Suggestion sent. Thank you.";
-const feedbackErrorMessage = "Sorry, unable to send feedback at this time.";
-const feedbackSuccessMessage = "Thank you for your feedback.";
-const errorIcon = 'glyphicon glyphicon-warning-sign';
-const successIcon = 'glyphicon glyphicon-ok';
-
-const renderMessage = (icon, message) => {
-    return {
-        icon,
-        message
-    }
-}
-const errorSettings = {type: "danger"};
-const successSettings = {type: "success"};
-*/
 function subForm (e){
     e.preventDefault();
     $.ajax({

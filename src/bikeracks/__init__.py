@@ -88,14 +88,13 @@ def create_app(test_config=None):
         if len(feedback) > 280:
             return ('Exceeded 280 character limit', 413)
         row = [timestamp, feedback]
-        try:
-            with open(csv_file, 'a', encoding='utf-8') as f:
-                # creating a csv writer object 
-                csvwriter = csv.writer(f) 
-                # writing the data rows 
-                csvwriter.writerow(row)
-        except Exception as e:
-            raise e
+        
+        with open(csv_file, 'a', encoding='utf-8') as f:
+            # creating a csv writer object 
+            csvwriter = csv.writer(f) 
+            # writing the data rows 
+            csvwriter.writerow(row)
+        
         return ('OK', 200)
 
     # Function for processing "suggest removal" request
@@ -107,18 +106,16 @@ def create_app(test_config=None):
 
         # connect to database
         db = get_db()
-
-        try:
-            query = """
-                INSERT INTO 
-                    suggested_removals
-                        (rack_id, user_id, reason_id, time_stamp)
-                    VALUES 
-                        (?, ?, ?, datetime('now'))"""
-            db.execute(query, (rack_id, user_id, reason_id))
-            db.commit()
-        except Exception as e:
-            raise e
+   
+        query = """
+            INSERT INTO 
+                suggested_removals
+                    (rack_id, user_id, reason_id, time_stamp)
+                VALUES 
+                    (?, ?, ?, datetime('now'))"""
+        db.execute(query, (rack_id, user_id, reason_id))
+        db.commit()
+        
         return ('OK', 200)
         
             

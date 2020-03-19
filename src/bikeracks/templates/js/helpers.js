@@ -61,23 +61,6 @@ function isLoggedIn(bikemap) {
 }
 
 
-// -------------------------------@-------------------------------------
-// for testing purposes
-
-function getRack(state) {
-    // Retrieve rack state from db based on rack_id
-    let rack_id = state.rack_id
-    let path = {{ url_for('bikes.get_single_rack')|tojson }},
-        params = $.param({rack_id: rack_id});
-        
-    return $.ajax({
-        method: 'GET',
-        url: path + '?' + params,
-        context: this,
-    }).done(data => console.log(data))
-        
-}
-
 
 
 

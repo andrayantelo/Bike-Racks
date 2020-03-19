@@ -8,9 +8,11 @@ from flask import (
     Flask, render_template, request, session, jsonify, Response
 )
 
+import logging
+from logging.handlers import RotatingFileHandler
 from . import db
-from . import bikes
-from . import votes
+from .blueprints import bikes
+from .blueprints import votes
 from bikeracks.db import get_db
 
 # Instead of creating a Flask instance globally, the app
@@ -29,7 +31,6 @@ def create_app(test_config=None):
     # DATABASE is the path where the SQLite db file will be saved
     # it's in the instance dir
     app.config.from_mapping(
-        SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'bikeracks.sqlite'),
     )
     # overrides the default configuration with values taken from
@@ -50,7 +51,23 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-        
+    
+    # Create error logging file
+    log_dir_path = os.path.join(app.instance_path, 'logs')
+    error_log_file = os.path.join(app.instance_path, 'logs', 'errors.log')
+    if not app.debug:
+        if not os.path.exists(log_dir_path):
+            os.mkdir(log_dir_path)
+        file_handler = RotatingFileHandler(error_log_file, maxBytes=524288,
+            backupCount=5)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        # write a line to log each time server starts
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('Bikeracks startup')
     # register close_db and init_db_command with the app
     db.init_app(app)
     
@@ -71,15 +88,13 @@ def create_app(test_config=None):
         if len(feedback) > 280:
             return ('Exceeded 280 character limit', 413)
         row = [timestamp, feedback]
-        try:
-            with open(csv_file, 'a', encoding='utf-8') as f:
-                # creating a csv writer object 
-                csvwriter = csv.writer(f) 
-                # writing the data rows 
-                csvwriter.writerow(row)
-        except Exception as e:
-            print(e)
-            raise e
+        
+        with open(csv_file, 'a', encoding='utf-8') as f:
+            # creating a csv writer object 
+            csvwriter = csv.writer(f) 
+            # writing the data rows 
+            csvwriter.writerow(row)
+        
         return ('OK', 200)
 
     # Function for processing "suggest removal" request
@@ -91,19 +106,16 @@ def create_app(test_config=None):
 
         # connect to database
         db = get_db()
-
-        try:
-            query = """
-                INSERT INTO 
-                    suggested_removals
-                        (rack_id, user_id, reason_id, time_stamp)
-                    VALUES 
-                        (?, ?, ?, datetime('now'))"""
-            db.execute(query, (rack_id, user_id, reason_id))
-            db.commit()
-        except Exception as e:
-            print(e)
-            raise e
+   
+        query = """
+            INSERT INTO 
+                suggested_removals
+                    (rack_id, user_id, reason_id, time_stamp)
+                VALUES 
+                    (?, ?, ?, datetime('now'))"""
+        db.execute(query, (rack_id, user_id, reason_id))
+        db.commit()
+        
         return ('OK', 200)
         
             

@@ -458,6 +458,8 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
     }).done(data => {
         // reload the map
         this.loadMap(user_id);
+    }).fail((error) => {
+        console.log(error);
     })
 }
 

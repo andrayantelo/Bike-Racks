@@ -91,30 +91,12 @@ BikeMap.prototype.initBikeMap = function () {
         position: 'topleft'
     }).addTo(this.mymap);
     
-       
-    // add marker to map at Mountain View Public Librarys TODO, remove later
-    //let approvedIcon = buildMarkerIcon(approvedMarkerColor);
-    //this.marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
-    
     // initialize the search bar
     this.provider = new GeoSearch.OpenStreetMapProvider();
-    
-    this.searchControl = new GeoSearch.GeoSearchControl({
-      provider: this.provider, 
-      style: 'bar',                              
-      showMarker: true, 
-      marker: {                                           	
-        icon: new L.Icon.Default(),	
-        draggable: false,	
-      },	
-      showPopup: false, 
-      maxMarkers: 1,                                      
-      retainZoomLevel: false,                             
-      animateZoom: true,                                  
-      autoClose: true,                                   
-      searchLabel: 'Enter address to find a bike rack',                       
-      keepResult: true                                 
-    }).addTo(this.mymap);
+
+    // Initialize the search bar
+    this.searchControl = initSearchBar(this.provider);
+    this.searchControl.addTo(this.mymap);
     
     // this should use .getContainer() instead of elements.container but
     // it doesn't work
@@ -122,10 +104,13 @@ BikeMap.prototype.initBikeMap = function () {
     this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
     //this.searchControl.getContainer().onclick =(e) => e.stopPropagation();
 
-    // Initialize Firebase
+    // Initialize Firebase, initializes authentication
+    // onAuthStateChanged event handler gets set
     this.initFirebase();
     
-    // empty the allRacks featureGroup
+    // empty the allRacks featureGroup, gets refilled when
+    // the map is loaded. The map is initially loaded after
+    // determining if a user is signed in or not
     this.allRacks.clearLayers();
     
     // add marker to map (by adding the cluster group)
@@ -152,23 +137,14 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         this.$signOutButton.removeAttr('hidden');
         // hide sign in button
         this.$signInButton.attr('hidden', true);
-        
-
-        // first things first, reload the map
-        this.loadMap(user.uid); 
-        
-        
     }
     else { // user is signed out 
         // Hide sign out button
         this.$signOutButton.attr('hidden', true);
         // show sign in button
         this.$signInButton.removeAttr('hidden');
-        
-        // reload the map again, so that popup buttons can be updated
-        this.loadMap();
     }
-    
+    this.loadMap();
 }
 
 BikeMap.prototype.signIn = function() {
@@ -177,7 +153,6 @@ BikeMap.prototype.signIn = function() {
 }
 
 BikeMap.prototype.signOut = function() {
-    
     this.auth.signOut();
 }
 
@@ -186,19 +161,17 @@ BikeMap.prototype.loadMap = function(userId) {
     // make bikerack instances with the states
     // create markers for each bikerack
     // display on map
-    
-    this.getRacks(userId).done((data) => {
+    this.getRacks().done((data) => {
         return this.buildRacks(data, userId);
     });
     
 };
 
-BikeMap.prototype.getRacks = function(userId, status) {
+BikeMap.prototype.getRacks = function(status) {
     // send a request to the server for data on racks with status=status
-    //e.preventDefault();
-
+    let userId = getUserId(this.auth);
     let path = {{ url_for('bikes.get_racks')|tojson }},
-        params = $.param({userId: userId, status: status});
+        params = $.param({userId, status});
         
     return $.ajax({
         method: 'GET',

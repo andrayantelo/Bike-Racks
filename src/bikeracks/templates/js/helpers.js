@@ -88,6 +88,36 @@ function isLoggedIn(bikemap) {
     return Boolean(bikemap.auth.currentUser);
 }
 
+const getUserId = (auth) => {
+    let userId;
+    if (auth.currentUser) {
+        userId = auth.currentUser.uid;
+    }
+    else {
+        userId = "";
+    }
+    return userId;
+}
+
+const initSearchBar = (mapProvider) => {
+    return new GeoSearch.GeoSearchControl({
+        provider: mapProvider,
+        style: 'bar',                       
+        showMarker: true,
+        marker: {                        	
+          icon: new L.Icon.Default(),
+          draggable: false,
+        },	
+        showPopup: false,
+        maxMarkers: 1,                                 
+        retainZoomLevel: false,                          
+        animateZoom: true,                             
+        autoClose: true,                             
+        searchLabel: 'Enter address to find a bike rack',                     
+        keepResult: true               
+      });
+}
+
 
 
 

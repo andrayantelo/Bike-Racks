@@ -22,19 +22,11 @@ function subForm (e){
             // clear the form
             $feedback.val("");
             $closeFeedbackModal.trigger('click');
-            $.notify(
-                Notifications.renderMessage(
-                    Notifications.successIcon,
-                    Notifications.feedbackSuccessMessage),
-                Notifications.successSettings);
+            Notifications.notifyFeedbackSuccess();
         },
         error: function() {
             $closeFeedbackModal.trigger('click');
-            $.notify(
-                Notifications.renderMessage(
-                    Notifications.errorIcon,
-                    Notifications.feedbackErrorMessage),
-                Notifications.errorSettings);
+            Notifications.notifyFeedbackError();
         }
     });
 }
@@ -60,19 +52,11 @@ function submitRemovalForm(e) {
         success:function(){
             // clear the form
             $closeRemovalModal.trigger('click');
-            $.notify(
-                Notifications.renderMessage(
-                    Notifications.successIcon,
-                    Notifications.suggestionSuccessMessage),
-                Notifications.successSettings);
+            Notifications.notifySubmitRemovalSuccess();
         },
         error: function() {
             $closeRemovalModal.trigger('click');
-            $.notify(
-                Notifications.renderMessage(
-                    Notifications.errorIcon,
-                    Notifications.suggestionErrorMessage),
-                Notifications.errorSettings);
+            Notifications.notifySubmitRemovalError();
         }
     });
 }

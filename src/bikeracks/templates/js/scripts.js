@@ -8,23 +8,28 @@ class BikeMap {
             zoomControl: false
         }).locate({setView:true, maxZoom: 16});
         
+        // Include button to locate user's location on the map
         L.control.locate().addTo(this.mymap);
-        // set map to display user's current location
-        //this.mymap = L.map('mapid').locate({setView: true, maxZoom: 13});
         
         this.marker;
-        // markers clustergroup
+        // markers clustergroup, to cluster markers together
+        // on the map, does not include temporary marker
         this.markers = L.markerClusterGroup();
-   
+        
+        // allRacks feature group does not include temporary marker,
+        // adds functionality to markers as a group
         this.allRacks = L.featureGroup([]);
         this.allRacks.on('click', (e) => {
+            // remove temporary marker when clicking on a marker
             this.mymap.removeLayer(this.tempMarker);
             this.marker = e.sourceTarget;
-            
+            // open the clicked on marker's popup
             e.target.openPopup();
         });
         
+        // Contains all approved markers (upvotes > 50%)
         this.allApproved = L.featureGroup([]);
+        // Contains all unapproved markers (downvotes <= 50%)
         this.allNotApproved = L.featureGroup([]);
    
         // temporary marker for when person clicks on random spot on map
@@ -39,6 +44,7 @@ class BikeMap {
         
         
         // click bindings
+        // Click handlers for sign in and sign out buttons
         this.$signOutButton.click(this.signOut.bind(this));
         this.$signInButton.click(this.signIn.bind(this));
         
@@ -49,10 +55,9 @@ class BikeMap {
             this.mymap.removeLayer(this.tempMarker);
         }.bind(this))
         
+        // submit bike rack click handler
         this.$myMap.on('click', '#submitButton', function(e) {
-            
             this.submitBikeRack(e, this.buildRacks.bind(this));
-            
         }.bind(this));
         
         // arrow click binding
@@ -60,6 +65,7 @@ class BikeMap {
             this.vote(e)
         }.bind(this));
         
+        // 'Filter' dropdown click handlers
         this.$showApproved.on('click', function(e) {
             this.toggleMarkers("approved", this.$showApproved, this.allApproved);
         }.bind(this));
@@ -85,30 +91,12 @@ BikeMap.prototype.initBikeMap = function () {
         position: 'topleft'
     }).addTo(this.mymap);
     
-       
-    // add marker to map at Mountain View Public Librarys TODO, remove later
-    //let approvedIcon = buildMarkerIcon(approvedMarkerColor);
-    //this.marker = L.marker([37.3903, -122.0836], {icon: approvedIcon}).addTo(this.mymap);
-    
     // initialize the search bar
     this.provider = new GeoSearch.OpenStreetMapProvider();
-    
-    this.searchControl = new GeoSearch.GeoSearchControl({
-      provider: this.provider, 
-      style: 'bar',                              
-      showMarker: true, 
-      marker: {                                           	
-        icon: new L.Icon.Default(),	
-        draggable: false,	
-      },	
-      showPopup: false, 
-      maxMarkers: 1,                                      
-      retainZoomLevel: false,                             
-      animateZoom: true,                                  
-      autoClose: true,                                   
-      searchLabel: 'Enter address to find a bike rack',                       
-      keepResult: true                                 
-    }).addTo(this.mymap);
+
+    // Initialize the search bar
+    this.searchControl = initSearchBar(this.provider);
+    this.searchControl.addTo(this.mymap);
     
     // this should use .getContainer() instead of elements.container but
     // it doesn't work
@@ -116,10 +104,13 @@ BikeMap.prototype.initBikeMap = function () {
     this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
     //this.searchControl.getContainer().onclick =(e) => e.stopPropagation();
 
-    // Initialize Firebase
+    // Initialize Firebase, initializes authentication
+    // onAuthStateChanged event handler gets set
     this.initFirebase();
     
-    // empty the allRacks featureGroup
+    // empty the allRacks featureGroup, gets refilled when
+    // the map is loaded. The map is initially loaded after
+    // determining if a user is signed in or not
     this.allRacks.clearLayers();
     
     // add marker to map (by adding the cluster group)
@@ -146,23 +137,14 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
         this.$signOutButton.removeAttr('hidden');
         // hide sign in button
         this.$signInButton.attr('hidden', true);
-        
-
-        // first things first, reload the map
-        this.loadMap(user.uid); 
-        
-        
     }
     else { // user is signed out 
         // Hide sign out button
         this.$signOutButton.attr('hidden', true);
         // show sign in button
         this.$signInButton.removeAttr('hidden');
-        
-        // reload the map again, so that popup buttons can be updated
-        this.loadMap();
     }
-    
+    this.loadMap();
 }
 
 BikeMap.prototype.signIn = function() {
@@ -171,7 +153,6 @@ BikeMap.prototype.signIn = function() {
 }
 
 BikeMap.prototype.signOut = function() {
-    
     this.auth.signOut();
 }
 
@@ -180,19 +161,17 @@ BikeMap.prototype.loadMap = function(userId) {
     // make bikerack instances with the states
     // create markers for each bikerack
     // display on map
-    
-    this.getRacks(userId).done((data) => {
+    this.getRacks().done((data) => {
         return this.buildRacks(data, userId);
     });
     
 };
 
-BikeMap.prototype.getRacks = function(userId, status) {
+BikeMap.prototype.getRacks = function(status) {
     // send a request to the server for data on racks with status=status
-    //e.preventDefault();
-
+    let userId = getUserId(this.auth);
     let path = {{ url_for('bikes.get_racks')|tojson }},
-        params = $.param({userId: userId, status: status});
+        params = $.param({userId, status});
         
     return $.ajax({
         method: 'GET',

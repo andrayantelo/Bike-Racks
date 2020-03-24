@@ -24,39 +24,40 @@ const Notifications = (() => {
             message
         }
     }
-    exports.notifyFeedbackSuccess = () => {
+    const notifyMessage = (icon, message, settings) => {
         $.notify(
             exports.renderMessage(
-                exports.successIcon,
-                exports.feedbackSuccessMessage
+                icon,
+                message
             ),
+            settings
+        )
+    }
+    exports.notifyFeedbackSuccess = () => {
+        notifyMessage(
+            exports.successIcon,
+            exports.feedbackSuccessMessage,
             exports.successSettings
         )
     }
     exports.notifyFeedbackError = () => {
-        $.notify(
-            exports.renderMessage(
-                exports.errorIcon,
-                exports.feedbackErrorMessage
-            ),
+        notifyMessage(
+            exports.errorIcon,
+            exports.feedbackErrorMessage,
             exports.errorSettings
         )
     }
     exports.notifySubmitRemovalSuccess = () => {
-        $.notify(
-            exports.renderMessage(
-                exports.successIcon,
-                exports.suggestionSuccessMessage
-            ),
+        notifyMessage(
+            exports.successIcon,
+            exports.suggestionSuccessMessage,
             exports.successSettings
         )
     }
     exports.notifySubmitRemovalError = () => {
-        $.notify(
-            exports.renderMessage(
-                exports.errorIcon,
-                exports.suggestionErrorMessage
-            ),
+        notifyMessage(
+            exports.errorIcon,
+            exports.suggestionErrorMessage,
             exports.errorSettings
         )
     }

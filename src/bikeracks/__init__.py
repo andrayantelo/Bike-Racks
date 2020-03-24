@@ -85,9 +85,11 @@ def create_app(test_config=None):
         csv_file = os.path.join(app.instance_path, "feedback.csv")
         timestamp = int(time())
         feedback = request.form.get('feedback', type=str)
+        userId = request.form.get('userId')
+        
         if len(feedback) > 280:
             return ('Exceeded 280 character limit', 413)
-        row = [timestamp, feedback]
+        row = [timestamp, userId, feedback]
         
         with open(csv_file, 'a', encoding='utf-8') as f:
             # creating a csv writer object 

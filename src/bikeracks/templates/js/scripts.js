@@ -165,7 +165,7 @@ BikeMap.prototype.loadMap = function(userId) {
 
 BikeMap.prototype.getRacks = function(status) {
     // send a request to the server for data on racks with status=status
-    let userId = getUserId(firebase.auth());
+    let userId = getUserId();
     let path = {{ url_for('bikes.get_racks')|tojson }},
         params = $.param({userId, status});
         
@@ -550,7 +550,7 @@ BikeMap.prototype.popupContent = function(state) {
                `
     
     // if user is online and this isn't a temporary marker include the submit button and the voting buttons
-    if (isLoggedIn(this) && !isTemporary(state)) {
+    if (isLoggedIn() && !isTemporary(state)) {
         // include the "suggest an edit" button
         const editButton = 
             `<div id="edit">
@@ -570,7 +570,7 @@ BikeMap.prototype.popupContent = function(state) {
         
     }
     // if the user is online and this IS a temporary marker include only the submit button
-    else if (isLoggedIn(this) && isTemporary(state) && state.address) {
+    else if (isLoggedIn() && isTemporary(state) && state.address) {
         
         content += `<div id="options"><button id="submitButton" type="submit">Add Bike Rack</button></div>`
     }

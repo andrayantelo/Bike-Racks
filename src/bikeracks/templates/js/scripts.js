@@ -122,13 +122,9 @@ BikeMap.prototype.initBikeMap = function () {
 BikeMap.prototype.initFirebase = function() {
     // Initialize Firebase authentication
     firebase.initializeApp(firebaseConfig);
-    
-    // shortcut to firebase SDK features
-    this.auth = firebase.auth();
-    
+
     // Initiates Firebase auth and listen to auth state changes.
-    this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
-    
+    firebase.auth().onAuthStateChanged(this.onAuthStateChanged.bind(this));
 };
 
 BikeMap.prototype.onAuthStateChanged = function(user) {
@@ -149,11 +145,11 @@ BikeMap.prototype.onAuthStateChanged = function(user) {
 
 BikeMap.prototype.signIn = function() {
     let provider = new firebase.auth.GoogleAuthProvider();
-    this.auth.signInWithRedirect(provider);
+    firebase.auth().signInWithRedirect(provider);
 }
 
 BikeMap.prototype.signOut = function() {
-    this.auth.signOut();
+    firebase.auth().signOut();
 }
 
 BikeMap.prototype.loadMap = function(userId) {
@@ -169,7 +165,7 @@ BikeMap.prototype.loadMap = function(userId) {
 
 BikeMap.prototype.getRacks = function(status) {
     // send a request to the server for data on racks with status=status
-    let userId = getUserId(this.auth);
+    let userId = getUserId(firebase.auth());
     let path = {{ url_for('bikes.get_racks')|tojson }},
         params = $.param({userId, status});
         
@@ -214,14 +210,14 @@ BikeMap.prototype.buildRacks = function(states, userId) {
 
 BikeMap.prototype.submitBikeRack = function(e, callback) {
     // first of all, check if user is signed in 
-    if (!this.auth.currentUser) {
+    if (!firebase.auth().currentUser) {
         // redirect user to sign in
         this.signIn()
         
     }
     else {
         // this means the user is signed in so proceed with the function
-        let userId = this.auth.currentUser.uid;
+        let userId = firebase.auth().currentUser.uid;
         // send a request to the server, sending the coordinates of the
         // place on the map that was clicked
         
@@ -254,8 +250,8 @@ BikeMap.prototype.onRightClick = function (e) {
     // finished, add the address to the popup content
     let userId,
         state;
-    if (this.auth.currentUser) {
-        userId = this.auth.currentUser.uid
+    if (firebase.auth().currentUser) {
+        userId = firebase.auth().currentUser.uid
     }
     
     let tempMarker = this.addTempMarker(e.latlng.lat, e.latlng.lng),
@@ -292,7 +288,7 @@ BikeMap.prototype.findAddress = function(lat, lng) {
 BikeMap.prototype.addTempMarker = function(lat, lng, address) {
     // add a temporary marker to the map
     
-    let userId = this.auth.currentUser ? this.auth.currentUser.uid : "";
+    let userId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : "";
 
     let markerIcon = buildMarkerIcon(tempMarkerColor),
         markerState = {
@@ -444,7 +440,7 @@ BikeMap.prototype.submitVote = function(rack_id, user_id, vote_type) {
 
 
 BikeMap.prototype.vote = function(e) {
-    if (!this.auth.currentUser) {
+    if (!firebase.auth().currentUser) {
         // redirect user to sign in
         bikemap.signIn()
         return
@@ -452,7 +448,7 @@ BikeMap.prototype.vote = function(e) {
 
         
     let rack_id = e.currentTarget.id.substring(2),
-        user_id = this.auth.currentUser.uid,
+        user_id = firebase.auth().currentUser.uid,
         voteStatusP = this.getVoteStatus(rack_id, user_id),
         arrowDiv = e.target.id;
 

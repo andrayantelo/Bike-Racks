@@ -84,14 +84,14 @@ function isTemporary(state) {
     return !state.rack_id;
 }
 
-function isLoggedIn(bikemap) {
-    return Boolean(bikemap.auth.currentUser);
+function isLoggedIn() {
+    return Boolean(firebase.auth().currentUser);
 }
 
-const getUserId = (auth) => {
+const getUserId = () => {
     let userId;
-    if (auth.currentUser) {
-        userId = auth.currentUser.uid;
+    if (firebase.auth().currentUser) {
+        userId = firebase.auth().currentUser.uid;
     }
     return userId;
 }

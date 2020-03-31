@@ -1,24 +1,18 @@
 const Notifications = (() => {
-    const exports = {
-        // Options and settings for alerts
-        // Success/error messages for submitting a bike rack removal suggestion
-        suggestionErrorMessage: "Sorry, unable to send suggestion at this time.",
-        suggestionSuccessMessage: "Suggestion sent. Thank you.",
-        // Success/error messages for submitting feedback
-        feedbackErrorMessage: "Sorry, unable to send feedback at this time.",
-        feedbackSuccessMessage: "Thank you for your feedback.",
-        // Success/error messages for voting on a bike rack
-        voteErrorMessage: "Sorry, there was an error. Please try again later.",
-        voteSuccessMessage: "Thank you for your vote.",
-        // Success/error messages for submitting a bike rack
-        submitBikeSuccess: "Thank you for adding a bike rack to the map.",
-        submitBikeError: "Unable to add bike rack at this time. Please try again later.",
-        errorIcon: 'glyphicon glyphicon-warning-sign',
-        successIcon: 'glyphicon glyphicon-ok',
-        errorSettings: {type: "danger"},
-        successSettings: {type: "success"}
-    }
-    exports.renderMessage = (icon, message) => {
+    
+    // Options and settings for alerts
+    // Success/error messages for submitting a bike rack removal suggestion
+    const suggestionErrorMessage = "Sorry, unable to send suggestion at this time.";
+    const  suggestionSuccessMessage = "Suggestion sent. Thank you.";
+    // Success/error messages for submitting feedback
+    const feedbackErrorMessage = "Sorry, unable to send feedback at this time.";
+    const feedbackSuccessMessage = "Thank you for your feedback.";
+    const errorIcon = 'glyphicon glyphicon-warning-sign';
+    const successIcon = 'glyphicon glyphicon-ok';
+    const errorSettings = {type: "danger"};
+    const successSettings = {type: "success"};
+    
+    const renderMessage = (icon, message) => {
         return {
             icon,
             message
@@ -26,39 +20,42 @@ const Notifications = (() => {
     }
     const notifyMessage = (icon, message, settings) => {
         $.notify(
-            exports.renderMessage(
+            renderMessage(
                 icon,
                 message
             ),
             settings
         )
     }
+
+    const exports = {};
+
     exports.notifyFeedbackSuccess = () => {
         notifyMessage(
-            exports.successIcon,
-            exports.feedbackSuccessMessage,
-            exports.successSettings
+            successIcon,
+            feedbackSuccessMessage,
+            successSettings
         )
     }
     exports.notifyFeedbackError = () => {
         notifyMessage(
-            exports.errorIcon,
-            exports.feedbackErrorMessage,
-            exports.errorSettings
+            errorIcon,
+            feedbackErrorMessage,
+            errorSettings
         )
     }
     exports.notifySubmitRemovalSuccess = () => {
         notifyMessage(
-            exports.successIcon,
-            exports.suggestionSuccessMessage,
-            exports.successSettings
+            successIcon,
+            suggestionSuccessMessage,
+            successSettings
         )
     }
     exports.notifySubmitRemovalError = () => {
         notifyMessage(
-            exports.errorIcon,
-            exports.suggestionErrorMessage,
-            exports.errorSettings
+            errorIcon,
+            suggestionErrorMessage,
+            errorSettings
         )
     }
     return exports;

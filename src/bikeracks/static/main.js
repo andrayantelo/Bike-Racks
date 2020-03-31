@@ -1,40 +1,11 @@
 "use strict"
 // Relevant DOM elements
-// Feedback DOM elements
-const $feedbackModal = $('#feedbackModal');
-const $feedback = $feedbackModal.find('#feedback');
-const $submitFeedback = $feedbackModal.find('#submitFeedback');
-const $feedbackForm = $feedbackModal.find('#feedbackForm');
-const $closeFeedbackModal = $feedbackModal.find('#closeFeedbackModal');
+
 // Suggestion Removal elements
 const $suggestRemovalModal = $('#removalModal');
 const $sendSuggestionButton = $suggestRemovalModal.find('#sendSuggestionButton');
 const $removalReason = $suggestRemovalModal.find('#removalReason');
 const $closeRemovalModal = $suggestRemovalModal.find('#closeRemovalModal');
-
-// subForm handles the request to submit feedback
-function subForm (e){
-    e.preventDefault();
-    const userId = getUserId();
-    $.ajax({
-        url:'/submitFeedback',
-        type:'POST',
-        data: {
-            feedback: $feedbackForm.serialize(),
-            userId,
-        },
-        success:function(){
-            // clear the form
-            $feedback.val("");
-            $closeFeedbackModal.trigger('click');
-            Notifications.notifyFeedbackSuccess();
-        },
-        error: function() {
-            $closeFeedbackModal.trigger('click');
-            Notifications.notifyFeedbackError();
-        }
-    });
-}
 
 // Handles POST request to submit a suggestion to remove a bike rack
 function submitRemovalForm(e) {
@@ -75,6 +46,6 @@ $(document).ready(function() {
     bind .click() inside of $(document).ready() to be certain that the element to which the
     .click() event is bound has been created when the function executes.
     */
-    $submitFeedback.on('click', subForm);
+    
     $sendSuggestionButton.on('click', submitRemovalForm);
 });

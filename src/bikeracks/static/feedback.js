@@ -5,9 +5,11 @@ const Feedback = (() => {
     const $submitFeedback = $feedbackModal.find('#submitFeedback');
     const $feedbackForm = $feedbackModal.find('#feedbackForm');
     const $closeFeedbackModal = $feedbackModal.find('#closeFeedbackModal');
+    // notification messages
     const feedbackErrorMessage = "Sorry, unable to send feedback at this time.";
     const feedbackSuccessMessage = "Thank you for your feedback.";
 
+    // bind events
     $submitFeedback.on('click', subForm);
 
     // subForm handles the request to submit feedback

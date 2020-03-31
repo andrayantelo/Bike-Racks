@@ -5,6 +5,8 @@ const Feedback = (() => {
     const $submitFeedback = $feedbackModal.find('#submitFeedback');
     const $feedbackForm = $feedbackModal.find('#feedbackForm');
     const $closeFeedbackModal = $feedbackModal.find('#closeFeedbackModal');
+    const feedbackErrorMessage = "Sorry, unable to send feedback at this time.";
+    const feedbackSuccessMessage = "Thank you for your feedback.";
 
     $submitFeedback.on('click', subForm);
 
@@ -27,12 +29,27 @@ const Feedback = (() => {
     function onSuccess () {
         $feedback.val("");
         $closeFeedbackModal.trigger('click');
-        Notifications.notifyFeedbackSuccess();
+        notifyFeedbackSuccess();
     }
 
     function onError () {
         $closeFeedbackModal.trigger('click');
-        Notifications.notifyFeedbackError();
+        notifyFeedbackError();
+    }
+
+    function notifyFeedbackSuccess() {
+        Notifications.notifyMessage(
+            Notifications.successIcon,
+            feedbackSuccessMessage,
+            Notifications.successSettings
+        )
+    }
+    function notifyFeedbackError() {
+        Notifications.notifyMessage(
+            Notifications.errorIcon,
+            feedbackErrorMessage,
+            Notifications.errorSettings
+        )
     }
 })()
 

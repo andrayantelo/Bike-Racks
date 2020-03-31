@@ -1,12 +1,16 @@
 "use strict"
 // Relevant DOM elements
-const $sendSuggestionButton = $('#sendSuggestionButton');
-const $submitFeedback = $('#submitFeedback');
-const $removalReason = $('#removalReason');
-const $feedbackForm = $('#feedbackForm');
-const $feedback = $('#feedback');
-const $closeFeedbackModal = $('#closeFeedbackModal');
-const $closeRemovalModal = $('#closeRemovalModal');
+// Feedback DOM elements
+const $feedbackModal = $('#feedbackModal');
+const $feedback = $feedbackModal.find('#feedback');
+const $submitFeedback = $feedbackModal.find('#submitFeedback');
+const $feedbackForm = $feedbackModal.find('#feedbackForm');
+const $closeFeedbackModal = $feedbackModal.find('#closeFeedbackModal');
+// Suggestion Removal elements
+const $suggestRemovalModal = $('#removalModal');
+const $sendSuggestionButton = $suggestRemovalModal.find('#sendSuggestionButton');
+const $removalReason = $suggestRemovalModal.find('#removalReason');
+const $closeRemovalModal = $suggestRemovalModal.find('#closeRemovalModal');
 
 // subForm handles the request to submit feedback
 function subForm (e){

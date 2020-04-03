@@ -51,6 +51,7 @@ const Suggestion = (() => {
             Notifications.successSettings
         )
     }
+    
     function notifySubmitRemovalError () {
         Notifications.notifyMessage(
             Notifications.errorIcon,

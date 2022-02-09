@@ -9,12 +9,12 @@ class BikeMap {
         }).locate({setView:true, maxZoom: 16});
         
         // Include button to locate user's location on the map
-        L.control.locate().addTo(this.mymap);
+        //L.control.locate().addTo(this.mymap);
         
         this.marker;
         // markers clustergroup, to cluster markers together
         // on the map, does not include temporary marker
-        this.markers = L.markerClusterGroup();
+        //this.markers = L.markerClusterGroup();
         
         // allRacks feature group does not include temporary marker,
         // adds functionality to markers as a group
@@ -92,16 +92,16 @@ BikeMap.prototype.initBikeMap = function () {
     }).addTo(this.mymap);
     
     // initialize the search bar
-    this.provider = new GeoSearch.OpenStreetMapProvider();
+    //this.provider = new GeoSearch.OpenStreetMapProvider();
 
     // Initialize the search bar
-    this.searchControl = initSearchBar(this.provider);
-    this.searchControl.addTo(this.mymap);
+    //this.searchControl = initSearchBar(this.provider);
+    //this.searchControl.addTo(this.mymap);
     
     // this should use .getContainer() instead of elements.container but
     // it doesn't work
     // https://github.com/smeijer/leaflet-geosearch/issues/169
-    this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
+    //this.searchControl.elements.container.onclick = (e) => e.stopPropagation();
     //this.searchControl.getContainer().onclick =(e) => e.stopPropagation();
 
     // Initialize Firebase, initializes authentication
